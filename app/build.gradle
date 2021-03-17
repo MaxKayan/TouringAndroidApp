@@ -1,6 +1,5 @@
-plugins {
-    id 'com.android.application'
-}
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 30
@@ -57,4 +56,12 @@ dependencies {
 
     def osmdroid_ver = '6.1.10'
     implementation "org.osmdroid:osmdroid-android:$osmdroid_ver"
+
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    // Kotlin Coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1'
+
+//    implementation "androidx.room:room-ktx:$room_version"
+//    implementation "androidx.room:room-coroutines:$room_version"
 }
