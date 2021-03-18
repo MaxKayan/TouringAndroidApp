@@ -1,5 +1,10 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+//    id 'kotlin-android-extensions'
+    id 'kotlin-kapt' // add this line in file build.gradle (Module : YourAppName)
+    id 'dagger.hilt.android.plugin'
+}
 
 android {
     compileSdkVersion 30
@@ -64,4 +69,27 @@ dependencies {
 
 //    implementation "androidx.room:room-ktx:$room_version"
 //    implementation "androidx.room:room-coroutines:$room_version"
+
+    //Dagger - Hilt
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+
+    implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
+    kapt "androidx.hilt:hilt-compiler:1.0.0-beta01"
+
+    // Activity KTX for viewModels()
+    implementation "androidx.activity:activity-ktx:1.2.1"
+
+    // Retrofit
+    def retrofit_version = "2.9.0"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+
+    // Room
+    def room_version = "2.3.0-beta03"
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+//    implementation "androidx.room:room-rxjava2:$room_version"
+//    implementation "androidx.room:room-guava:$room_version"
+//    testImplementation "androidx.room:room-testing:$room_version"
 }
