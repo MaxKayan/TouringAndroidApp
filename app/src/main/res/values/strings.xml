@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">TouringAndroidApp</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="app_name">TouringApp</string>
+    <string name="title_home">Главная</string>
+    <string name="title_map">Карта</string>
+    <string name="title_settings">Настройки</string>
     <string name="map_view">Map View</string>
 </resources>
