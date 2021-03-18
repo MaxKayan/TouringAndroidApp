@@ -4,4 +4,6 @@
     <string name="title_map">Карта</string>
     <string name="title_settings">Настройки</string>
     <string name="map_view">Map View</string>
+    
+    <string name="string_to_inject">Second injected string from resources</string>
 </resources>
