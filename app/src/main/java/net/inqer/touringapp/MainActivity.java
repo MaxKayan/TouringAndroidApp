@@ -1,4 +1,4 @@
-package net.inqer.touringandroidapp;
+package net.inqer.touringapp;
 
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -15,7 +15,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import net.inqer.touringandroidapp.databinding.ActivityMainBinding;
+import net.inqer.touringapp.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";

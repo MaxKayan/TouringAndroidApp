@@ -1,4 +1,4 @@
-package net.inqer.touringandroidapp.ui.home;
+package net.inqer.touringapp.ui.home;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import net.inqer.touringandroidapp.R;
+import net.inqer.touringapp.R;
 
 public class HomeFragment extends Fragment {
 

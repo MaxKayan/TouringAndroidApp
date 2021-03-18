@@ -1,4 +1,4 @@
-package net.inqer.touringandroidapp;
+package net.inqer.touringapp;
 
 import android.content.Context;
 

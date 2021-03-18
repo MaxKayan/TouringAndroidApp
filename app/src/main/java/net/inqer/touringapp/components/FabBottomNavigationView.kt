@@ -1,4 +1,4 @@
-package net.inqer.touringandroidapp.components
+package net.inqer.touringapp.components
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -11,7 +11,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
-import net.inqer.touringandroidapp.R
+import net.inqer.touringapp.R
 
 
 //@SuppressLint("RestrictedApi")

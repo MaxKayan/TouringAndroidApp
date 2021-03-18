@@ -1,4 +1,4 @@
-package net.inqer.touringandroidapp.components;
+package net.inqer.touringapp.components;
 /*
  * Copyright 2017 The Android Open Source Project
  *
