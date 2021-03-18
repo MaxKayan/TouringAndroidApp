@@ -54,27 +54,26 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void navigateTo(final int navigation) {
-        if (navController.getCurrentDestination().getId() == navigation) return;
+    private void navigateTo(final int navigationId) {
+        if (navController.getCurrentDestination().getId() == navigationId) return;
 
-        navController.navigate(navigation, null);
+        navController.navigate(navigationId, null);
     }
 
     private void setFabState(boolean active) {
         Drawable fabIcon = ContextCompat.getDrawable(this, R.drawable.ic_outline_map_24);
-        Drawable coloredFabIcon = fabIcon.getConstantState().newDrawable();
 
         if (active) {
             binding.fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.design_default_color_primary)));
 
-            coloredFabIcon.mutate().setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY);
-            binding.fab.setImageDrawable(coloredFabIcon);
+            fabIcon.mutate().setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY);
         } else {
             binding.fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.material_on_background_emphasis_medium)));
 
-            coloredFabIcon.mutate().setColorFilter(Color.DKGRAY, PorterDuff.Mode.MULTIPLY);
-            binding.fab.setImageDrawable(coloredFabIcon);
+            fabIcon.mutate().setColorFilter(Color.DKGRAY, PorterDuff.Mode.MULTIPLY);
         }
+
+        binding.fab.setImageDrawable(fabIcon);
     }
 
 }
