@@ -1,35 +1,59 @@
-package net.inqer.touringapp.ui.home;
+package net.inqer.touringapp.ui.home
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import net.inqer.touringapp.databinding.FragmentHomeBinding
+import net.inqer.touringapp.util.Resource
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
+@AndroidEntryPoint
+class HomeFragment : Fragment() {
+    private val TAG = "HomeFragment"
 
-import net.inqer.touringapp.R;
+    private lateinit var binding: FragmentHomeBinding
+    private val viewModel: HomeViewModel by viewModels()
 
-public class HomeFragment extends Fragment {
+    override fun onCreateView(inflater: LayoutInflater,
+                              container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = FragmentHomeBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-    private HomeViewModel homeViewModel;
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel =
-                new ViewModelProvider(this).get(HomeViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
-        final TextView textView = root.findViewById(R.id.text_home);
-        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
+        lifecycleScope.launchWhenCreated {
+            viewModel.fetchRoutesBrief()
+        }
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.routes.collect { event ->
+                when (event) {
+                    is Resource.Success -> {
+                        Log.d(TAG, "onViewCreated: ${event.data}")
+                        event.data?.forEach { Toast.makeText(context, it.title, Toast.LENGTH_LONG).show() }
+                    }
+                    is Resource.Error -> {
+                        Log.e(TAG, "onViewCreated: $event")
+                        Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+                    }
+                    is Resource.Loading -> {
+                        Snackbar.make(view, "Загрузка туров...", Snackbar.LENGTH_SHORT).show()
+                    }
+                    is Resource.Empty -> {
+                        Log.d(TAG, "onViewCreated: empty routes")
+                    }
+                }
             }
-        });
-        return root;
+        }
     }
 }
