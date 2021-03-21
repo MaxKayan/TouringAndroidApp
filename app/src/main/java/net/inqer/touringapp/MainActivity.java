@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -50,19 +52,34 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        setupNavigation();
+
+        setupClickListeners();
+    }
+
+    private void setupNavigation() {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_home, R.id.navigation_map, R.id.navigation_settings)
                 .build();
 
-        navController = ((NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)).getNavController();
+        NavHostFragment hostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+
+        if (hostFragment == null) {
+            Log.e(TAG, "setupNavigation: Nav Host Fragment is null! Navigation is not initialized.");
+            return;
+        }
+
+        navController = hostFragment.getNavController();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             setFabState(destination.getId() == R.id.navigation_map);
         });
+    }
 
+    private void setupClickListeners() {
         binding.fab.setOnClickListener(view -> {
             navigateTo(R.id.navigation_map);
 
@@ -74,13 +91,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void navigateTo(final int navigationId) {
-        if (navController.getCurrentDestination().getId() == navigationId) return;
+        NavDestination destination = navController.getCurrentDestination();
+        if (destination == null || navController == null || destination.getId() == navigationId)
+            return;
 
         navController.navigate(navigationId, null);
     }
 
     private void setFabState(boolean active) {
         Drawable fabIcon = ContextCompat.getDrawable(this, R.drawable.ic_outline_map_24);
+        if (fabIcon == null) {
+            Log.e(TAG, "setFabState: fab icon is null!");
+            return;
+        }
 
         if (active) {
             binding.fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.design_default_color_primary)));
