@@ -6,4 +6,5 @@
     <string name="map_view">Map View</string>
     
     <string name="string_to_inject">Second injected string from resources</string>
+    <string name="main_preference_file_key">TOURING_APP_PREFERENCES</string>
 </resources>
