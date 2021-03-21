@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import net.inqer.touringapp.databinding.FragmentSettingsBinding
 import net.inqer.touringapp.ui.home.HomeViewModel
@@ -27,7 +26,7 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.btnSave.setOnClickListener {
-            Snackbar.make(it, "Click", Snackbar.LENGTH_SHORT).show()
+            binding.preferences.save()
         }
     }
 
