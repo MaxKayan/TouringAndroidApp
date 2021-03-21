@@ -1,6 +1,7 @@
 package net.inqer.touringapp.components
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.res.XmlResourceParser
 import android.util.AttributeSet
 import android.util.Log
@@ -9,21 +10,29 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textview.MaterialTextView
+import dagger.hilt.android.AndroidEntryPoint
 import net.inqer.touringapp.R
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class PreferencesView @JvmOverloads constructor(
         context: Context,
+//        sharedPreferences: SharedPreferences? = null,
         attrs: AttributeSet? = null,
 //        defStyle: Int = 0,
 //        defStyleRes: Int = 0
 ) : LinearLayout(context, attrs) {
 
+    @Inject
+    lateinit var sharedPreferences: SharedPreferences;
+
     private val parser: XmlResourceParser
     private val layoutInflater: LayoutInflater
+    private val textFields: HashMap<String, TextInputLayout> = HashMap()
 
     init {
         orientation = VERTICAL
@@ -53,7 +62,13 @@ class PreferencesView @JvmOverloads constructor(
                         appendCategoryHeader(Xml.asAttributeSet(parser).getAttributeValue(xmlns, "title"))
                     }
                     "Preference" -> {
-                        appendTextField(Xml.asAttributeSet(parser).getAttributeValue(xmlns, "title"))
+                        val attrs = Xml.asAttributeSet(parser)
+                        val key = attrs.getAttributeValue(xmlns, "key")
+                        appendTextField(
+                                key,
+                                attrs.getAttributeValue(xmlns, "title"),
+                                sharedPreferences.getString(key, "")
+                        )
                     }
                 }
             }
@@ -66,10 +81,24 @@ class PreferencesView @JvmOverloads constructor(
         view.findViewById<MaterialTextView>(R.id.header_title)?.text = title
     }
 
-    private fun appendTextField(title: String?) {
+    private fun appendTextField(key: String, title: String?, value: String?) {
         Log.d(TAG, "appendTextField: $title")
         val view = layoutInflater.inflate(R.layout.item_setting, this, true)
-        view.findViewById<TextInputLayout>(R.id.text_field)?.hint = title
+        val textInputLayout = view.findViewById<TextInputLayout>(R.id.text_field).apply {
+            hint = title
+            editText?.setText(value)
+        }
+        textFields[key] = textInputLayout
+    }
+
+    fun save() {
+        val editor = sharedPreferences.edit()
+        textFields.forEach {
+            Log.d(TAG, "save: ${it.key} ${it.value.editText?.text}")
+            editor.putString(it.key, it.value.editText?.text.toString())
+        }
+
+        editor.apply()
     }
 
     companion object {
