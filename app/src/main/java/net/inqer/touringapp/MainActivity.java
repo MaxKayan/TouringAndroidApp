@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, String.format("Injected String - %s \n hash - %s",
                     testString1, testString1.hashCode()), Toast.LENGTH_SHORT).show();
 
-            Snackbar.make(view, String.format("View model string - \n %s", viewModel.getTestString2()), Snackbar.LENGTH_LONG).show();
+//            Snackbar.make(view, String.format("View model string - \n %s", viewModel.getTestString2()), Snackbar.LENGTH_LONG).show();
         });
     }
 
