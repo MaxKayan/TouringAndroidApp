@@ -44,6 +44,9 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
+
+        // the new JVM IR backend
+        useIR = true
     }
 }
 
