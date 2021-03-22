@@ -1,5 +1,6 @@
 package net.inqer.touringapp;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -55,6 +56,12 @@ public class MainActivity extends AppCompatActivity {
         setupNavigation();
 
         setupClickListeners();
+    }
+
+    public void restart() {
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
     }
 
     private void setupNavigation() {
