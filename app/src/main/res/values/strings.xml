@@ -8,4 +8,7 @@
     <string name="string_to_inject">Second injected string from resources</string>
     <string name="main_preference_file_key">TOURING_APP_PREFERENCES</string>
     <string name="main_server_address">server_address</string>
+    <string name="tour_item">Tour Item</string>
+    <string name="open">Открыть</string>
+    <string name="image_overlay">Image Overlay</string>
 </resources>
