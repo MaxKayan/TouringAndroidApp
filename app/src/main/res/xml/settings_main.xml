@@ -6,7 +6,7 @@
         app:title="Параметры связи">
 
         <Preference
-            app:key="server_address"
+            app:key="@string/main_server_address"
             app:summary="IP-адрес, либо доменное имя"
             app:title="Адрес сервера" />
 

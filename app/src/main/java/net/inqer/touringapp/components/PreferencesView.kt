@@ -11,6 +11,7 @@ import android.widget.LinearLayout
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textview.MaterialTextView
 import dagger.hilt.android.AndroidEntryPoint
+import net.inqer.touringapp.AppConfig
 import net.inqer.touringapp.R
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
@@ -29,6 +30,9 @@ class PreferencesView @JvmOverloads constructor(
 
     @Inject
     lateinit var sharedPreferences: SharedPreferences;
+
+    @Inject
+    lateinit var config: AppConfig
 
     private val parser: XmlResourceParser
     private val layoutInflater: LayoutInflater
@@ -63,11 +67,12 @@ class PreferencesView @JvmOverloads constructor(
                     }
                     "Preference" -> {
                         val attrs = Xml.asAttributeSet(parser)
-                        val key = attrs.getAttributeValue(xmlns, "key")
+                        val keyString = attrs.getAttributeValue(xmlns, "key")
+                        val key = context.getString(keyString.substring(1).toInt())
                         appendTextField(
                                 key,
                                 attrs.getAttributeValue(xmlns, "title"),
-                                sharedPreferences.getString(key, "")
+                                sharedPreferences.getString(key, config.BASE_URL)
                         )
                     }
                 }
@@ -82,7 +87,7 @@ class PreferencesView @JvmOverloads constructor(
     }
 
     private fun appendTextField(key: String, title: String?, value: String?) {
-        Log.d(TAG, "appendTextField: $title")
+        Log.d(TAG, "appendTextField: $key $title $value")
         val view = layoutInflater.inflate(R.layout.item_setting, this, true)
         val textInputLayout = view.findViewById<TextInputLayout>(R.id.text_field).apply {
             hint = title

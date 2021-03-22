@@ -19,6 +19,9 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    private const val TAG = "AppModule"
+
+    const val DEFAULT_URL = "http://192.168.0.186:8000/api/"
 
     @Singleton
     @Named("String1")
@@ -27,7 +30,19 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideAppConfig(): AppConfig = AppConfig
+    fun provideAppConfig(
+            @ApplicationContext context: Context,
+            preferences: SharedPreferences
+    ): AppConfig {
+        val key = context.getString(R.string.main_server_address)
+        val url = preferences.getString(key, DEFAULT_URL)
+
+        return object : AppConfig {
+            override val BASE_URL: String
+                get() = url
+                        ?: DEFAULT_URL
+        }
+    }
 
     @Singleton
     @Provides
