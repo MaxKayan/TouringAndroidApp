@@ -1,19 +1,12 @@
-package net.inqer.touringapp.ui.map;
+package net.inqer.touringapp.ui.map
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-public class MapViewModel extends ViewModel {
+@HiltViewModel
+class MapViewModel @Inject constructor() : ViewModel() {
 
-    private MutableLiveData<String> mText;
-
-    public MapViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is dashboard fragment");
-    }
-
-    public LiveData<String> getText() {
-        return mText;
-    }
 }
