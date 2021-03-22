@@ -48,6 +48,7 @@ class HomeFragment : Fragment() {
                     }
 
                     is Resource.Loading -> {
+                        Log.d(TAG, "onViewCreated: Loading...")
 //                        Snackbar.make(view, "Загрузка туров...", Snackbar.LENGTH_SHORT).show()
                     }
 
