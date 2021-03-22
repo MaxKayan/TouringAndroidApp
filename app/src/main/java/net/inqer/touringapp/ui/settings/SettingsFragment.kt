@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
+import net.inqer.touringapp.MainActivity
 import net.inqer.touringapp.databinding.FragmentSettingsBinding
 import net.inqer.touringapp.ui.home.HomeViewModel
 
@@ -27,6 +28,7 @@ class SettingsFragment : Fragment() {
 
         binding.btnSave.setOnClickListener {
             binding.preferences.save()
+            (activity as MainActivity).restartApp()
         }
     }
 
