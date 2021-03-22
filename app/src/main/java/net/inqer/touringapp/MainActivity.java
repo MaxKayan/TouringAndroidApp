@@ -3,10 +3,12 @@ package net.inqer.touringapp;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Window;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,8 +20,6 @@ import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-
-import com.google.android.material.snackbar.Snackbar;
 
 import net.inqer.touringapp.databinding.ActivityMainBinding;
 
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+//        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -56,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
         setupNavigation();
 
         setupClickListeners();
+
+        binding.fab.setCompatPressedTranslationZ(1f);
     }
 
     public void restartApp() {
@@ -93,9 +95,6 @@ public class MainActivity extends AppCompatActivity {
         binding.fab.setOnClickListener(view -> {
             navigateTo(R.id.navigation_map);
 
-            Toast.makeText(this, String.format("Injected String - %s \n hash - %s",
-                    testString1, testString1.hashCode()), Toast.LENGTH_SHORT).show();
-
 //            Snackbar.make(view, String.format("View model string - \n %s", viewModel.getTestString2()), Snackbar.LENGTH_LONG).show();
         });
     }
@@ -114,18 +113,26 @@ public class MainActivity extends AppCompatActivity {
             Log.e(TAG, "setFabState: fab icon is null!");
             return;
         }
-
         if (active) {
-            binding.fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.design_default_color_primary)));
+            binding.fab.setPressed(true);
+            binding.fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.purple_200)));
 
             fabIcon.mutate().setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY);
         } else {
-            binding.fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.material_on_background_emphasis_medium)));
+            binding.fab.setPressed(false);
+            binding.fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, android.R.color.darker_gray)));
 
             fabIcon.mutate().setColorFilter(Color.DKGRAY, PorterDuff.Mode.MULTIPLY);
         }
 
         binding.fab.setImageDrawable(fabIcon);
+    }
+
+    @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        Window window = getWindow();
+        window.setFormat(PixelFormat.RGBA_8888);
     }
 
 }
