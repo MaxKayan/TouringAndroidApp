@@ -58,8 +58,11 @@ public class MainActivity extends AppCompatActivity {
         setupClickListeners();
     }
 
-    public void restart() {
-        Intent intent = getIntent();
+    public void restartApp() {
+        Intent intent = getBaseContext().getPackageManager().getLaunchIntentForPackage(
+                getBaseContext().getPackageName());
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         finish();
         startActivity(intent);
     }
