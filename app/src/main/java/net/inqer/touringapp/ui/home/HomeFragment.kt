@@ -9,14 +9,18 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
+import net.inqer.touringapp.data.models.TourRouteBrief
 import net.inqer.touringapp.databinding.FragmentHomeBinding
 import net.inqer.touringapp.util.Resource
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
+    private lateinit var adapter: ToursAdapter
+
     private val viewModel: HomeViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater,
@@ -27,6 +31,12 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setupRecyclerView()
+
+        binding.swipeLayout.setOnRefreshListener {
+            binding.swipeLayout.isRefreshing = false
+        }
 
         Log.d(TAG, "onViewCreated: CALLED")
         lifecycleScope.launchWhenCreated {
@@ -39,7 +49,7 @@ class HomeFragment : Fragment() {
                 when (event) {
                     is Resource.Success -> {
                         Log.d(TAG, "onViewCreated: ${event.data}")
-                        event.data?.forEach { Toast.makeText(context, it.title, Toast.LENGTH_LONG).show() }
+                        adapter.submitList(event.data)
                     }
 
                     is Resource.Error -> {
@@ -58,6 +68,18 @@ class HomeFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun setupRecyclerView() {
+        adapter = ToursAdapter(object : ToursAdapter.Companion.TourViewHolder.OnTourViewInteraction {
+            override fun click(item: TourRouteBrief) {
+                Toast.makeText(context, item.title, Toast.LENGTH_SHORT).show()
+            }
+        })
+
+        binding.recyclerView.layoutManager = LinearLayoutManager(context)
+        binding.recyclerView.setHasFixedSize(true)
+        binding.recyclerView.adapter = adapter
     }
 
     companion object {
