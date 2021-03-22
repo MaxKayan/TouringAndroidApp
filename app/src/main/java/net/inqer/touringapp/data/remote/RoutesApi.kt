@@ -8,9 +8,9 @@ import retrofit2.http.Path
 import java.math.BigInteger
 
 interface RoutesApi {
-    @GET("/routes/{route_id}/")
+    @GET("routes/{route_id}/")
     suspend fun getRoute(@Path("route_id") routeId: Int): Response<TourRoute>
 
-    @GET("/routes/")
+    @GET("routes/")
     suspend fun getRoutesBrief(): Response<List<TourRouteBrief>>
 }
