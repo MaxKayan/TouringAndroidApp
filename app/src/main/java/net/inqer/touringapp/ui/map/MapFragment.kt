@@ -19,6 +19,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
+import net.inqer.touringapp.R
 import net.inqer.touringapp.databinding.FragmentMapBinding
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -97,7 +98,6 @@ class MapFragment : Fragment() {
 
         setDefaultView()
 
-//        setPolylines();
         setMarkers()
 
         requestPermissionsIfNecessary(arrayOf( // if you need to show the current location, uncomment the line below
@@ -120,7 +120,6 @@ class MapFragment : Fragment() {
         fusedLocationClient!!.lastLocation.addOnSuccessListener { location ->
             Log.d(TAG, "onSuccess: location - $location")
             lastLocation = location
-            setPolylines()
         }
     }
 
@@ -145,7 +144,7 @@ class MapFragment : Fragment() {
 
     private fun initMap(locationProvider: GpsMyLocationProvider) {
         val ctx: Context = appContext
-        val dm = ctx.resources.displayMetrics
+//        val dm = ctx.resources.displayMetrics
         binding.map.setTileSource(TileSourceFactory.MAPNIK)
         //needed for pinch zooms
         binding.map.setMultiTouchControls(true)
@@ -222,6 +221,7 @@ class MapFragment : Fragment() {
     private fun setMarkers() {
         val rgutMarker = Marker(binding.map)
         rgutMarker.position = POINT_RGUTIS
+        rgutMarker.icon = ContextCompat.getDrawable(appContext, R.drawable.marker_icon)
         rgutMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
         rgutMarker.title = POINT_RGUTIS.label
         rgutMarker.setOnMarkerClickListener { marker, mapView ->
