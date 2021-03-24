@@ -11,4 +11,5 @@
     <string name="tour_item">Tour Item</string>
     <string name="open">Открыть</string>
     <string name="image_overlay">Image Overlay</string>
+    <string name="launch_tour">Launch Tour</string>
 </resources>
