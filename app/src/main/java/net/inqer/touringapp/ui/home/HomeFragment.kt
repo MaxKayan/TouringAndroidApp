@@ -35,7 +35,7 @@ class HomeFragment : Fragment() {
         setupRecyclerView()
 
         binding.swipeLayout.setOnRefreshListener {
-            binding.swipeLayout.isRefreshing = false
+            viewModel.fetchRoutesBrief()
         }
 
         Log.d(TAG, "onViewCreated: CALLED")
@@ -50,16 +50,22 @@ class HomeFragment : Fragment() {
                     is Resource.Success -> {
                         Log.d(TAG, "onViewCreated: ${event.data}")
                         adapter.submitList(event.data)
+
+                        binding.swipeLayout.isRefreshing = false
                     }
 
                     is Resource.Error -> {
                         Log.e(TAG, "onViewCreated: $event")
                         Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+
+                        binding.swipeLayout.isRefreshing = false
                     }
 
                     is Resource.Loading -> {
                         Log.d(TAG, "onViewCreated: Loading...")
 //                        Snackbar.make(view, "Загрузка туров...", Snackbar.LENGTH_SHORT).show()
+
+                        binding.swipeLayout.isRefreshing = true
                     }
 
                     is Resource.Empty -> {
