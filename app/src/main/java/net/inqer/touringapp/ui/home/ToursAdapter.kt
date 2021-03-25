@@ -45,6 +45,8 @@ class ToursAdapter constructor(
                 private val binding: ItemTourBinding
         ) : RecyclerView.ViewHolder(binding.root) {
 
+            private var fabRevealed = false
+
             interface OnTourViewInteraction {
                 fun click(item: TourRouteBrief)
             }
@@ -85,33 +87,43 @@ class ToursAdapter constructor(
                 val viewHeight = circularRevealWidget.height
                 val viewDiagonal = sqrt((viewWidth * viewWidth + viewHeight * viewHeight).toDouble()).toInt()
 
-                val animatorSet = AnimatorSet().apply {
-                    playTogether(
-                            CircularRevealCompat.createCircularReveal(
-                                    circularRevealWidget,
-                                    (viewWidth - 132).toFloat(),
-                                    (viewHeight / 2).toFloat() + 50f,
-                                    if (expand) 10f else 1000f,
-                                    if (expand) (viewDiagonal / 1.2).toFloat() else 10f
-                            ),
+                val objectAnimator =
+                        if (expand)
                             ObjectAnimator.ofArgb(
                                     circularRevealWidget,
                                     CircularRevealWidget.CircularRevealScrimColorProperty.CIRCULAR_REVEAL_SCRIM_COLOR,
                                     ContextCompat.getColor(circularRevealWidget.context, R.color.purple_200),
                                     Color.TRANSPARENT)
+                        else
+                            ObjectAnimator.ofArgb(
+                                    circularRevealWidget,
+                                    CircularRevealWidget.CircularRevealScrimColorProperty.CIRCULAR_REVEAL_SCRIM_COLOR,
+                                    Color.TRANSPARENT,
+                                    ContextCompat.getColor(circularRevealWidget.context, R.color.purple_200))
+
+                val animatorSet = AnimatorSet().apply {
+                    playTogether(
+                            CircularRevealCompat.createCircularReveal(
+                                    circularRevealWidget,
+                                    (viewWidth - 130).toFloat(),
+                                    (viewHeight / 2).toFloat() + 50f,
+                                    if (expand) 10f else 1000f,
+                                    if (expand) (viewDiagonal / 1.2).toFloat() else 10f
+                            ),
+                            objectAnimator
                     )
 
                     duration = 512
 
-                    addListener(object : AnimatorListenerAdapter() {
+                    if (!expand) addListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator?) {
                             super.onAnimationEnd(animation)
-                            if (!expand) circularRevealWidget.visibility = View.INVISIBLE
+                            circularRevealWidget.visibility = View.INVISIBLE
                         }
                     })
                 }
 
-                circularRevealWidget.visibility = View.VISIBLE
+                if (expand) circularRevealWidget.visibility = View.VISIBLE
                 animatorSet.start()
             }
         }
