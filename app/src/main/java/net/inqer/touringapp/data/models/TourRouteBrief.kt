@@ -7,7 +7,7 @@ data class TourRouteBrief(
         val id: Int,
         val created_at: String,
         val description: String,
-        val image: Any,
+        val image: String,
         val title: String,
         val updated_at: String
 )
