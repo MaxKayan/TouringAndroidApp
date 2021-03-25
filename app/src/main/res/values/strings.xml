@@ -12,4 +12,9 @@
     <string name="open">Открыть</string>
     <string name="image_overlay">Image Overlay</string>
     <string name="launch_tour">Launch Tour</string>
+    <string name="lets_go">Начать!</string>
+    <string name="tour_length">Протяжённость маршрута составляет %1$s км.</string>
+    <string name="n_waypoints">%1$s маршрутных точек</string>
+    <string name="estimated_n_minutes">Примерно %1$ минут</string>
+    <string name="n_destinations">%1$s точек притяжения</string>
 </resources>
