@@ -20,6 +20,7 @@ import com.google.android.material.circularreveal.CircularRevealWidget
 import net.inqer.touringapp.R
 import net.inqer.touringapp.data.models.TourRouteBrief
 import net.inqer.touringapp.databinding.ItemTourBinding
+import net.inqer.touringapp.util.DrawableHelper
 import kotlin.math.sqrt
 
 
@@ -67,7 +68,12 @@ class ToursAdapter constructor(
                 }
 
                 binding.fabTour.setOnClickListener {
-                    animateCircularReveal(binding.innerCard)
+                    animateCircularReveal(binding.innerCard, !fabRevealed)
+                    fabRevealed = !fabRevealed
+
+                    DrawableHelper.modifyFab(binding.root.context, binding.fabTour,
+                            if (fabRevealed) R.drawable.ic_baseline_close_24 else R.drawable.ic_baseline_launch_24
+                    )
                 }
             }
         }

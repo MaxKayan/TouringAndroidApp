@@ -1,19 +1,12 @@
 package net.inqer.touringapp;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.graphics.PixelFormat;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
@@ -22,6 +15,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import net.inqer.touringapp.databinding.ActivityMainBinding;
+import net.inqer.touringapp.util.DrawableHelper;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -108,24 +102,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setFabState(boolean active) {
-        Drawable fabIcon = ContextCompat.getDrawable(this, R.drawable.ic_outline_map_24);
-        if (fabIcon == null) {
-            Log.e(TAG, "setFabState: fab icon is null!");
-            return;
-        }
         if (active) {
-            binding.fab.setPressed(true);
-            binding.fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.purple_200)));
-
-            fabIcon.mutate().setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY);
+            DrawableHelper.INSTANCE.modifyFab(this, binding.fab,
+                    R.drawable.ic_outline_map_24, R.color.purple_200);
         } else {
-            binding.fab.setPressed(false);
-            binding.fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, android.R.color.darker_gray)));
-
-            fabIcon.mutate().setColorFilter(Color.DKGRAY, PorterDuff.Mode.MULTIPLY);
+            DrawableHelper.INSTANCE.modifyFab(this, binding.fab,
+                    R.drawable.ic_outline_map_24, android.R.color.darker_gray,
+                    R.color.bottom_panel);
         }
-
-        binding.fab.setImageDrawable(fabIcon);
     }
 
     @Override
