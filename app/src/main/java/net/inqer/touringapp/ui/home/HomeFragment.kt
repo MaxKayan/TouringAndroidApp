@@ -79,7 +79,7 @@ class HomeFragment : Fragment() {
     private fun setupRecyclerView() {
         adapter = ToursAdapter(object : ToursAdapter.Companion.TourViewHolder.OnTourViewInteraction {
             override fun click(item: TourRouteBrief) {
-                Toast.makeText(context, item.title, Toast.LENGTH_SHORT).show()
+//                Toast.makeText(context, item.title, Toast.LENGTH_SHORT).show()
             }
         })
 
