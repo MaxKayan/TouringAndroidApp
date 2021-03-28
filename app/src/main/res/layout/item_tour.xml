@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.circularreveal.cardview.CircularRevealCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -90,112 +90,138 @@
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="gone">
+            tools:visibility="visible">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="16dp">
+                android:layout_height="match_parent">
 
-                <TextView
-                    android:id="@+id/innerTitle"
-                    style="@style/TextAppearance.MaterialComponents.Headline4"
+                <ImageView
+                    android:id="@+id/inner_image"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/white"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/tour_item"
+                    android:scaleType="centerCrop"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Подольские Лётчики" />
+                    tools:srcCompat="@mipmap/ic_launcher" />
 
-                <TextView
-                    android:id="@+id/innerSubtitle"
-                    style="@style/TextAppearance.MaterialComponents.Subtitle1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/innerTitle"
-                    tools:text="О героях среди нас" />
-
-                <View
-                    android:id="@+id/innerDivider"
+                <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="8dp"
-                    android:alpha="0.5"
-                    android:background="@android:color/white"
-                    app:layout_constraintTop_toBottomOf="@id/innerSubtitle" />
+                    android:layout_height="match_parent"
+                    android:src="@drawable/card_overlay_inner_gradient" />
 
-                <TextView
-                    android:id="@+id/innerTourLength"
-                    style="@style/TextAppearance.MaterialComponents.Body1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/tour_length"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/innerDivider" />
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="16dp">
 
-                <TextView
-                    android:id="@+id/innerWaypoints"
-                    style="@style/TextAppearance.MaterialComponents.Body1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/n_waypoints"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/innerTourLength" />
+                    <TextView
+                        android:id="@+id/innerTitle"
+                        style="@style/TextAppearance.MaterialComponents.Headline4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="Подольские Лётчики" />
 
-                <TextView
-                    android:id="@+id/innerTime"
-                    style="@style/TextAppearance.MaterialComponents.Body1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/estimated_n_minutes"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/innerWaypoints" />
+                    <TextView
+                        android:id="@+id/innerSubtitle"
+                        style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/innerTitle"
+                        tools:text="О героях среди нас" />
 
-                <TextView
-                    android:id="@+id/innerDestinations"
-                    style="@style/TextAppearance.MaterialComponents.Body1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/n_destinations"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/innerTime" />
+                    <View
+                        android:id="@+id/innerDivider"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="8dp"
+                        android:alpha="0.5"
+                        android:background="@android:color/white"
+                        app:layout_constraintTop_toBottomOf="@id/innerSubtitle" />
 
-                <!--                <Button-->
-                <!--                    style="?attr/borderlessButtonStyle"-->
-                <!--                    android:layout_width="wrap_content"-->
-                <!--                    android:layout_height="wrap_content"-->
-                <!--                    android:text="@string/lets_go"-->
-                <!--                    android:textColor="@color/white"-->
-                <!--                    android:textSize="20sp"-->
-                <!--                    app:layout_constraintBottom_toBottomOf="parent"-->
-                <!--                    app:layout_constraintRight_toRightOf="parent" />-->
+                    <TextView
+                        android:id="@+id/innerTourLength"
+                        style="@style/TextAppearance.MaterialComponents.Body1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/tour_length"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/innerDivider" />
+
+                    <TextView
+                        android:id="@+id/innerWaypoints"
+                        style="@style/TextAppearance.MaterialComponents.Body1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/n_waypoints"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/innerTourLength" />
+
+                    <TextView
+                        android:id="@+id/innerTime"
+                        style="@style/TextAppearance.MaterialComponents.Body1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/estimated_n_minutes"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/innerWaypoints" />
+
+                    <TextView
+                        android:id="@+id/innerDestinations"
+                        style="@style/TextAppearance.MaterialComponents.Body1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/n_destinations"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/innerTime" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/inner_btn_start"
+                        style="?attr/borderlessButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lets_go"
+                        android:textColor="@android:color/white"
+                        android:textSize="20sp"
+                        app:icon="@drawable/ic_baseline_send_24"
+                        app:iconGravity="textEnd"
+                        app:iconTint="@android:color/white"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toRightOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-
         </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
 
-        <Button
-            style="?android:attr/borderlessButtonStyle"
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_start"
+            style="?attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
             android:text="@string/lets_go"
             android:textColor="?attr/colorPrimary"
             android:textSize="20sp"
             app:icon="@drawable/ic_baseline_send_24"
             app:iconGravity="textEnd"
             app:iconTint="?attr/colorPrimary"
-            android:translationZ="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/content_layout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</com.google.android.material.circularreveal.cardview.CircularRevealCardView>
+</com.google.android.material.card.MaterialCardView>

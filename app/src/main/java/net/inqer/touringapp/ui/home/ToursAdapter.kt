@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.Context
 import android.graphics.Color
 import android.os.Build
 import android.view.LayoutInflater
@@ -65,24 +66,38 @@ class ToursAdapter constructor(
                         .load(tour.image)
                         .into(binding.image)
 
+                Glide.with(binding.root)
+                        .load(tour.image)
+                        .into(binding.innerImage)
+
                 binding.root.setOnClickListener {
                     callbacks.click(tour)
                 }
 
                 binding.fabTour.setOnClickListener {
-                    animateCircularReveal(binding.innerCard, !fabRevealed)
-                    fabRevealed = !fabRevealed
+                    animateCircularReveal(binding.root.context, binding.innerCard, !fabRevealed, object : AnimationCallback {
+                        override fun onStart() {
+                            it.isClickable = false
+                            fabRevealed = !fabRevealed
 
-                    DrawableHelper.modifyFab(binding.root.context, binding.fabTour,
-                            if (fabRevealed) R.drawable.ic_baseline_close_24 else R.drawable.ic_baseline_launch_24
-                    )
+                            DrawableHelper.modifyFab(binding.root.context, binding.fabTour,
+                                    if (fabRevealed) R.drawable.ic_baseline_close_24 else R.drawable.ic_baseline_launch_24
+                            )
+                        }
+
+                        override fun onEnd() {
+                            it.isClickable = true
+                        }
+                    })
                 }
             }
         }
 
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-        private fun <T> animateCircularReveal(circularRevealWidget: T, expand: Boolean = true) where T : View?, T : CircularRevealWidget? {
-            circularRevealWidget!!.post {
+        private fun <T> animateCircularReveal(context: Context, circularRevealWidget: T, expand: Boolean = true, callbacks: AnimationCallback) where T : View?, T : CircularRevealWidget? {
+            val primaryColor = ContextCompat.getColor(context, R.color.purple_200)
+
+            circularRevealWidget?.post {
                 val viewWidth = circularRevealWidget.width
                 val viewHeight = circularRevealWidget.height
                 val viewDiagonal = sqrt((viewWidth * viewWidth + viewHeight * viewHeight).toDouble()).toInt()
@@ -92,21 +107,21 @@ class ToursAdapter constructor(
                             ObjectAnimator.ofArgb(
                                     circularRevealWidget,
                                     CircularRevealWidget.CircularRevealScrimColorProperty.CIRCULAR_REVEAL_SCRIM_COLOR,
-                                    ContextCompat.getColor(circularRevealWidget.context, R.color.purple_200),
+                                    primaryColor,
                                     Color.TRANSPARENT)
                         else
                             ObjectAnimator.ofArgb(
                                     circularRevealWidget,
                                     CircularRevealWidget.CircularRevealScrimColorProperty.CIRCULAR_REVEAL_SCRIM_COLOR,
                                     Color.TRANSPARENT,
-                                    ContextCompat.getColor(circularRevealWidget.context, R.color.purple_200))
+                                    primaryColor)
 
                 val animatorSet = AnimatorSet().apply {
                     playTogether(
                             CircularRevealCompat.createCircularReveal(
                                     circularRevealWidget,
-                                    (viewWidth - 130).toFloat(),
-                                    (viewHeight / 2).toFloat() + 50f,
+                                    (viewWidth - 120).toFloat(),
+                                    (viewHeight / 2).toFloat() + 42f,
                                     if (expand) 10f else 1000f,
                                     if (expand) (viewDiagonal / 1.2).toFloat() else 10f
                             ),
@@ -115,10 +130,16 @@ class ToursAdapter constructor(
 
                     duration = 512
 
-                    if (!expand) addListener(object : AnimatorListenerAdapter() {
+                    addListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationStart(animation: Animator?, isReverse: Boolean) {
+                            super.onAnimationStart(animation, isReverse)
+                            callbacks.onStart()
+                        }
+
                         override fun onAnimationEnd(animation: Animator?) {
                             super.onAnimationEnd(animation)
-                            circularRevealWidget.visibility = View.INVISIBLE
+                            if (!expand) circularRevealWidget.visibility = View.INVISIBLE
+                            callbacks.onEnd()
                         }
                     })
                 }
@@ -126,6 +147,11 @@ class ToursAdapter constructor(
                 if (expand) circularRevealWidget.visibility = View.VISIBLE
                 animatorSet.start()
             }
+        }
+
+        private interface AnimationCallback {
+            fun onStart()
+            fun onEnd()
         }
 
         private val TOUR_BRIEF_ITEM_CALLBACK: DiffUtil.ItemCallback<TourRouteBrief> = object : DiffUtil.ItemCallback<TourRouteBrief>() {
