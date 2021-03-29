@@ -99,8 +99,8 @@ dependencies {
     // Room
     def room_version = "2.3.0-rc01"
     implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
-    annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
+    kapt "androidx.room:room-compiler:$room_version"
+    kapt "android.arch.persistence.room:compiler:1.1.1"
 //    implementation "androidx.room:room-rxjava2:$room_version"
 //    implementation "androidx.room:room-guava:$room_version"
 //    testImplementation "androidx.room:room-testing:$room_version"
