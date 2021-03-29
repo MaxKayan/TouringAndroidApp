@@ -1,4 +1,4 @@
-package net.inqer.touringapp.hilt
+package net.inqer.touringapp.di
 
 import android.content.Context
 import dagger.Module
@@ -10,7 +10,6 @@ import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import net.inqer.touringapp.R
-import net.inqer.touringapp.data.remote.RoutesApi
 import net.inqer.touringapp.data.repository.main.DefaultMainRepository
 import net.inqer.touringapp.data.repository.main.MainRepository
 import net.inqer.touringapp.util.DispatcherProvider
@@ -31,7 +30,7 @@ object MainModule {
 
     @ViewModelScoped
     @Provides
-    fun provideMainRepository(api: RoutesApi): MainRepository = DefaultMainRepository(api)
+    fun provideMainRepository(repository: DefaultMainRepository): MainRepository = repository
 
 
     @ViewModelScoped

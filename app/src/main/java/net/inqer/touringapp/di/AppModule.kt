@@ -1,7 +1,8 @@
-package net.inqer.touringapp.hilt
+package net.inqer.touringapp.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.room.Room
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -9,6 +10,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import net.inqer.touringapp.AppConfig
 import net.inqer.touringapp.R
+import net.inqer.touringapp.data.local.AppDatabase
 import net.inqer.touringapp.data.remote.RoutesApi
 import retrofit2.Converter
 import retrofit2.Retrofit
@@ -65,4 +67,11 @@ object AppModule {
             context.getSharedPreferences(
                     context.getString(R.string.main_preference_file_key), Context.MODE_PRIVATE
             )
+
+    @Singleton
+    @Provides
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
+            Room.databaseBuilder(context, AppDatabase::class.java, "touring-app-database")
+                    .fallbackToDestructiveMigration()
+                    .build()
 }
