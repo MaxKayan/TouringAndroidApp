@@ -56,11 +56,11 @@ class ToursAdapter constructor(
             fun bind(tour: TourRouteBrief, callbacks: OnTourViewInteraction) {
 //                binding.root.visibility = View.INVISIBLE
                 binding.title.text = tour.title
-                binding.secondaryText.text = tour.created_at
+                binding.secondaryText.text = tour.createdAt.toString()
                 binding.supportingText.text = tour.description
 
                 binding.innerTitle.text = tour.title
-                binding.innerSubtitle.text = tour.created_at
+                binding.innerSubtitle.text = tour.createdAt.toString()
 
                 Glide.with(binding.root)
                         .load(tour.image)
@@ -163,8 +163,8 @@ class ToursAdapter constructor(
                 return oldItem.title == newItem.title &&
                         oldItem.description == newItem.description &&
                         oldItem.image == newItem.image &&
-                        oldItem.created_at == newItem.created_at &&
-                        oldItem.updated_at == newItem.updated_at
+                        oldItem.createdAt == newItem.createdAt &&
+                        oldItem.updatedAt == newItem.updatedAt
             }
         }
     }
