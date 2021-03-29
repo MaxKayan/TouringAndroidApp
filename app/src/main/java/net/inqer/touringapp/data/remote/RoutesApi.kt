@@ -12,5 +12,5 @@ interface RoutesApi {
     suspend fun getRoute(@Path("route_id") routeId: Int): Response<TourRoute>
 
     @GET("routes/")
-    suspend fun getRoutesBrief(): Response<List<TourRouteBrief>>
+    suspend fun fetchRoutesBrief(): Response<List<TourRouteBrief>>
 }
