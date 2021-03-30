@@ -3,9 +3,7 @@ package net.inqer.touringapp.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.inqer.touringapp.data.models.TourRouteBrief
 import net.inqer.touringapp.data.repository.main.MainRepository
@@ -22,6 +20,23 @@ class HomeViewModel @Inject constructor(
     private val _routes = MutableStateFlow<Resource<List<TourRouteBrief>>>(Resource.Empty())
     val routes: StateFlow<Resource<List<TourRouteBrief>>> = _routes
 
+    init {
+        viewModelScope.launch(dispatchers.io) {
+            repository.getRoutesBriefFlow()
+                    .onStart {
+                        _routes.value = Resource.Loading()
+                    }
+                    .onEach { routes ->
+                        _routes.value = Resource.Success(routes)
+                    }
+                    .catch { cause ->
+                        _routes.value = Resource.Error(cause.message ?: "Ошибка")
+                    }
+                    .collect()
+        }
+    }
+
+
     fun fetchRoutesBrief() {
         viewModelScope.launch(dispatchers.io) {
             _routes.value = Resource.Loading()
@@ -33,6 +48,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    val routesBriefFlow: Flow<List<TourRouteBrief>>
-        get() = repository.getRoutesBriefFlow()
+//    val routesBriefFlow: Flow<List<TourRouteBrief>>
+//        get() = repository.getRoutesBriefFlow()
 }

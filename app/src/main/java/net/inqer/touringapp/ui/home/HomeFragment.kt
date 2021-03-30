@@ -35,7 +35,7 @@ class HomeFragment : Fragment() {
         setupRecyclerView()
 
         binding.swipeLayout.setOnRefreshListener {
-            viewModel.fetchRoutesBrief()
+//            viewModel.fetchRoutesBrief()
         }
 
 //        Log.d(TAG, "onViewCreated: CALLED")
@@ -45,39 +45,39 @@ class HomeFragment : Fragment() {
 //        }
 
         lifecycleScope.launchWhenStarted {
-//            viewModel.routes.collect { event ->
-//                when (event) {
-//                    is Resource.Success -> {
-//                        Log.d(TAG, "onViewCreated: ${event.data}")
-//                        adapter.submitList(event.data)
-//
-//                        binding.swipeLayout.isRefreshing = false
-//                    }
-//
-//                    is Resource.Error -> {
-//                        Log.e(TAG, "onViewCreated: $event")
-//                        Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
-//
-//                        binding.swipeLayout.isRefreshing = false
-//                    }
-//
-//                    is Resource.Loading -> {
-//                        Log.d(TAG, "onViewCreated: Loading...")
-////                        Snackbar.make(view, "Загрузка туров...", Snackbar.LENGTH_SHORT).show()
-//
-//                        binding.swipeLayout.isRefreshing = true
-//                    }
-//
-//                    is Resource.Empty -> {
-//                        Log.d(TAG, "onViewCreated: empty routes")
-//                    }
-//                }
-//            }
+            viewModel.routes.collect { event ->
+                when (event) {
+                    is Resource.Success -> {
+                        Log.d(TAG, "onViewCreated: ${event.data}")
+                        adapter.submitList(event.data)
 
-            viewModel.routesBriefFlow.collect { routes ->
-                Log.d(TAG, "onViewCreated: Fragment received data list! $routes")
-                adapter.submitList(routes)
+                        binding.swipeLayout.isRefreshing = false
+                    }
+
+                    is Resource.Error -> {
+                        Log.e(TAG, "onViewCreated: $event")
+                        Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+
+                        binding.swipeLayout.isRefreshing = false
+                    }
+
+                    is Resource.Loading -> {
+                        Log.d(TAG, "onViewCreated: Loading...")
+//                        Snackbar.make(view, "Загрузка туров...", Snackbar.LENGTH_SHORT).show()
+
+                        binding.swipeLayout.isRefreshing = true
+                    }
+
+                    is Resource.Empty -> {
+                        Log.d(TAG, "onViewCreated: empty routes")
+                    }
+                }
             }
+
+//            viewModel.routesBriefFlow.collect { routes ->
+//                Log.d(TAG, "onViewCreated: Fragment received data list! $routes")
+//                adapter.submitList(routes)
+//            }
         }
     }
 
