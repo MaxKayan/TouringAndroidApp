@@ -31,6 +31,7 @@ class DefaultMainRepository @Inject constructor(
             database.tourRouteBriefDao().getRoutesFlow()
                     .flowOn(dispatchers.io)
                     .onStart {
+                        Log.d(TAG, "getRoutesBriefFlow: Started...")
                         refreshTourRoutes()
                     }
                     .onCompletion {
@@ -42,14 +43,20 @@ class DefaultMainRepository @Inject constructor(
 
     private suspend fun refreshTourRoutes() {
         withContext(dispatchers.io) {
-            val response = api.fetchRoutesBrief()
-            val result = response.body()
+            try {
 
-            if (response.isSuccessful && result != null) {
+                val response = api.fetchRoutesBrief()
+                val result = response.body()
+
+                if (response.isSuccessful && result != null) {
 //                Resource.Success(result)
-                database.tourRouteBriefDao().insertAll(result)
-            } else {
-                Log.e(TAG, "refreshTourRoutes: failed to fetch ${response.message()}")
+                    database.tourRouteBriefDao().insertAll(result)
+                } else {
+                    Log.e(TAG, "refreshTourRoutes: the response was not successful" +
+                            " ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "refreshTourRoutes: failed to fetch", e)
             }
         }
     }
