@@ -1,7 +1,9 @@
 package net.inqer.touringapp.data.repository.main
 
 import android.util.Log
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import net.inqer.touringapp.data.local.AppDatabase
 import net.inqer.touringapp.data.models.TourRoute
@@ -14,33 +16,20 @@ import javax.inject.Inject
 
 
 class DefaultMainRepository @Inject constructor(
-        val api: RoutesApi,
-        val database: AppDatabase,
-        val dispatchers: DispatcherProvider
+        private val api: RoutesApi,
+        private val database: AppDatabase,
+        private val dispatchers: DispatcherProvider
 ) : Repository(), MainRepository {
 
-    override suspend fun getRoutesBrief(): Resource<List<TourRouteBrief>> {
-        return try {
-            processResponse(api.fetchRoutesBrief())
-        } catch (e: Exception) {
-            Resource.Error(e.message ?: "")
-        }
-    }
-
-    override fun getRoutesBriefFlow(): Flow<List<TourRouteBrief>> =
+    override fun getRoutesBrief(): Flow<List<TourRouteBrief>> =
             database.tourRouteBriefDao().getRoutesFlow()
-                    .onStart {
-                        Log.d(TAG, "getRoutesBriefFlow: Started...")
-                        refreshTourRoutes()
-                    }
-                    .onCompletion {
-                        Log.d(TAG, "getRoutesBriefFlow: onCompletion")
-                    }
-                    .onEach {
-                        Log.d(TAG, "getRoutesBriefFlow: onEach $it")
-                    }
 
-    private suspend fun refreshTourRoutes() {
+    override fun getRoutesBriefEvents() = routesBriefEvents.asStateFlow()
+
+    private val routesBriefEvents = MutableStateFlow<Resource<List<TourRouteBrief>>>(Resource.Empty())
+
+    override suspend fun refreshTourRoutes() {
+        routesBriefEvents.value = Resource.Loading()
         withContext(dispatchers.io) {
             try {
 
@@ -48,14 +37,16 @@ class DefaultMainRepository @Inject constructor(
                 val result = response.body()
 
                 if (response.isSuccessful && result != null) {
-//                Resource.Success(result)
+                    routesBriefEvents.value = Resource.Updated()
                     database.tourRouteBriefDao().insertAll(result)
                 } else {
                     Log.e(TAG, "refreshTourRoutes: the response was not successful" +
                             " ${response.message()}")
+                    routesBriefEvents.value = Resource.Error(response.message())
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "refreshTourRoutes: failed to fetch", e)
+                routesBriefEvents.value = Resource.Error(e.message ?: "Ошибка загрузки данных!")
             }
         }
     }

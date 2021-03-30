@@ -35,7 +35,7 @@ class HomeFragment : Fragment() {
         setupRecyclerView()
 
         binding.swipeLayout.setOnRefreshListener {
-//            viewModel.fetchRoutesBrief()
+            viewModel.refreshRoutes()
         }
 
 //        Log.d(TAG, "onViewCreated: CALLED")
@@ -44,16 +44,13 @@ class HomeFragment : Fragment() {
 //            viewModel.fetchRoutesBrief()
 //        }
 
+        viewModel.routes.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+        }
+
         lifecycleScope.launchWhenStarted {
-            viewModel.routes.collect { event ->
+            viewModel.routesEvents.collect() { event ->
                 when (event) {
-                    is Resource.Success -> {
-                        Log.d(TAG, "onViewCreated: ${event.data}")
-                        adapter.submitList(event.data)
-
-                        binding.swipeLayout.isRefreshing = false
-                    }
-
                     is Resource.Error -> {
                         Log.e(TAG, "onViewCreated: $event")
                         Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
@@ -70,6 +67,9 @@ class HomeFragment : Fragment() {
 
                     is Resource.Empty -> {
                         Log.d(TAG, "onViewCreated: empty routes")
+                    }
+                    else -> {
+                        binding.swipeLayout.isRefreshing = false
                     }
                 }
             }
