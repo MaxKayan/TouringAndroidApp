@@ -29,7 +29,6 @@ class DefaultMainRepository @Inject constructor(
 
     override fun getRoutesBriefFlow(): Flow<List<TourRouteBrief>> =
             database.tourRouteBriefDao().getRoutesFlow()
-                    .flowOn(dispatchers.io)
                     .onStart {
                         Log.d(TAG, "getRoutesBriefFlow: Started...")
                         refreshTourRoutes()
