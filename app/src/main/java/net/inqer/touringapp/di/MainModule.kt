@@ -10,6 +10,8 @@ import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import net.inqer.touringapp.R
+import net.inqer.touringapp.data.local.AppDatabase
+import net.inqer.touringapp.data.local.dao.TourRouteDao
 import net.inqer.touringapp.data.repository.main.DefaultMainRepository
 import net.inqer.touringapp.data.repository.main.MainRepository
 import net.inqer.touringapp.util.DispatcherProvider
@@ -46,4 +48,8 @@ object MainModule {
             get() = Dispatchers.Unconfined
 
     }
+
+    @ViewModelScoped
+    @Provides
+    fun provideTourRouteDao(database: AppDatabase): TourRouteDao = database.tourRouteDao()
 }

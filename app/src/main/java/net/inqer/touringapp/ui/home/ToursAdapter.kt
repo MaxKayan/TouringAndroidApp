@@ -19,7 +19,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.circularreveal.CircularRevealCompat
 import com.google.android.material.circularreveal.CircularRevealWidget
 import net.inqer.touringapp.R
-import net.inqer.touringapp.data.models.TourRouteBrief
+import net.inqer.touringapp.data.models.TourRoute
 import net.inqer.touringapp.databinding.ItemTourBinding
 import net.inqer.touringapp.util.DrawableHelper
 import kotlin.math.sqrt
@@ -27,7 +27,7 @@ import kotlin.math.sqrt
 
 class ToursAdapter constructor(
         private val callbacks: TourViewHolder.OnTourViewInteraction
-) : ListAdapter<TourRouteBrief, ToursAdapter.Companion.TourViewHolder>(TOUR_BRIEF_ITEM_CALLBACK) {
+) : ListAdapter<TourRoute, ToursAdapter.Companion.TourViewHolder>(TOUR_BRIEF_ITEM_CALLBACK) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TourViewHolder {
         val binding: ItemTourBinding = ItemTourBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return TourViewHolder(binding)
@@ -49,12 +49,11 @@ class ToursAdapter constructor(
             private var fabRevealed = false
 
             interface OnTourViewInteraction {
-                fun click(item: TourRouteBrief)
+                fun click(item: TourRoute)
             }
 
             @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-            fun bind(tour: TourRouteBrief, callbacks: OnTourViewInteraction) {
-//                binding.root.visibility = View.INVISIBLE
+            fun bind(tour: TourRoute, callbacks: OnTourViewInteraction) {
                 binding.title.text = tour.title
                 binding.secondaryText.text = tour.createdAt.toString()
                 binding.supportingText.text = tour.description
@@ -154,12 +153,12 @@ class ToursAdapter constructor(
             fun onEnd()
         }
 
-        private val TOUR_BRIEF_ITEM_CALLBACK: DiffUtil.ItemCallback<TourRouteBrief> = object : DiffUtil.ItemCallback<TourRouteBrief>() {
-            override fun areItemsTheSame(oldItem: TourRouteBrief, newItem: TourRouteBrief): Boolean {
+        private val TOUR_BRIEF_ITEM_CALLBACK: DiffUtil.ItemCallback<TourRoute> = object : DiffUtil.ItemCallback<TourRoute>() {
+            override fun areItemsTheSame(oldItem: TourRoute, newItem: TourRoute): Boolean {
                 return oldItem.id == newItem.id
             }
 
-            override fun areContentsTheSame(oldItem: TourRouteBrief, newItem: TourRouteBrief): Boolean {
+            override fun areContentsTheSame(oldItem: TourRoute, newItem: TourRoute): Boolean {
                 return oldItem.title == newItem.title &&
                         oldItem.description == newItem.description &&
                         oldItem.image == newItem.image &&

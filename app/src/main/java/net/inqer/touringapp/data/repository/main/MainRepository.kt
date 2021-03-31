@@ -7,9 +7,10 @@ import net.inqer.touringapp.data.models.TourRouteBrief
 import net.inqer.touringapp.util.Resource
 
 interface MainRepository {
-    fun getRoutesBrief(): Flow<List<TourRouteBrief>>
-    fun getRoutesBriefEvents(): StateFlow<Resource<List<TourRouteBrief>>>
+    fun getRoutesFlow(): Flow<List<TourRoute>>
+    fun getRoutesEvents(): StateFlow<Resource<List<TourRoute>>>
 
-    suspend fun getRoute(id: Int): Resource<TourRoute>
+    suspend fun getRoute(id: Long): Resource<TourRoute>
     suspend fun refreshTourRoutes()
+    suspend fun refreshFullRouteData(id: Long)
 }

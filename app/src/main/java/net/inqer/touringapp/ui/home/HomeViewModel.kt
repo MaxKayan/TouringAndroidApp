@@ -21,8 +21,8 @@ class HomeViewModel @Inject constructor(
 
     //    private val _routes = MutableStateFlow<Resource<List<TourRouteBrief>>>(Resource.Empty())
 //    val routes: StateFlow<Resource<List<TourRouteBrief>>> = repository.getRoutesBriefFlow().asLiveData()
-    val routes = repository.getRoutesBrief().asLiveData()
-    val routesEvents = repository.getRoutesBriefEvents()
+    val routes = repository.getRoutesFlow().asLiveData()
+    val routesEvents = repository.getRoutesEvents()
 
 //    init {
 //        viewModelScope.launch(dispatchers.io) {
@@ -41,8 +41,14 @@ class HomeViewModel @Inject constructor(
 //    }
 
     fun refreshRoutes() {
-        viewModelScope.launch(dispatchers.io) {
+        viewModelScope.launch {
             repository.refreshTourRoutes()
+        }
+    }
+
+    fun refreshFullRouteData(id: Long) {
+        viewModelScope.launch {
+            repository.refreshFullRouteData(id)
         }
     }
 

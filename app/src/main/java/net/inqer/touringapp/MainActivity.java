@@ -107,7 +107,8 @@ public class MainActivity extends AppCompatActivity {
                     R.drawable.ic_outline_map_24, R.color.purple_200);
         } else {
             DrawableHelper.INSTANCE.modifyFab(this, binding.fab,
-                    R.drawable.ic_outline_map_24, android.R.color.darker_gray,
+                    R.drawable.ic_outline_map_24,
+                    android.R.color.darker_gray,
                     R.color.bottom_panel);
         }
     }

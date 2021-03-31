@@ -9,8 +9,8 @@ import java.math.BigInteger
 
 interface RoutesApi {
     @GET("routes/{route_id}/")
-    suspend fun getRoute(@Path("route_id") routeId: Int): Response<TourRoute>
+    suspend fun fetchRoute(@Path("route_id") routeId: Long): Response<TourRoute>
 
     @GET("routes/")
-    suspend fun fetchRoutesBrief(): Response<List<TourRouteBrief>>
+    suspend fun fetchRoutesBrief(): Response<List<TourRoute>>
 }
