@@ -78,9 +78,6 @@ dependencies {
     // Kotlin Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1'
 
-//    implementation "androidx.room:room-ktx:$room_version"
-//    implementation "androidx.room:room-coroutines:$room_version"
-
     //Dagger - Hilt
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
@@ -122,4 +119,7 @@ dependencies {
 
     // Play Services location
     implementation "com.google.android.gms:play-services-location:18.0.0"
+
+    // Emoji
+    implementation "androidx.emoji:emoji:1.2.0-alpha03"
 }
