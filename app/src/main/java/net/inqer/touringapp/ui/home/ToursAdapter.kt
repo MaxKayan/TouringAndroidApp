@@ -51,10 +51,12 @@ class ToursAdapter constructor(
 
             interface OnTourViewInteraction {
                 fun click(item: TourRoute)
+                fun fabClick(item: TourRoute)
             }
 
             @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
             fun bind(tour: TourRoute, callbacks: OnTourViewInteraction) {
+                val context = binding.root.context
                 binding.title.text = tour.title
                 binding.secondaryText.text = tour.createdAt.toString()
                 binding.supportingText.text = tour.description
@@ -62,7 +64,17 @@ class ToursAdapter constructor(
                 binding.innerTitle.text = tour.title
                 binding.innerSubtitle.text = tour.createdAt.toString()
 
-                val progress = CircularProgressDrawable(binding.root.context)
+                val isFull = tour.waypoints != null && tour.destinations != null && tour.totalDistance != null
+
+                if (isFull) {
+                    binding.innerTourLength.text = context.getString(R.string.tour_length, tour.totalDistance)
+                    binding.innerWaypoints.text = context.getString(R.string.n_waypoints, tour.waypoints?.size)
+                    binding.innerTime.text = context.getString(R.string.estimated_n_minutes, tour.estimatedDuration)
+                    binding.innerDestinations.text = context.getString(R.string.n_destinations, tour.destinations?.size)
+                }
+
+
+                val progress = CircularProgressDrawable(context)
                 progress.centerRadius = 30f
                 progress.strokeWidth = 4f
                 progress.setColorSchemeColors(R.color.teal_200, R.color.purple_200)
@@ -83,12 +95,13 @@ class ToursAdapter constructor(
                 }
 
                 binding.fabTour.setOnClickListener {
-                    animateCircularReveal(binding.root.context, binding.innerCard, !fabRevealed, object : AnimationCallback {
+                    callbacks.fabClick(tour)
+                    animateCircularReveal(context, binding.innerCard, !fabRevealed, object : AnimationCallback {
                         override fun onStart() {
                             it.isClickable = false
                             fabRevealed = !fabRevealed
 
-                            DrawableHelper.modifyFab(binding.root.context, binding.fabTour,
+                            DrawableHelper.modifyFab(context, binding.fabTour,
                                     if (fabRevealed) R.drawable.ic_baseline_close_24 else R.drawable.ic_baseline_launch_24
                             )
                         }
@@ -168,11 +181,24 @@ class ToursAdapter constructor(
             }
 
             override fun areContentsTheSame(oldItem: TourRoute, newItem: TourRoute): Boolean {
-                return oldItem.title == newItem.title &&
-                        oldItem.description == newItem.description &&
-                        oldItem.image == newItem.image &&
-                        oldItem.createdAt == newItem.createdAt &&
-                        oldItem.updatedAt == newItem.updatedAt
+//                if (oldItem.id != newItem.id) return false
+                if (oldItem.title != newItem.title) return false
+                if (oldItem.description != newItem.description) return false
+                if (oldItem.image != newItem.image) return false
+                if (oldItem.createdAt != newItem.createdAt) return false
+                if (oldItem.updatedAt != newItem.updatedAt) return false
+                if (oldItem.totalDistance != newItem.totalDistance) return false
+                if (oldItem.estimatedDuration != newItem.estimatedDuration) return false
+                if (oldItem.waypoints != null) {
+                    if (newItem.waypoints == null) return false
+                    if (!oldItem.waypoints.contentEquals(newItem.waypoints)) return false
+                } else if (newItem.waypoints != null) return false
+                if (oldItem.destinations != null) {
+                    if (newItem.destinations == null) return false
+                    if (!oldItem.destinations.contentEquals(newItem.destinations)) return false
+                } else if (newItem.destinations != null) return false
+
+                return true
             }
         }
     }

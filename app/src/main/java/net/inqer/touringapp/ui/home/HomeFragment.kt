@@ -77,6 +77,10 @@ class HomeFragment : Fragment() {
         adapter = ToursAdapter(object : ToursAdapter.Companion.TourViewHolder.OnTourViewInteraction {
             override fun click(item: TourRoute) {
             }
+
+            override fun fabClick(item: TourRoute) {
+                viewModel.refreshFullRouteData(item.id)
+            }
         })
 
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
