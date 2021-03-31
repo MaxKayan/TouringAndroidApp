@@ -22,12 +22,12 @@ data class TourRoute(
         @SerializedName("updated_at")
         val updatedAt: Date,
         @SerializedName("total_distance")
-        val totalDistance: Float,
+        val totalDistance: Float?,
         @SerializedName("estimated_duration")
-        val estimatedDuration: Float,
+        val estimatedDuration: Float?,
 
-        val waypoints: Array<Waypoint>,
-        val destinations: Array<Destination>,
+        val waypoints: Array<Waypoint>?,
+        val destinations: Array<Destination>?,
 ) {
         override fun equals(other: Any?): Boolean {
                 if (this === other) return true
@@ -43,8 +43,14 @@ data class TourRoute(
                 if (updatedAt != other.updatedAt) return false
                 if (totalDistance != other.totalDistance) return false
                 if (estimatedDuration != other.estimatedDuration) return false
-                if (!waypoints.contentEquals(other.waypoints)) return false
-                if (!destinations.contentEquals(other.destinations)) return false
+                if (waypoints != null) {
+                        if (other.waypoints == null) return false
+                        if (!waypoints.contentEquals(other.waypoints)) return false
+                } else if (other.waypoints != null) return false
+                if (destinations != null) {
+                        if (other.destinations == null) return false
+                        if (!destinations.contentEquals(other.destinations)) return false
+                } else if (other.destinations != null) return false
 
                 return true
         }
@@ -56,10 +62,10 @@ data class TourRoute(
                 result = 31 * result + image.hashCode()
                 result = 31 * result + createdAt.hashCode()
                 result = 31 * result + updatedAt.hashCode()
-                result = 31 * result + totalDistance.hashCode()
-                result = 31 * result + estimatedDuration.hashCode()
-                result = 31 * result + waypoints.contentHashCode()
-                result = 31 * result + destinations.contentHashCode()
+                result = 31 * result + (totalDistance?.hashCode() ?: 0)
+                result = 31 * result + (estimatedDuration?.hashCode() ?: 0)
+                result = 31 * result + (waypoints?.contentHashCode() ?: 0)
+                result = 31 * result + (destinations?.contentHashCode() ?: 0)
                 return result
         }
 }
