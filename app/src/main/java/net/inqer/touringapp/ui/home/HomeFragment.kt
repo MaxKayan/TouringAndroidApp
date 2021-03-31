@@ -12,7 +12,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
-import net.inqer.touringapp.data.models.TourRouteBrief
+import net.inqer.touringapp.R
+import net.inqer.touringapp.data.models.TourRoute
 import net.inqer.touringapp.databinding.FragmentHomeBinding
 import net.inqer.touringapp.util.Resource
 
@@ -32,17 +33,13 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.root.setColorSchemeResources(R.color.purple_200)
+
         setupRecyclerView()
 
         binding.swipeLayout.setOnRefreshListener {
             viewModel.refreshRoutes()
         }
-
-//        Log.d(TAG, "onViewCreated: CALLED")
-//        lifecycleScope.launchWhenCreated {
-//            Log.w(TAG, "onViewCreated: CREATED, FETCHING!")
-//            viewModel.fetchRoutesBrief()
-//        }
 
         viewModel.routes.observe(viewLifecycleOwner) {
             adapter.submitList(it)
@@ -73,18 +70,12 @@ class HomeFragment : Fragment() {
                     }
                 }
             }
-
-//            viewModel.routesBriefFlow.collect { routes ->
-//                Log.d(TAG, "onViewCreated: Fragment received data list! $routes")
-//                adapter.submitList(routes)
-//            }
         }
     }
 
     private fun setupRecyclerView() {
         adapter = ToursAdapter(object : ToursAdapter.Companion.TourViewHolder.OnTourViewInteraction {
-            override fun click(item: TourRouteBrief) {
-//                Toast.makeText(context, item.title, Toast.LENGTH_SHORT).show()
+            override fun click(item: TourRoute) {
             }
         })
 

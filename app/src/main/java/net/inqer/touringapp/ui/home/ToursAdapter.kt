@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.google.android.material.circularreveal.CircularRevealCompat
 import com.google.android.material.circularreveal.CircularRevealWidget
@@ -61,12 +62,20 @@ class ToursAdapter constructor(
                 binding.innerTitle.text = tour.title
                 binding.innerSubtitle.text = tour.createdAt.toString()
 
+                val progress = CircularProgressDrawable(binding.root.context)
+                progress.centerRadius = 30f
+                progress.strokeWidth = 4f
+                progress.setColorSchemeColors(R.color.teal_200, R.color.purple_200)
+                progress.start()
+
                 Glide.with(binding.root)
                         .load(tour.image)
+                        .placeholder(progress)
                         .into(binding.image)
 
                 Glide.with(binding.root)
                         .load(tour.image)
+                        .placeholder(progress)
                         .into(binding.innerImage)
 
                 binding.root.setOnClickListener {
