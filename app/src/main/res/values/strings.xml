@@ -4,7 +4,7 @@
     <string name="title_map">Карта</string>
     <string name="title_settings">Настройки</string>
     <string name="map_view">Map View</string>
-    
+
     <string name="string_to_inject">Second injected string from resources</string>
     <string name="main_preference_file_key">TOURING_APP_PREFERENCES</string>
     <string name="main_server_address">server_address</string>
@@ -13,8 +13,8 @@
     <string name="image_overlay">Image Overlay</string>
     <string name="launch_tour">Launch Tour</string>
     <string name="lets_go">Начать!</string>
-    <string name="tour_length">Протяжённость маршрута составляет %1$s км.</string>
-    <string name="n_waypoints">%1$s маршрутных точек</string>
-    <string name="estimated_n_minutes">Примерно %1$ минут</string>
-    <string name="n_destinations">%1$s точек притяжения</string>
+    <string name="tour_length">🗺 Протяжённость - %1$s км.</string>
+    <string name="n_waypoints">📍 %1$s маршрутных точек</string>
+    <string name="estimated_n_minutes">🕑 Примерно %1$ минут пешком</string>
+    <string name="n_destinations">⛲ %1$s точек притяжения</string>
 </resources>
