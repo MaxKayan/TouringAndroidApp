@@ -75,11 +75,15 @@ class HomeFragment : Fragment() {
 
     private fun setupRecyclerView() {
         adapter = ToursAdapter(object : ToursAdapter.Companion.TourViewHolder.OnTourViewInteraction {
-            override fun click(item: TourRoute) {
+            override fun rootClick(item: TourRoute) {
             }
 
             override fun fabClick(item: TourRoute) {
                 viewModel.refreshFullRouteData(item.id)
+            }
+
+            override fun launchClick(item: TourRoute) {
+                viewModel.refreshRoutes()
             }
         })
 

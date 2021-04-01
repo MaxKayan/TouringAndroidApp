@@ -7,6 +7,7 @@ import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,7 +32,7 @@ class ToursAdapter constructor(
 ) : ListAdapter<TourRoute, ToursAdapter.Companion.TourViewHolder>(TOUR_BRIEF_ITEM_CALLBACK) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TourViewHolder {
         val binding: ItemTourBinding = ItemTourBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return TourViewHolder(binding)
+        return TourViewHolder(binding, revealedStates)
     }
 
 
@@ -40,18 +41,22 @@ class ToursAdapter constructor(
         holder.bind(getItem(position), callbacks)
     }
 
+    private val revealedStates: HashMap<Long, Boolean> = HashMap()
+
     companion object {
         private const val TAG = "ToursAdapter"
 
         class TourViewHolder constructor(
-                private val binding: ItemTourBinding
+                private val binding: ItemTourBinding,
+                private val states: HashMap<Long, Boolean>
         ) : RecyclerView.ViewHolder(binding.root) {
 
             private var fabRevealed = false
 
             interface OnTourViewInteraction {
-                fun click(item: TourRoute)
+                fun rootClick(item: TourRoute)
                 fun fabClick(item: TourRoute)
+                fun launchClick(item: TourRoute)
             }
 
             @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -62,17 +67,39 @@ class ToursAdapter constructor(
                 binding.supportingText.text = tour.description
 
                 binding.innerTitle.text = tour.title
-                binding.innerSubtitle.text = tour.createdAt.toString()
+//                binding.innerSubtitle.text = tour.createdAt.toString()
+                binding.innerSubtitle.text = "id = ${tour.id}"
 
-                val isFull = tour.waypoints != null && tour.destinations != null && tour.totalDistance != null
-
+                val isFull = tour.totalDistance != null && tour.estimatedDuration != null
+                Log.d(TAG, "bind: ${tour.id} ; isFull = $isFull")
                 if (isFull) {
+                    binding.innerTourLength.visibility = View.VISIBLE
+                    binding.innerWaypoints.visibility = View.VISIBLE
+                    binding.innerTime.visibility = View.VISIBLE
+                    binding.innerDestinations.visibility = View.VISIBLE
+                    binding.innerBtnStart.isClickable = false
+
                     binding.innerTourLength.text = context.getString(R.string.tour_length, tour.totalDistance)
                     binding.innerWaypoints.text = context.getString(R.string.n_waypoints, tour.waypoints?.size)
                     binding.innerTime.text = context.getString(R.string.estimated_n_minutes, tour.estimatedDuration)
                     binding.innerDestinations.text = context.getString(R.string.n_destinations, tour.destinations?.size)
+                    binding.innerBtnStart.setOnClickListener {
+                        callbacks.launchClick(tour)
+                    }
+                } else {
+                    binding.innerTourLength.visibility = View.INVISIBLE
+                    binding.innerWaypoints.visibility = View.INVISIBLE
+                    binding.innerTime.visibility = View.INVISIBLE
+                    binding.innerDestinations.visibility = View.INVISIBLE
+                    binding.innerBtnStart.isClickable = false
                 }
 
+                fabRevealed = states[tour.id] ?: fabRevealed
+                DrawableHelper.modifyFab(context, binding.fabTour,
+                        if (fabRevealed) R.drawable.ic_baseline_close_24 else R.drawable.ic_baseline_launch_24
+                )
+                binding.innerCard.visibility = if (fabRevealed) View.VISIBLE else View.INVISIBLE
+                binding.innerCard.circularRevealScrimColor = ContextCompat.getColor(context, android.R.color.transparent)
 
                 val progress = CircularProgressDrawable(context)
                 progress.centerRadius = 30f
@@ -91,15 +118,21 @@ class ToursAdapter constructor(
                         .into(binding.innerImage)
 
                 binding.root.setOnClickListener {
-                    callbacks.click(tour)
+                    callbacks.rootClick(tour)
                 }
 
                 binding.fabTour.setOnClickListener {
-                    callbacks.fabClick(tour)
                     animateCircularReveal(context, binding.innerCard, !fabRevealed, object : AnimationCallback {
                         override fun onStart() {
                             it.isClickable = false
                             fabRevealed = !fabRevealed
+
+                            val revealed = states[tour.id]
+                            if (revealed != null) {
+                                states[tour.id] = !revealed
+                            } else {
+                                states[tour.id] = true
+                            }
 
                             DrawableHelper.modifyFab(context, binding.fabTour,
                                     if (fabRevealed) R.drawable.ic_baseline_close_24 else R.drawable.ic_baseline_launch_24
@@ -108,6 +141,7 @@ class ToursAdapter constructor(
 
                         override fun onEnd() {
                             it.isClickable = true
+                            if (fabRevealed) callbacks.fabClick(tour)
                         }
                     })
                 }
