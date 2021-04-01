@@ -46,7 +46,7 @@ class HomeFragment : Fragment() {
         }
 
         lifecycleScope.launchWhenStarted {
-            viewModel.routesEvents.collect() { event ->
+            viewModel.routesEvents.collect { event ->
                 when (event) {
                     is Resource.Error -> {
                         Log.e(TAG, "onViewCreated: $event")
