@@ -1,6 +1,5 @@
 package net.inqer.touringapp.data.repository.main
 
-import android.util.Log
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +12,6 @@ import net.inqer.touringapp.data.remote.RoutesApi
 import net.inqer.touringapp.data.repository.Repository
 import net.inqer.touringapp.util.DispatcherProvider
 import net.inqer.touringapp.util.Resource
-import retrofit2.Response
 import javax.inject.Inject
 
 
@@ -56,36 +54,9 @@ class DefaultMainRepository @Inject constructor(
     }
 
     override suspend fun refreshFullRouteData(id: Long) {
-        genericApiOperation(routesEvents, { api.fetchRoute(id) }, { result ->
+        processResponse({ api.fetchRoute(id) }, routesEvents, { result ->
             routeDao.insert(result)
         })
-    }
-
-    private suspend fun <T> genericApiOperation(events: MutableStateFlow<Resource<List<T>>>,
-                                                apiCall: suspend () -> Response<T>,
-                                                onSuccess: suspend (result: T) -> Unit,
-                                                onError: ((e: Exception) -> Unit)? = null
-    ) {
-        events.value = Resource.Loading()
-        withContext(dispatchers.io) {
-            try {
-                val response = apiCall()
-                val body = response.body()
-
-                if (response.isSuccessful && body != null) {
-                    events.value = Resource.Updated()
-                    onSuccess(body)
-                } else {
-                    Log.e(TAG, "refreshTourRoutes: the response was not successful" +
-                            " ${response.message()}")
-                    events.value = Resource.Error(response.message())
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "refreshTourRoutes: failed to fetch", e)
-                events.value = Resource.Error(e.message ?: "Ошибка загрузки данных!")
-                onError?.let { it(e) }
-            }
-        }
     }
 
     override suspend fun getRoute(id: Long): Resource<TourRoute> {
