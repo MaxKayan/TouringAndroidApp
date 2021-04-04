@@ -1,12 +1,14 @@
 package net.inqer.touringapp.data.repository.main
 
 import android.util.Log
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import net.inqer.touringapp.data.local.dao.TourRouteDao
 import net.inqer.touringapp.data.models.TourRoute
+import net.inqer.touringapp.data.models.TourRouteBrief
 import net.inqer.touringapp.data.remote.RoutesApi
 import net.inqer.touringapp.data.repository.Repository
 import net.inqer.touringapp.util.DispatcherProvider
@@ -31,22 +33,25 @@ class DefaultMainRepository @Inject constructor(
     override suspend fun refreshTourRoutes() {
         routesEvents.value = Resource.Loading()
         withContext(dispatchers.io) {
-            try {
-                val response = api.fetchRoutesBrief()
-                val result = response.body()
+            val currentList = async { routeDao.getRoutesList() }
+            val newList = async { processResponse({ api.fetchRoutesBrief() }) }
 
-                if (response.isSuccessful && result != null) {
-                    routesEvents.value = Resource.Updated()
-                    routeDao.insertAll(result)
-                } else {
-                    Log.e(TAG, "refreshTourRoutes: the response was not successful" +
-                            " ${response.message()}")
-                    routesEvents.value = Resource.Error(response.message())
+            val diff = currentList.await().toMutableList()
+            val createdTours = mutableListOf<TourRouteBrief>()
+            newList.await().data?.forEach { tourRoute ->
+                diff.indexOfFirst { it.id == tourRoute.id }.let { index ->
+                    if (index > -1) diff.removeAt(index) else createdTours.add(tourRoute)
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "refreshTourRoutes: failed to fetch", e)
-                routesEvents.value = Resource.Error(e.message ?: "Ошибка загрузки данных!")
             }
+
+            if (diff.isNotEmpty()) {
+                routeDao.deleteAll(diff)
+            }
+
+            routeDao.createByBriefList(createdTours)
+            routeDao.updateByBriefList(newList.await().data)
+
+            routesEvents.value = Resource.Updated()
         }
     }
 
