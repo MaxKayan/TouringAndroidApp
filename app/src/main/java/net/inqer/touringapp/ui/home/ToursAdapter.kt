@@ -32,36 +32,108 @@ class ToursAdapter constructor(
 ) : ListAdapter<TourRoute, ToursAdapter.Companion.TourViewHolder>(TOUR_BRIEF_ITEM_CALLBACK) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TourViewHolder {
         val binding: ItemTourBinding = ItemTourBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return TourViewHolder(binding, revealedStates)
+        return TourViewHolder(this, binding, callbacks, revealedStates)
     }
 
+    init {
+        setHasStableIds(true)
+    }
+
+    override fun getItemId(position: Int) = getItem(position).id
+
+    private lateinit var recyclerView: RecyclerView
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onBindViewHolder(holder: TourViewHolder, position: Int) {
-        holder.bind(getItem(position), callbacks)
+        holder.bind(getItem(position))
     }
 
     private val revealedStates: HashMap<Long, Boolean> = HashMap()
+
+    private fun updateStatesWithList(list: MutableList<TourRoute>) {
+        val diff = revealedStates.toMutableMap()
+        list.forEach { route ->
+            diff.remove(route.id)
+        }
+
+        diff.keys.forEach { removedRouteId -> revealedStates.remove(removedRouteId) }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    fun closeOthers(id: Long) {
+        revealedStates.filter { it.value && it.key != id }.forEach { entry ->
+            val holder = recyclerView.findViewHolderForItemId(entry.key) as TourViewHolder?
+            Log.d(TAG, "closeOthers: holder - $holder")
+//            holder?.performCardReveal(getItem(holder.adapterPosition))
+
+            if (holder != null) {
+                holder.performCardReveal(getItem(holder.adapterPosition))
+            } else {
+                Log.d(TAG, "closeOthers: holder is null!")
+                revealedStates[entry.key] = false
+                Log.d(TAG, "closeOthers: $revealedStates")
+            }
+        }
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        this.recyclerView = recyclerView
+    }
+
+    override fun onCurrentListChanged(previousList: MutableList<TourRoute>, currentList: MutableList<TourRoute>) {
+        super.onCurrentListChanged(previousList, currentList)
+        updateStatesWithList(currentList)
+    }
 
     companion object {
         private const val TAG = "ToursAdapter"
 
         class TourViewHolder constructor(
-                private val binding: ItemTourBinding,
+                private val adapter: ToursAdapter,
+                val binding: ItemTourBinding,
+                private val callbacks: OnTourViewInteraction,
                 private val states: HashMap<Long, Boolean>
         ) : RecyclerView.ViewHolder(binding.root) {
 
             private var fabRevealed = false
+            private val context = binding.root.context
+
+            @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+            fun performCardReveal(tour: TourRoute) {
+                binding.fabTour.isClickable = false
+                animateCircularReveal(context, binding.innerCard, !fabRevealed, object : AnimationCallback {
+                    override fun onStart() {
+                        fabRevealed = !fabRevealed
+
+                        val revealed = states[tour.id]
+                        if (revealed != null) {
+                            states[tour.id] = !revealed
+                        } else {
+                            states[tour.id] = true
+                        }
+
+                        DrawableHelper.modifyFab(context, binding.fabTour,
+                                if (fabRevealed) R.drawable.ic_baseline_close_24 else R.drawable.ic_baseline_launch_24
+                        )
+                    }
+
+                    override fun onEnd() {
+                        binding.fabTour.isClickable = true
+                        if (fabRevealed) callbacks.cardOpened(tour)
+                    }
+                })
+            }
 
             interface OnTourViewInteraction {
                 fun rootClick(item: TourRoute)
+                fun cardOpened(item: TourRoute)
                 fun fabClick(item: TourRoute)
                 fun launchClick(item: TourRoute)
             }
 
             @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-            fun bind(tour: TourRoute, callbacks: OnTourViewInteraction) {
-                val context = binding.root.context
+            fun bind(tour: TourRoute) {
                 binding.title.text = tour.title
                 binding.secondaryText.text = tour.createdAt.toString()
                 binding.supportingText.text = tour.description
@@ -122,28 +194,9 @@ class ToursAdapter constructor(
                 }
 
                 binding.fabTour.setOnClickListener {
-                    animateCircularReveal(context, binding.innerCard, !fabRevealed, object : AnimationCallback {
-                        override fun onStart() {
-                            it.isClickable = false
-                            fabRevealed = !fabRevealed
-
-                            val revealed = states[tour.id]
-                            if (revealed != null) {
-                                states[tour.id] = !revealed
-                            } else {
-                                states[tour.id] = true
-                            }
-
-                            DrawableHelper.modifyFab(context, binding.fabTour,
-                                    if (fabRevealed) R.drawable.ic_baseline_close_24 else R.drawable.ic_baseline_launch_24
-                            )
-                        }
-
-                        override fun onEnd() {
-                            it.isClickable = true
-                            if (fabRevealed) callbacks.fabClick(tour)
-                        }
-                    })
+                    adapter.closeOthers(tour.id)
+                    callbacks.fabClick(tour)
+                    performCardReveal(tour)
                 }
             }
         }

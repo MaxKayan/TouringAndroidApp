@@ -78,8 +78,12 @@ class HomeFragment : Fragment() {
             override fun rootClick(item: TourRoute) {
             }
 
-            override fun fabClick(item: TourRoute) {
+            override fun cardOpened(item: TourRoute) {
                 viewModel.refreshFullRouteData(item.id)
+            }
+
+            override fun fabClick(item: TourRoute) {
+//                adapter.closeOpened()
             }
 
             override fun launchClick(item: TourRoute) {
