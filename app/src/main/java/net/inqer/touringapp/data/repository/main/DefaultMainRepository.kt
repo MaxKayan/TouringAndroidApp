@@ -88,12 +88,6 @@ class DefaultMainRepository @Inject constructor(
         }
     }
 
-    interface ApiOperationCallbacks<T> {
-        suspend fun apiCall(): Response<T>
-        fun onSuccess(result: T)
-        fun onError(e: Exception)
-    }
-
     override suspend fun getRoute(id: Long): Resource<TourRoute> {
         return try {
             processResponse({ api.fetchRoute(id) })
