@@ -118,7 +118,7 @@ class DefaultMainRepository @Inject constructor(
 
     override suspend fun getRoute(id: Long): Resource<TourRoute> {
         return try {
-            processResponse(api.fetchRoute(id))
+            processResponse({ api.fetchRoute(id) })
         } catch (e: Exception) {
             Resource.Error(e.message ?: "")
         }
