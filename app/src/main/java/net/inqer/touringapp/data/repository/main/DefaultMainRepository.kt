@@ -51,9 +51,7 @@ class DefaultMainRepository @Inject constructor(
     }
 
     override suspend fun refreshFullRouteData(id: Long) {
-        genericApiOperation(routesEvents, {
-            api.fetchRoute(id)
-        }, { result ->
+        genericApiOperation(routesEvents, { api.fetchRoute(id) }, { result ->
             routeDao.insert(result)
         })
     }
