@@ -94,31 +94,6 @@ class DefaultMainRepository @Inject constructor(
         fun onError(e: Exception)
     }
 
-    suspend fun <T> genericApiOperation2(events: MutableStateFlow<Resource<T>>,
-                                         callbacks: ApiOperationCallbacks<T>
-    ) {
-        events.value = Resource.Loading()
-        withContext(dispatchers.io) {
-            try {
-                val response = callbacks.apiCall()
-                val body = response.body()
-
-                if (response.isSuccessful && body != null) {
-                    events.value = Resource.Updated()
-                    callbacks.onSuccess(body)
-                } else {
-                    Log.e(TAG, "refreshTourRoutes: the response was not successful" +
-                            " ${response.message()}")
-                    events.value = Resource.Error(response.message())
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "refreshTourRoutes: failed to fetch", e)
-                events.value = Resource.Error(e.message ?: "Ошибка загрузки данных!")
-                callbacks.onError(e)
-            }
-        }
-    }
-
     override suspend fun getRoute(id: Long): Resource<TourRoute> {
         return try {
             processResponse({ api.fetchRoute(id) })
