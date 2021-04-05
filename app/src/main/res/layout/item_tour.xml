@@ -144,6 +144,13 @@
                         android:background="@android:color/white"
                         app:layout_constraintTop_toBottomOf="@id/innerSubtitle" />
 
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/innerProgressBar"
+                        app:layout_constraintTop_toBottomOf="@id/innerDivider"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:indeterminate="true"/>
+
                     <TextView
                         android:id="@+id/innerTourLength"
                         style="@style/TextAppearance.MaterialComponents.Body1"

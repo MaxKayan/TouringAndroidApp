@@ -142,9 +142,12 @@ class ToursAdapter constructor(
 //                binding.innerSubtitle.text = tour.createdAt.toString()
                 binding.innerSubtitle.text = "id = ${tour.id}"
 
+                // Logic that depends on current card data state (Partial/Full)
                 val isFull = tour.totalDistance != null && tour.estimatedDuration != null
                 Log.d(TAG, "bind: ${tour.id} ; isFull = $isFull")
                 if (isFull) {
+                    // The data we have is full
+                    binding.innerProgressBar.visibility = View.INVISIBLE
                     binding.innerTourLength.visibility = View.VISIBLE
                     binding.innerWaypoints.visibility = View.VISIBLE
                     binding.innerTime.visibility = View.VISIBLE
@@ -159,6 +162,8 @@ class ToursAdapter constructor(
                         callbacks.launchClick(tour)
                     }
                 } else {
+                    // The data we have is currently partial
+                    binding.innerProgressBar.visibility = View.VISIBLE
                     binding.innerTourLength.visibility = View.INVISIBLE
                     binding.innerWaypoints.visibility = View.INVISIBLE
                     binding.innerTime.visibility = View.INVISIBLE
