@@ -146,10 +146,11 @@
 
                     <com.google.android.material.progressindicator.LinearProgressIndicator
                         android:id="@+id/innerProgressBar"
-                        app:layout_constraintTop_toBottomOf="@id/innerDivider"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:indeterminate="true"/>
+                        android:indeterminate="true"
+                        app:hideAnimationBehavior="outward"
+                        app:layout_constraintTop_toBottomOf="@id/innerDivider" />
 
                     <TextView
                         android:id="@+id/innerTourLength"
