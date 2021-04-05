@@ -79,7 +79,6 @@ class ToursAdapter constructor(
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         this.recyclerView = recyclerView
-        this.recyclerView.setItemViewCacheSize(0) // TODO: Check if the performance impact is acceptable
     }
 
     override fun onCurrentListChanged(previousList: MutableList<TourRoute>, currentList: MutableList<TourRoute>) {
