@@ -44,19 +44,18 @@ class DefaultMainRepository @Inject constructor(
                         if (index > -1) difference.removeAt(index) else createdTours.add(tourRoute)
                     }
                 }
+                if (difference.isNotEmpty()) {
+                    routeDao.deleteAll(difference)
+                }
+
+                routeDao.createByBriefList(createdTours)
+                apiResponse.data.let { routeDao.updateByBriefList(it) }
+
+                routesEvents.value = Resource.Updated()
             } else {
                 routesEvents.value = Resource.Error(apiResponse.message
                         ?: "Неизвестная ошибка загрузки данных с сервера!")
             }
-
-            if (difference.isNotEmpty()) {
-                routeDao.deleteAll(difference)
-            }
-
-            routeDao.createByBriefList(createdTours)
-            apiResponse.data?.let { routeDao.updateByBriefList(it) }
-
-            routesEvents.value = Resource.Updated()
         }
     }
 
