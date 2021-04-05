@@ -13,17 +13,17 @@ interface BaseDao<T> {
     suspend fun insertAndReadId(entity: T): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(list: List<T>?)
+    suspend fun insertAll(list: List<T>)
 
     @Update
     suspend fun update(entity: T)
 
     @Update
-    suspend fun updateAll(list: List<T>?)
+    suspend fun updateAll(list: List<T>)
 
     @Delete
     suspend fun delete(entity: T)
 
     @Delete
-    suspend fun deleteAll(list: List<T>?)
+    suspend fun deleteAll(list: List<T>)
 }

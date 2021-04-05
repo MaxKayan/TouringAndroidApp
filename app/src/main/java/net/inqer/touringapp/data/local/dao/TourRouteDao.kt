@@ -12,10 +12,10 @@ import net.inqer.touringapp.data.models.TourRouteBrief
 interface TourRouteDao : BaseDao<TourRoute> {
 
     @Update(entity = TourRoute::class)
-    suspend fun updateByBriefList(list: List<TourRouteBrief>?)
+    suspend fun updateByBriefList(list: List<TourRouteBrief>)
 
     @Insert(entity = TourRoute::class)
-    suspend fun createByBriefList(list: List<TourRouteBrief>?)
+    suspend fun createByBriefList(list: List<TourRouteBrief>)
 
     @Query("SELECT * FROM routes WHERE id = :id")
     suspend fun getRoute(id: Long): TourRoute

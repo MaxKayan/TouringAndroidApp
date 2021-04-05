@@ -31,23 +31,30 @@ class DefaultMainRepository @Inject constructor(
     override suspend fun refreshTourRoutes() {
         routesEvents.value = Resource.Loading()
         withContext(dispatchers.io) {
-            val currentList = async { routeDao.getRoutesList() }
-            val newList = async { processResponse({ api.fetchRoutesBrief() }) }
+            val currentListJob = async { routeDao.getRoutesList() }
+            val newListJob = async { processResponse({ api.fetchRoutesBrief() }) }
 
-            val diff = currentList.await().toMutableList()
+            val difference = currentListJob.await().toMutableList()
             val createdTours = mutableListOf<TourRouteBrief>()
-            newList.await().data?.forEach { tourRoute ->
-                diff.indexOfFirst { it.id == tourRoute.id }.let { index ->
-                    if (index > -1) diff.removeAt(index) else createdTours.add(tourRoute)
+
+            val apiResponse = newListJob.await()
+            if (apiResponse.data != null) {
+                apiResponse.data.forEach { tourRoute ->
+                    difference.indexOfFirst { it.id == tourRoute.id }.let { index ->
+                        if (index > -1) difference.removeAt(index) else createdTours.add(tourRoute)
+                    }
                 }
+            } else {
+                routesEvents.value = Resource.Error(apiResponse.message
+                        ?: "Неизвестная ошибка загрузки данных с сервера!")
             }
 
-            if (diff.isNotEmpty()) {
-                routeDao.deleteAll(diff)
+            if (difference.isNotEmpty()) {
+                routeDao.deleteAll(difference)
             }
 
             routeDao.createByBriefList(createdTours)
-            routeDao.updateByBriefList(newList.await().data)
+            apiResponse.data?.let { routeDao.updateByBriefList(it) }
 
             routesEvents.value = Resource.Updated()
         }
