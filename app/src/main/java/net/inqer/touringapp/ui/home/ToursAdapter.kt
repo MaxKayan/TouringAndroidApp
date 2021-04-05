@@ -69,9 +69,9 @@ class ToursAdapter constructor(
             if (holder != null) {
                 holder.performCardReveal(getItem(holder.adapterPosition))
             } else {
-                Log.d(TAG, "closeOthers: holder is null!")
+                Log.w(TAG, "closeOthers: holder is null!")
                 revealedStates[entry.key] = false
-                Log.d(TAG, "closeOthers: $revealedStates")
+                notifyDataSetChanged()
             }
         }
     }
@@ -79,6 +79,7 @@ class ToursAdapter constructor(
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         this.recyclerView = recyclerView
+        this.recyclerView.setItemViewCacheSize(0) // TODO: Check if the performance impact is acceptable
     }
 
     override fun onCurrentListChanged(previousList: MutableList<TourRoute>, currentList: MutableList<TourRoute>) {
