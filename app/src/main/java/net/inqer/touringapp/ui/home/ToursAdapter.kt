@@ -147,7 +147,8 @@ class ToursAdapter constructor(
                 Log.d(TAG, "bind: ${tour.id} ; isFull = $isFull")
                 if (isFull) {
                     // The data we have is full
-                    binding.innerProgressBar.visibility = View.INVISIBLE
+                    binding.innerProgressBar.hide()
+
                     binding.innerTourLength.visibility = View.VISIBLE
                     binding.innerWaypoints.visibility = View.VISIBLE
                     binding.innerTime.visibility = View.VISIBLE
@@ -163,7 +164,8 @@ class ToursAdapter constructor(
                     }
                 } else {
                     // The data we have is currently partial
-                    binding.innerProgressBar.visibility = View.VISIBLE
+                    binding.innerProgressBar.show()
+
                     binding.innerTourLength.visibility = View.INVISIBLE
                     binding.innerWaypoints.visibility = View.INVISIBLE
                     binding.innerTime.visibility = View.INVISIBLE
