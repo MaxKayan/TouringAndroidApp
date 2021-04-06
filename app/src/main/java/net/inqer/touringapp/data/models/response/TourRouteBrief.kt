@@ -1,4 +1,4 @@
-package net.inqer.touringapp.data.models
+package net.inqer.touringapp.data.models.response
 
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
