@@ -10,6 +10,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import net.inqer.touringapp.AppConfig
 import net.inqer.touringapp.R
+import net.inqer.touringapp.SettingsConstants.DEFAULT_URL
 import net.inqer.touringapp.data.local.AppDatabase
 import net.inqer.touringapp.data.remote.RoutesApi
 import retrofit2.Converter
@@ -22,8 +23,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
     private const val TAG = "AppModule"
-
-    const val DEFAULT_URL = "http://192.168.0.186:8000/api/"
 
     @Singleton
     @Named("String1")
