@@ -22,8 +22,8 @@ abstract class Repository {
                 Resource.Success(body)
             } else {
                 Log.e(TAG, "refreshTourRoutes: the response was not successful" +
-                        " ${response.message()}")
-                events?.value = Resource.Error(response.message())
+                        " ${response.message()} ; ${response.code()} ; ${response.body()}")
+                events?.value = Resource.Error(response.message() + "; \n " + response.body())
                 Resource.Error(response.message())
             }
         } catch (e: Exception) {
