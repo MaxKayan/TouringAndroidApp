@@ -1,5 +1,6 @@
 package net.inqer.touringapp.data.models
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
@@ -16,6 +17,10 @@ data class TourRoute(
         val title: String,
         val description: String,
         val image: String,
+
+//        @Transient
+        @ColumnInfo(defaultValue = "0")
+        val isActive: Boolean = false,
 
         @SerializedName("created_at")
         val createdAt: Date,

@@ -6,7 +6,7 @@ import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import net.inqer.touringapp.data.models.TourRoute
-import net.inqer.touringapp.data.models.TourRouteBrief
+import net.inqer.touringapp.data.models.response.TourRouteBrief
 
 @Dao
 interface TourRouteDao : BaseDao<TourRoute> {
@@ -25,4 +25,7 @@ interface TourRouteDao : BaseDao<TourRoute> {
 
     @Query("SELECT * FROM routes")
     suspend fun getRoutesList(): List<TourRoute>
+
+    @Query("UPDATE routes SET isActive = CASE id WHEN :routeId THEN 1 ELSE 0 END")
+    suspend fun setActiveRoute(routeId: Long)
 }
