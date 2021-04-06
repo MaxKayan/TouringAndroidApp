@@ -1,7 +1,7 @@
 package net.inqer.touringapp.data.remote
 
 import net.inqer.touringapp.data.models.TourRoute
-import net.inqer.touringapp.data.models.TourRouteBrief
+import net.inqer.touringapp.data.models.response.TourRouteBrief
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
