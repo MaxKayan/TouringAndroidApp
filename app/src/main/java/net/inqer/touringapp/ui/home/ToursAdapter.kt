@@ -286,6 +286,7 @@ class ToursAdapter constructor(
                 if (oldItem.description != newItem.description) return false
                 if (oldItem.image != newItem.image) return false
                 if (oldItem.createdAt != newItem.createdAt) return false
+                if (oldItem.isActive != newItem.isActive) return false
                 if (oldItem.updatedAt != newItem.updatedAt) return false
                 if (oldItem.totalDistance != newItem.totalDistance) return false
                 if (oldItem.estimatedDuration != newItem.estimatedDuration) return false

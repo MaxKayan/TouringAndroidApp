@@ -34,6 +34,7 @@ data class TourRoute(
         val waypoints: Array<Waypoint>?,
         val destinations: Array<Destination>?,
 ) {
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -44,6 +45,7 @@ data class TourRoute(
         if (title != other.title) return false
         if (description != other.description) return false
         if (image != other.image) return false
+        if (isActive != other.isActive) return false
         if (createdAt != other.createdAt) return false
         if (updatedAt != other.updatedAt) return false
         if (totalDistance != other.totalDistance) return false
@@ -65,6 +67,7 @@ data class TourRoute(
         result = 31 * result + title.hashCode()
         result = 31 * result + description.hashCode()
         result = 31 * result + image.hashCode()
+        result = 31 * result + isActive.hashCode()
         result = 31 * result + createdAt.hashCode()
         result = 31 * result + updatedAt.hashCode()
         result = 31 * result + (totalDistance?.hashCode() ?: 0)
