@@ -12,4 +12,6 @@ interface MainRepository {
     suspend fun getRoute(id: Long): Resource<TourRoute>
     suspend fun refreshTourRoutes()
     suspend fun refreshFullRouteData(id: Long)
+
+    suspend fun setActiveRoute(id: Long)
 }

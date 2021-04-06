@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import net.inqer.touringapp.data.local.dao.TourRouteDao
 import net.inqer.touringapp.data.models.TourRoute
-import net.inqer.touringapp.data.models.TourRouteBrief
+import net.inqer.touringapp.data.models.response.TourRouteBrief
 import net.inqer.touringapp.data.remote.RoutesApi
 import net.inqer.touringapp.data.repository.Repository
 import net.inqer.touringapp.util.DispatcherProvider
@@ -60,9 +60,17 @@ class DefaultMainRepository @Inject constructor(
     }
 
     override suspend fun refreshFullRouteData(id: Long) {
-        processResponse({ api.fetchRoute(id) }, routesEvents, { result ->
-            routeDao.insert(result)
-        })
+        withContext(dispatchers.io) {
+            processResponse({ api.fetchRoute(id) }, routesEvents, { result ->
+                routeDao.insert(result)
+            })
+        }
+    }
+
+    override suspend fun setActiveRoute(id: Long) {
+        withContext(dispatchers.io) {
+            routeDao.setActiveRoute(id)
+        }
     }
 
     override suspend fun getRoute(id: Long): Resource<TourRoute> {

@@ -87,7 +87,7 @@ class HomeFragment : Fragment() {
             }
 
             override fun launchClick(item: TourRoute) {
-                viewModel.refreshRoutes()
+                viewModel.activateRoute(item.id)
             }
         })
 

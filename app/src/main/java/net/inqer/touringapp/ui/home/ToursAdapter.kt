@@ -138,6 +138,15 @@ class ToursAdapter constructor(
                 binding.secondaryText.text = tour.createdAt.toString()
                 binding.supportingText.text = tour.description
 
+                binding.activeIndicator.visibility = if (tour.isActive) View.VISIBLE else View.INVISIBLE
+
+                val launchClick = View.OnClickListener {
+                    callbacks.launchClick(tour)
+                }
+
+                binding.btnStart.setOnClickListener(launchClick)
+                binding.innerBtnStart.setOnClickListener(launchClick)
+
                 binding.innerTitle.text = tour.title
 //                binding.innerSubtitle.text = tour.createdAt.toString()
                 binding.innerSubtitle.text = "id = ${tour.id}"
@@ -159,9 +168,6 @@ class ToursAdapter constructor(
                     binding.innerWaypoints.text = context.getString(R.string.n_waypoints, tour.waypoints?.size)
                     binding.innerTime.text = context.getString(R.string.estimated_n_minutes, tour.estimatedDuration)
                     binding.innerDestinations.text = context.getString(R.string.n_destinations, tour.destinations?.size)
-                    binding.innerBtnStart.setOnClickListener {
-                        callbacks.launchClick(tour)
-                    }
                 } else {
                     // The data we have is currently partial
                     binding.innerProgressBar.show()

@@ -19,30 +19,18 @@ class HomeViewModel @Inject constructor(
         refreshRoutes()
     }
 
-    //    private val _routes = MutableStateFlow<Resource<List<TourRouteBrief>>>(Resource.Empty())
-//    val routes: StateFlow<Resource<List<TourRouteBrief>>> = repository.getRoutesBriefFlow().asLiveData()
     val routes = repository.getRoutesFlow().asLiveData()
     val routesEvents = repository.getRoutesEvents()
-
-//    init {
-//        viewModelScope.launch(dispatchers.io) {
-//            repository.getRoutesBriefFlow()
-//                    .onStart {
-//                        _routes.value = Resource.Loading()
-//                    }
-//                    .onEach { routes ->
-//                        _routes.value = Resource.Success(routes)
-//                    }
-//                    .catch { cause ->
-//                        _routes.value = Resource.Error(cause.message ?: "Ошибка")
-//                    }
-//                    .collect()
-//        }
-//    }
 
     fun refreshRoutes() {
         viewModelScope.launch {
             repository.refreshTourRoutes()
+        }
+    }
+
+    fun activateRoute(id: Long) {
+        viewModelScope.launch {
+            repository.setActiveRoute(id)
         }
     }
 
@@ -51,7 +39,4 @@ class HomeViewModel @Inject constructor(
             repository.refreshFullRouteData(id)
         }
     }
-
-//    val routesBriefFlow: Flow<List<TourRouteBrief>>
-//        get() = repository.getRoutesBriefFlow()
 }
