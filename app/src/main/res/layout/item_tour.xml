@@ -55,6 +55,7 @@
                 android:layout_toStartOf="@id/icon_active"
                 android:text="Активен"
                 android:textAllCaps="true"
+                android:textColor="?attr/colorSecondary"
                 android:textSize="18sp" />
 
         </RelativeLayout>
@@ -111,7 +112,7 @@
 
 
         <com.google.android.material.circularreveal.cardview.CircularRevealCardView
-            android:id="@+id/innerCard"
+            android:id="@+id/inner_card"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:backgroundTint="?attr/colorSecondary"
@@ -145,7 +146,7 @@
                     android:padding="16dp">
 
                     <TextView
-                        android:id="@+id/innerTitle"
+                        android:id="@+id/inner_title"
                         style="@style/TextAppearance.MaterialComponents.Headline4"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -154,34 +155,34 @@
                         tools:text="Подольские Лётчики" />
 
                     <TextView
-                        android:id="@+id/innerSubtitle"
+                        android:id="@+id/inner_subtitle"
                         style="@style/TextAppearance.MaterialComponents.Subtitle1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/innerTitle"
+                        app:layout_constraintTop_toBottomOf="@id/inner_title"
                         tools:text="О героях среди нас" />
 
                     <View
-                        android:id="@+id/innerDivider"
+                        android:id="@+id/inner_divider"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginTop="8dp"
                         android:alpha="0.5"
                         android:background="@android:color/white"
-                        app:layout_constraintTop_toBottomOf="@id/innerSubtitle" />
+                        app:layout_constraintTop_toBottomOf="@id/inner_subtitle" />
 
                     <com.google.android.material.progressindicator.LinearProgressIndicator
-                        android:id="@+id/innerProgressBar"
+                        android:id="@+id/inner_progress_bar"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:indeterminate="true"
                         app:hideAnimationBehavior="outward"
-                        app:layout_constraintTop_toBottomOf="@id/innerDivider" />
+                        app:layout_constraintTop_toBottomOf="@id/inner_divider" />
 
                     <TextView
-                        android:id="@+id/innerTourLength"
+                        android:id="@+id/inner_tour_length"
                         style="@style/TextAppearance.MaterialComponents.Body1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -189,20 +190,20 @@
                         android:fontFamily="@font/noto_color_emoji_compat"
                         android:text="@string/tour_length"
                         app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/innerDivider" />
+                        app:layout_constraintTop_toBottomOf="@id/inner_divider" />
 
                     <TextView
-                        android:id="@+id/innerWaypoints"
+                        android:id="@+id/inner_waypoints"
                         style="@style/TextAppearance.MaterialComponents.Body1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:text="@string/n_waypoints"
                         app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/innerTourLength" />
+                        app:layout_constraintTop_toBottomOf="@id/inner_tour_length" />
 
                     <TextView
-                        android:id="@+id/innerTime"
+                        android:id="@+id/inner_time"
                         style="@style/TextAppearance.MaterialComponents.Body1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -211,17 +212,17 @@
                         android:text="@string/estimated_n_minutes"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/innerWaypoints" />
+                        app:layout_constraintTop_toBottomOf="@id/inner_waypoints" />
 
                     <TextView
-                        android:id="@+id/innerDestinations"
+                        android:id="@+id/inner_destinations"
                         style="@style/TextAppearance.MaterialComponents.Body1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:text="@string/n_destinations"
                         app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/innerTime" />
+                        app:layout_constraintTop_toBottomOf="@id/inner_time" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/inner_btn_start"
@@ -236,6 +237,36 @@
                         app:iconTint="@android:color/white"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintRight_toRightOf="parent" />
+
+                    <RelativeLayout
+                        android:id="@+id/inner_active_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        app:layout_constraintBottom_toBottomOf="@id/inner_subtitle"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/inner_subtitle">
+
+                        <ImageView
+                            android:id="@+id/inner_icon_active"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:src="@drawable/ic_baseline_navigation_24"
+                            app:tint="?attr/colorSecondary" />
+
+                        <TextView
+                            android:id="@+id/inner_text_active"
+                            style="@style/TextAppearance.MaterialComponents.Overline"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toStartOf="@id/inner_icon_active"
+                            android:text="Активен"
+                            android:textAllCaps="true"
+                            android:textColor="?attr/colorSecondary"
+                            android:textSize="18sp" />
+
+                    </RelativeLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

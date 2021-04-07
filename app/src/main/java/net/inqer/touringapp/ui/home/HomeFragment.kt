@@ -1,5 +1,6 @@
 package net.inqer.touringapp.ui.home
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,16 +12,26 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.collect
 import net.inqer.touringapp.R
 import net.inqer.touringapp.data.models.TourRoute
 import net.inqer.touringapp.databinding.FragmentHomeBinding
 import net.inqer.touringapp.util.Resource
+import java.text.DateFormat
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private lateinit var adapter: ToursAdapter
+
+    @Inject
+    lateinit var dateFormat: DateFormat
+
+    @Inject
+    @ApplicationContext
+    lateinit var appContext: Context
 
     private val viewModel: HomeViewModel by viewModels()
 
@@ -57,8 +68,6 @@ class HomeFragment : Fragment() {
 
                     is Resource.Loading -> {
                         Log.d(TAG, "onViewCreated: Loading...")
-//                        Snackbar.make(view, "Загрузка туров...", Snackbar.LENGTH_SHORT).show()
-
                         binding.swipeLayout.isRefreshing = true
                     }
 
@@ -74,7 +83,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = ToursAdapter(object : ToursAdapter.Companion.TourViewHolder.OnTourViewInteraction {
+        adapter = ToursAdapter(appContext, object : ToursAdapter.Companion.TourViewHolder.OnTourViewInteraction {
             override fun rootClick(item: TourRoute) {
             }
 
@@ -83,13 +92,17 @@ class HomeFragment : Fragment() {
             }
 
             override fun fabClick(item: TourRoute) {
-//                adapter.closeOpened()
             }
 
             override fun launchClick(item: TourRoute) {
                 viewModel.activateRoute(item.id)
             }
-        })
+
+            override fun cancelClick(item: TourRoute) {
+                viewModel.deactivateRoutes()
+            }
+        },
+                dateFormat)
 
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
         binding.recyclerView.setHasFixedSize(true)

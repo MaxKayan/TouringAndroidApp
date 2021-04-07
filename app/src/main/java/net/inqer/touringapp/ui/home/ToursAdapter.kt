@@ -5,12 +5,18 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -24,11 +30,19 @@ import net.inqer.touringapp.R
 import net.inqer.touringapp.data.models.TourRoute
 import net.inqer.touringapp.databinding.ItemTourBinding
 import net.inqer.touringapp.util.DrawableHelper
+import net.inqer.touringapp.util.DrawableHelper.modifyButtonIcon
+import java.text.DateFormat
+import java.util.*
+import kotlin.collections.HashMap
 import kotlin.math.sqrt
 
+@ColorInt
+fun Context.getThemeColor(@AttrRes attribute: Int) = TypedValue().let { theme.resolveAttribute(attribute, it, true); it.data }
 
 class ToursAdapter constructor(
-        private val callbacks: TourViewHolder.OnTourViewInteraction
+        context: Context,
+        private val callbacks: TourViewHolder.OnTourViewInteraction,
+        private val dateFormat: DateFormat
 ) : ListAdapter<TourRoute, ToursAdapter.Companion.TourViewHolder>(TOUR_BRIEF_ITEM_CALLBACK) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TourViewHolder {
         val binding: ItemTourBinding = ItemTourBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -55,6 +69,7 @@ class ToursAdapter constructor(
         list.forEach { route ->
             diff.remove(route.id)
         }
+        Log.d(TAG, "init: ${dateFormat.format(Date())}")
 
         diff.keys.forEach { removedRouteId -> revealedStates.remove(removedRouteId) }
     }
@@ -130,6 +145,7 @@ class ToursAdapter constructor(
                 fun cardOpened(item: TourRoute)
                 fun fabClick(item: TourRoute)
                 fun launchClick(item: TourRoute)
+                fun cancelClick(item: TourRoute)
             }
 
             @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -138,18 +154,45 @@ class ToursAdapter constructor(
                 binding.secondaryText.text = tour.createdAt.toString()
                 binding.supportingText.text = tour.description
 
-                binding.activeIndicator.visibility = if (tour.isActive) View.VISIBLE else View.INVISIBLE
+                val activeIndicatorVisibility = if (tour.isActive) View.VISIBLE else View.INVISIBLE
+                binding.activeIndicator.visibility = activeIndicatorVisibility
+                binding.innerActiveIndicator.visibility = activeIndicatorVisibility
 
-                val launchClick = View.OnClickListener {
-                    callbacks.launchClick(tour)
+                val launchText: CharSequence
+                val launchClick: View.OnClickListener
+                val launchIcon: Drawable?
+
+                @DrawableRes val launchIconRes: Int
+                if (!tour.isActive) {
+                    launchText = context.getText(R.string.lets_go)
+                    launchClick = View.OnClickListener { callbacks.launchClick(tour) }
+                    launchIcon = ContextCompat.getDrawable(context, R.drawable.ic_baseline_send_24)
+                } else {
+                    launchText = context.getText(R.string.cancel)
+                    launchClick = View.OnClickListener { callbacks.cancelClick(tour) }
+                    launchIcon = ContextCompat.getDrawable(context, R.drawable.ic_baseline_close_24)
                 }
 
+                val color = ColorStateList.valueOf(context.getThemeColor(R.attr.colorPrimary))
+                val color2 = ColorStateList.valueOf(Color.BLUE)
+                Log.d(TAG, "bind: colors: $color ; $color2")
+
                 binding.btnStart.setOnClickListener(launchClick)
+                binding.btnStart.text = launchText
+                binding.btnStart.icon = launchIcon
+
+//                binding.btnStart.iconTint = iconTint
+                binding.btnStart.also {
+                    modifyButtonIcon(it, launchIcon, context.getThemeColor(R.attr.colorPrimary))
+                }
+
                 binding.innerBtnStart.setOnClickListener(launchClick)
+                binding.innerBtnStart.text = launchText
+                binding.innerBtnStart.icon = launchIcon
+//                binding.innerBtnStart.iconTint = ColorStateList.valueOf(Color.WHITE)
 
                 binding.innerTitle.text = tour.title
-//                binding.innerSubtitle.text = tour.createdAt.toString()
-                binding.innerSubtitle.text = "id = ${tour.id}"
+                binding.innerSubtitle.text = tour.createdAt.toString()
 
                 // Logic that depends on current card data state (Partial/Full)
                 val isFull = tour.totalDistance != null && tour.estimatedDuration != null

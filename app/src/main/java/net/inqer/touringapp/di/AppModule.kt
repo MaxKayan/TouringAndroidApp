@@ -16,6 +16,7 @@ import net.inqer.touringapp.data.remote.RoutesApi
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.text.DateFormat
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -73,4 +74,8 @@ object AppModule {
             Room.databaseBuilder(context, AppDatabase::class.java, "touring-app-database")
                     .fallbackToDestructiveMigration()
                     .build()
+
+    @Singleton
+    @Provides
+    fun provideDateFormat(@ApplicationContext context: Context): DateFormat = android.text.format.DateFormat.getDateFormat(context)
 }

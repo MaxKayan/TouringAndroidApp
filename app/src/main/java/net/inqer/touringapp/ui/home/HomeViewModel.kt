@@ -34,6 +34,12 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun deactivateRoutes() {
+        viewModelScope.launch {
+            repository.deactivateRoutes()
+        }
+    }
+
     fun refreshFullRouteData(id: Long) {
         viewModelScope.launch {
             repository.refreshFullRouteData(id)
