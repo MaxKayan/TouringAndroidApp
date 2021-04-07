@@ -20,4 +20,6 @@
     <string name="n_waypoints">📍 %1$d маршрутных точек</string>
     <string name="estimated_n_minutes">🕑 Примерно %1$f минут пешком</string>
     <string name="n_destinations">⛲ %1$d точек притяжения</string>
+    <string name="tour_is_active_icon">Tour Is Active Icon</string>
+    <string name="active">Активен</string>
 </resources>

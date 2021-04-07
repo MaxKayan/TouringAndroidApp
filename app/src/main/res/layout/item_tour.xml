@@ -119,7 +119,7 @@
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="gone">
+            tools:visibility="visible">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -157,10 +157,11 @@
                     <TextView
                         android:id="@+id/inner_subtitle"
                         style="@style/TextAppearance.MaterialComponents.Subtitle1"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toLeftOf="@id/inner_active_indicator"
                         app:layout_constraintTop_toBottomOf="@id/inner_title"
                         tools:text="О героях среди нас" />
 
@@ -238,7 +239,7 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintRight_toRightOf="parent" />
 
-                    <RelativeLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/inner_active_indicator"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -251,8 +252,10 @@
                             android:id="@+id/inner_icon_active"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
+                            android:contentDescription="@string/tour_is_active_icon"
                             android:src="@drawable/ic_baseline_navigation_24"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
                             app:tint="?attr/colorSecondary" />
 
                         <TextView
@@ -261,12 +264,14 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_toStartOf="@id/inner_icon_active"
-                            android:text="Активен"
+                            android:text="@string/active"
                             android:textAllCaps="true"
                             android:textColor="?attr/colorSecondary"
-                            android:textSize="18sp" />
+                            android:textSize="18sp"
+                            app:layout_constraintRight_toLeftOf="@id/inner_icon_active"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                    </RelativeLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
