@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -50,6 +51,14 @@ class HomeFragment : Fragment() {
 
         binding.swipeLayout.setOnRefreshListener {
             viewModel.refreshRoutes()
+        }
+
+        lifecycle.coroutineScope.launchWhenResumed {
+            viewModel.observeActiveRoute()
+                    .collect {
+                        Toast.makeText(context, it.title, Toast.LENGTH_SHORT).show()
+                        Log.d(TAG, "onViewCreated: active route: $it")
+                    }
         }
 
         viewModel.routes.observe(viewLifecycleOwner) {

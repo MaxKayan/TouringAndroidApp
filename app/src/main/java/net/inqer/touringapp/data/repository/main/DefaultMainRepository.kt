@@ -1,9 +1,7 @@
 package net.inqer.touringapp.data.repository.main
 
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import net.inqer.touringapp.data.local.dao.TourRouteDao
 import net.inqer.touringapp.data.models.TourRoute
@@ -78,6 +76,12 @@ class DefaultMainRepository @Inject constructor(
             routeDao.deactivateRoutes()
         }
     }
+
+    override fun observeActiveRoute(): Flow<TourRoute> =
+        routeDao.observeActiveRoute()
+                .distinctUntilChanged()
+//                .flowOn(dispatchers.io)
+
 
     override suspend fun getRoute(id: Long): Resource<TourRoute> {
 //        return try {

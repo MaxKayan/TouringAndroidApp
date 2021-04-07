@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import net.inqer.touringapp.data.models.TourRoute
 import net.inqer.touringapp.data.repository.main.MainRepository
 import net.inqer.touringapp.util.DispatcherProvider
 import javax.inject.Inject
@@ -45,4 +47,6 @@ class HomeViewModel @Inject constructor(
             repository.refreshFullRouteData(id)
         }
     }
+
+    fun observeActiveRoute(): Flow<TourRoute> = repository.observeActiveRoute()
 }

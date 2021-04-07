@@ -35,4 +35,7 @@ interface TourRouteDao : BaseDao<TourRoute> {
 
     @Query("UPDATE routes SET isActive = 0")
     suspend fun deactivateRoutes()
+
+    @Query("SELECT * FROM routes WHERE isActive = 1")
+    fun observeActiveRoute(): Flow<TourRoute>
 }
