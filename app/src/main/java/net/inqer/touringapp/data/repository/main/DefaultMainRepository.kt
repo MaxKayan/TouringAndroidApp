@@ -32,7 +32,7 @@ class DefaultMainRepository @Inject constructor(
         routesEvents.value = Resource.Loading()
         withContext(dispatchers.io) {
             val currentListJob = async { routeDao.getRoutesList() }
-            val newListJob = async { processResponse({ api.fetchRoutesBrief() }) }
+            val newListJob = async { processResponse({ api.fetchRoutesBrief() }, routesEvents) }
 
             val difference = currentListJob.await().toMutableList()
             val createdTours = mutableListOf<TourRouteBrief>()
@@ -62,7 +62,7 @@ class DefaultMainRepository @Inject constructor(
     override suspend fun refreshFullRouteData(id: Long) {
         withContext(dispatchers.io) {
             processResponse({ api.fetchRoute(id) }, routesEvents, { result ->
-                routeDao.insert(result)
+                routeDao.updateFullRoute(result)
             })
         }
     }
@@ -80,11 +80,12 @@ class DefaultMainRepository @Inject constructor(
     }
 
     override suspend fun getRoute(id: Long): Resource<TourRoute> {
-        return try {
-            processResponse({ api.fetchRoute(id) })
-        } catch (e: Exception) {
-            Resource.Error(e.message ?: "")
-        }
+//        return try {
+//            processResponse({ api.fetchRoute(id) })
+//        } catch (e: Exception) {
+//            Resource.Error(e.message ?: "")
+//        }
+        return Resource.Empty()
     }
 
     companion object {

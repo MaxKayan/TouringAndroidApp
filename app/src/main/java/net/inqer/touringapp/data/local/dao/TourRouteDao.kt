@@ -7,6 +7,7 @@ import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import net.inqer.touringapp.data.models.TourRoute
 import net.inqer.touringapp.data.models.response.TourRouteBrief
+import net.inqer.touringapp.data.models.response.TourRouteResponse
 
 @Dao
 interface TourRouteDao : BaseDao<TourRoute> {
@@ -19,6 +20,9 @@ interface TourRouteDao : BaseDao<TourRoute> {
 
     @Query("SELECT * FROM routes WHERE id = :id")
     suspend fun getRoute(id: Long): TourRoute
+
+    @Update(entity = TourRoute::class)
+    suspend fun updateFullRoute(fullRoute: TourRouteResponse)
 
     @Query("SELECT * FROM routes")
     fun getRoutesFlow(): Flow<List<TourRoute>>

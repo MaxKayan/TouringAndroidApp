@@ -1,26 +1,19 @@
-package net.inqer.touringapp.data.models
+package net.inqer.touringapp.data.models.response
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.google.gson.annotations.SerializedName
 import net.inqer.touringapp.data.converters.TourItemConverters
+import net.inqer.touringapp.data.models.Destination
+import net.inqer.touringapp.data.models.Waypoint
 import java.util.*
 
-@Entity(tableName = "routes")
 @TypeConverters(TourItemConverters::class)
-data class TourRoute(
-        @PrimaryKey
+data class TourRouteResponse(
         @SerializedName("pk")
         val id: Long,
         val title: String,
         val description: String,
         val image: String,
-
-        @Transient
-        @ColumnInfo(defaultValue = "0")
-        val isActive: Boolean = false,
 
         @SerializedName("created_at")
         val createdAt: Date,
@@ -39,13 +32,12 @@ data class TourRoute(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as TourRoute
+        other as TourRouteResponse
 
         if (id != other.id) return false
         if (title != other.title) return false
         if (description != other.description) return false
         if (image != other.image) return false
-        if (isActive != other.isActive) return false
         if (createdAt != other.createdAt) return false
         if (updatedAt != other.updatedAt) return false
         if (totalDistance != other.totalDistance) return false
@@ -67,7 +59,6 @@ data class TourRoute(
         result = 31 * result + title.hashCode()
         result = 31 * result + description.hashCode()
         result = 31 * result + image.hashCode()
-        result = 31 * result + isActive.hashCode()
         result = 31 * result + createdAt.hashCode()
         result = 31 * result + updatedAt.hashCode()
         result = 31 * result + (totalDistance?.hashCode() ?: 0)

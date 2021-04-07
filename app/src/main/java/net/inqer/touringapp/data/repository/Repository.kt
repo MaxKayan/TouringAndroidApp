@@ -6,9 +6,9 @@ import net.inqer.touringapp.util.Resource
 import retrofit2.Response
 
 abstract class Repository {
-    protected suspend fun <T> processResponse(
+    protected suspend fun <T, R> processResponse(
             apiCall: suspend () -> Response<T>,
-            events: MutableStateFlow<Resource<List<T>>>? = null,
+            events: MutableStateFlow<Resource<R>>? = null,
             onSuccess: (suspend (result: T) -> Unit)? = null,
             onError: ((e: Exception) -> Unit)? = null
     ): Resource<T> {
