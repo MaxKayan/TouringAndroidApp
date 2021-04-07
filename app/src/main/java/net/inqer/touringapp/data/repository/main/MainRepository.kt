@@ -14,4 +14,5 @@ interface MainRepository {
     suspend fun refreshFullRouteData(id: Long)
 
     suspend fun setActiveRoute(id: Long)
+    suspend fun deactivateRoutes()
 }

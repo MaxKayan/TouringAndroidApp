@@ -28,4 +28,7 @@ interface TourRouteDao : BaseDao<TourRoute> {
 
     @Query("UPDATE routes SET isActive = CASE id WHEN :routeId THEN 1 ELSE 0 END")
     suspend fun setActiveRoute(routeId: Long)
+
+    @Query("UPDATE routes SET isActive = 0")
+    suspend fun deactivateRoutes()
 }

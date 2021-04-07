@@ -73,6 +73,12 @@ class DefaultMainRepository @Inject constructor(
         }
     }
 
+    override suspend fun deactivateRoutes() {
+        withContext(dispatchers.io) {
+            routeDao.deactivateRoutes()
+        }
+    }
+
     override suspend fun getRoute(id: Long): Resource<TourRoute> {
         return try {
             processResponse({ api.fetchRoute(id) })
