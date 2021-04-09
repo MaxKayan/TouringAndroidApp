@@ -53,14 +53,6 @@ class HomeFragment : Fragment() {
             viewModel.refreshRoutes()
         }
 
-        lifecycle.coroutineScope.launchWhenResumed {
-            viewModel.observeActiveRoute()
-                    .collect {
-                        Toast.makeText(context, it.title, Toast.LENGTH_SHORT).show()
-                        Log.d(TAG, "onViewCreated: active route: $it")
-                    }
-        }
-
         viewModel.routes.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
