@@ -48,5 +48,5 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun observeActiveRoute(): Flow<TourRoute> = repository.observeActiveRoute()
+    fun observeActiveRoute(): Flow<TourRoute?> = repository.observeActiveRoute()
 }
