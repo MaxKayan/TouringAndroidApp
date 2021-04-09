@@ -84,7 +84,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = ToursAdapter(appContext, object : ToursAdapter.Companion.TourViewHolder.OnTourViewInteraction {
+        adapter = ToursAdapter(object : ToursAdapter.Companion.TourViewHolder.OnTourViewInteraction {
             override fun rootClick(item: TourRoute) {
             }
 

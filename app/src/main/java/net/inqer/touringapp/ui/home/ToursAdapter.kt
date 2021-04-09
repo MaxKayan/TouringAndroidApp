@@ -40,7 +40,6 @@ import kotlin.math.sqrt
 fun Context.getThemeColor(@AttrRes attribute: Int) = TypedValue().let { theme.resolveAttribute(attribute, it, true); it.data }
 
 class ToursAdapter constructor(
-        context: Context,
         private val callbacks: TourViewHolder.OnTourViewInteraction,
         private val dateFormat: DateFormat
 ) : ListAdapter<TourRoute, ToursAdapter.Companion.TourViewHolder>(TOUR_BRIEF_ITEM_CALLBACK) {
