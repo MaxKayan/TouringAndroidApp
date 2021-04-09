@@ -23,15 +23,6 @@ object MainModule {
 
     @ViewModelScoped
     @Provides
-    @Named("String2")
-    fun provideTestString2(
-            @ApplicationContext context: Context,
-            @Named("String1") testString1: String
-    ) = "${context.getString(R.string.string_to_inject)} - $testString1"
-
-
-    @ViewModelScoped
-    @Provides
     fun provideMainRepository(repository: DefaultMainRepository): MainRepository = repository
 
 

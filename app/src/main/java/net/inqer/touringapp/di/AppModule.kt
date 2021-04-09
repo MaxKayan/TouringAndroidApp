@@ -26,11 +26,6 @@ object AppModule {
     private const val TAG = "AppModule"
 
     @Singleton
-    @Named("String1")
-    @Provides
-    fun provideTestString() = "This is an injected string - Max"
-
-    @Singleton
     @Provides
     fun provideAppConfig(
             @ApplicationContext context: Context,

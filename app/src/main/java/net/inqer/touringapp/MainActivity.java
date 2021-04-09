@@ -27,10 +27,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
-    @Inject
-    @Named("String1")
-    String testString1;
-
     private ActivityMainBinding binding;
     private NavController navController;
 
