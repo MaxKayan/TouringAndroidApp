@@ -9,8 +9,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -96,7 +96,9 @@ class HomeFragment : Fragment() {
             }
 
             override fun launchClick(item: TourRoute) {
+                viewModel.refreshFullRouteData(item.id)
                 viewModel.activateRoute(item.id)
+                navigateToRouteMap()
             }
 
             override fun cancelClick(item: TourRoute) {
@@ -108,6 +110,10 @@ class HomeFragment : Fragment() {
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.adapter = adapter
+    }
+
+    private fun navigateToRouteMap() {
+        findNavController().navigate(R.id.navigation_map)
     }
 
     companion object {
