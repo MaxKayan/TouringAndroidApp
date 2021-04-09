@@ -15,5 +15,5 @@ interface MainRepository {
 
     suspend fun setActiveRoute(id: Long)
     suspend fun deactivateRoutes()
-    fun observeActiveRoute(): Flow<TourRoute>
+    fun observeActiveRoute(): Flow<TourRoute?>
 }
