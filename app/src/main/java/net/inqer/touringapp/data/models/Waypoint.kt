@@ -10,8 +10,8 @@ data class Waypoint(
         val routeId: Int,
         val index: Int,
         val label: String,
-        val latitude: String,
-        val longitude: String,
+        val latitude: Double,
+        val longitude: Double,
 
         @SerializedName("created_at")
         val createdAt: Date,
