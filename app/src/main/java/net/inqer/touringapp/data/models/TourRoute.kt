@@ -16,7 +16,7 @@ data class TourRoute(
         val id: Long,
         val title: String,
         val description: String,
-        val image: String,
+        val image: String?,
 
         @Transient
         @ColumnInfo(defaultValue = "0")

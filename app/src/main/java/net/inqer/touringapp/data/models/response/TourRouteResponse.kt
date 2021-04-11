@@ -13,7 +13,7 @@ data class TourRouteResponse(
         val id: Long,
         val title: String,
         val description: String,
-        val image: String,
+        val image: String?,
 
         @SerializedName("created_at")
         val createdAt: Date,
