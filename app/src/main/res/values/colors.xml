@@ -12,4 +12,6 @@
     <color name="bottom_panel">#303030</color>
 
     <color name="black_overlay">#66000000</color>
+
+    <color name="target_line">#80BB86FC</color>
 </resources>
