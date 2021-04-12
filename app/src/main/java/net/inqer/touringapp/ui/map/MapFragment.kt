@@ -201,29 +201,6 @@ class MapFragment : Fragment() {
             enableMyLocation()
             binding.map.overlayManager.add(this)
         }
-
-
-//        if (ActivityCompat.checkSelfPermission(context,
-//                        Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-//                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            requestPermissionsIfNecessary(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
-////            return
-//        }
-//        viewModel.fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
-//            Log.d(TAG, "setupLocationOverlay: location: $location ; ${location.accuracy} ; ${location.geoPoint()}")
-//            viewModel.lastLocation = location
-//            viewModel.lastLocationPoint = location.geoPoint()
-//
-//            updateTargetLine()
-//        }
     }
 
 
