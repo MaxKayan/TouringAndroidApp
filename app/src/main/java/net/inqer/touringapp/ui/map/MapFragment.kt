@@ -195,6 +195,7 @@ class MapFragment : Fragment() {
         LocationOverlay(locationProvider, binding.map).apply {
             setOnLocationChangedListener { location, source ->
                 viewModel.updateLocation(location)
+                updateTargetLine()
             }
 
             enableMyLocation()
