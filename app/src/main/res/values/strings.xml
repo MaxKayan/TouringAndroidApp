@@ -22,4 +22,6 @@
     <string name="n_destinations">⛲ %1$d точек притяжения</string>
     <string name="tour_is_active_icon">Tour Is Active Icon</string>
     <string name="active">Активен</string>
+    <string name="my_location">My Location</string>
+    <string name="step_backward">Step Backward</string>
 </resources>
