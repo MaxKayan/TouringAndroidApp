@@ -3,6 +3,7 @@ package net.inqer.touringapp.ui.map
 import android.location.Location
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -22,6 +23,8 @@ class MapViewModel @Inject constructor(
         val fusedLocationProviderClient: FusedLocationProviderClient,
         @ActiveTourRouteFlow private val activeTourRouteFlow: Flow<TourRoute>
 ) : ViewModel() {
+    private val _mutableCurrentLocation: MutableLiveData<GeoPoint?> = MutableLiveData()
+
     var lastLocation: Location? = null
         private set
 
@@ -32,10 +35,14 @@ class MapViewModel @Inject constructor(
         lastLocation = location
         lastLocationPoint = GeoPoint(location)
 
+        _mutableCurrentLocation.value = lastLocationPoint
+
         Log.d(TAG, "updateLocation: $lastLocation ; $lastLocationPoint")
     }
 
     val activeTourRoute: LiveData<TourRoute?> = activeTourRouteFlow.asLiveData(dispatchers.io)
+
+    val currentLocation: LiveData<GeoPoint?> = _mutableCurrentLocation
 
     companion object {
         private const val TAG = "MapViewModel"

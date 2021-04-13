@@ -7,7 +7,7 @@ data class Waypoint(
         @SerializedName("pk")
         val id: Long,
         @SerializedName("route")
-        val routeId: Int,
+        val routeId: Long,
         val index: Int,
         val label: String,
         val latitude: Double,

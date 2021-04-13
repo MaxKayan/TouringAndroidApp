@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -26,10 +25,11 @@ import net.inqer.touringapp.ui.map.overlays.LocationOverlay
 import net.inqer.touringapp.util.GeoHelpers.calculateArea
 import net.inqer.touringapp.util.GeoHelpers.calculatePointBetween
 import org.osmdroid.config.Configuration
+import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
-import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.compass.CompassOverlay
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider
@@ -49,12 +49,15 @@ class MapFragment : Fragment() {
 
     private lateinit var binding: FragmentMapBinding
 
+    private lateinit var destinationsAdapter: DestinationsMapAdapter
+
     private val waypointsPolyline: Polyline = Polyline()
     private val targetPolyline: Polyline = Polyline()
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentMapBinding.inflate(inflater, container, false)
+        destinationsAdapter = DestinationsMapAdapter(binding.map, layoutInflater)
         return binding.root
     }
 
@@ -64,9 +67,11 @@ class MapFragment : Fragment() {
 
         Configuration.getInstance().load(appContext, PreferenceManager.getDefaultSharedPreferences(appContext))
 
-        setupWaypointsPolyline()
-
         initMap()
+
+        setupMapEvents()
+
+        setupWaypointsPolyline()
 
         setDefaultView()
 
@@ -79,6 +84,20 @@ class MapFragment : Fragment() {
         setupButtonClickListeners()
 
         subscribeObservers()
+    }
+
+    private fun setupMapEvents() {
+        val eventsOverlay = MapEventsOverlay(object : MapEventsReceiver {
+            override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
+                destinationsAdapter.closeAllInfoWindows()
+                return true
+            }
+
+            override fun longPressHelper(p: GeoPoint?): Boolean {
+                return false
+            }
+        })
+        binding.map.overlayManager.add(eventsOverlay)
     }
 
 
@@ -104,7 +123,7 @@ class MapFragment : Fragment() {
 
     private fun setupButtonClickListeners() {
         binding.fabMyLocation.setOnClickListener {
-            viewModel.lastLocationPoint.let { binding.map.controller.animateTo(it) }
+            viewModel.currentLocation.value.let { binding.map.controller.animateTo(it) }
         }
     }
 
@@ -120,6 +139,14 @@ class MapFragment : Fragment() {
                 setTourWaypointsLine(
                         waypoints.map { GeoPoint(it.latitude, it.longitude) }.toList()
                 )
+            }
+
+            route.destinations?.let { destinations ->
+                destinationsAdapter.submitList(destinations.toList())
+            }
+
+            viewModel.currentLocation.observe(viewLifecycleOwner) { point ->
+                updateTargetLine(point)
             }
         }
     }
@@ -156,13 +183,13 @@ class MapFragment : Fragment() {
 
         binding.map.zoomToBoundingBox(calculateArea(geoPoints), true, 100)
 
-        updateTargetLine()
+        updateTargetLine(viewModel.currentLocation.value)
     }
 
 
-    private fun updateTargetLine() {
-        if (waypointsPolyline.actualPoints.isNotEmpty() && viewModel.lastLocationPoint !== null) {
-            targetPolyline.setPoints(listOf(viewModel.lastLocationPoint, waypointsPolyline.actualPoints[0]))
+    private fun updateTargetLine(location: GeoPoint?) {
+        if (waypointsPolyline.actualPoints.isNotEmpty() && location !== null) {
+            targetPolyline.setPoints(listOf(location, waypointsPolyline.actualPoints[0]))
         }
     }
 
@@ -189,13 +216,11 @@ class MapFragment : Fragment() {
             binding.map.overlayManager.add(this)
         }
 
-
         //My Location
         //note you have handle the permissions yourself, the overlay did not do it for you
         LocationOverlay(locationProvider, binding.map).apply {
             setOnLocationChangedListener { location, source ->
                 viewModel.updateLocation(location)
-                updateTargetLine()
             }
 
             enableMyLocation()
@@ -294,18 +319,7 @@ class MapFragment : Fragment() {
 
 
     private fun setMarkers() {
-        val rgutMarker = Marker(binding.map)
-        rgutMarker.position = POINT_RGUTIS
-        rgutMarker.icon = ContextCompat.getDrawable(appContext, R.drawable.marker_icon)
-        rgutMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-        rgutMarker.title = POINT_RGUTIS.label
-        rgutMarker.setOnMarkerClickListener { marker, mapView ->
-            Toast.makeText(context, String.format(Locale.US, "Marker %s was tapped! %f %f",
-                    marker.title, marker.position.longitude, marker.position.longitude),
-                    Toast.LENGTH_SHORT).show()
-            false
-        }
-        binding.map.overlays.add(rgutMarker)
+
     }
 
 
