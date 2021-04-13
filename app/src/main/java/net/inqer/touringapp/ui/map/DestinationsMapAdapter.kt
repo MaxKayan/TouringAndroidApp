@@ -31,7 +31,7 @@ class DestinationsMapAdapter(
         for (destination in list) {
             val marker = Marker(map).apply {
                 position = destination.geoPoint()
-                icon = ContextCompat.getDrawable(context, R.drawable.ic_baseline_location_on_24)
+                icon = ContextCompat.getDrawable(context, R.drawable.ic_location)
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                 title = destination.title
 
