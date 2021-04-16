@@ -10,10 +10,11 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import dagger.hilt.android.AndroidEntryPoint
 import net.inqer.touringapp.MainActivity
 import net.inqer.touringapp.R
 
-//@AndroidEntryPoint
+@AndroidEntryPoint
 class RouteService : Service() {
     override fun onBind(intent: Intent?): IBinder? {
         return null
@@ -21,7 +22,7 @@ class RouteService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         //do heavy work on a background thread
-        val input = intent?.getStringExtra("inputExtra")
+        val input = intent?.getStringExtra(INIT_MESSAGE_EXTRA)
         createNotificationChannel()
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
@@ -44,7 +45,7 @@ class RouteService : Service() {
             val serviceChannel = NotificationChannel(CHANNEL_ID, "Foreground Service Channel",
                     NotificationManager.IMPORTANCE_DEFAULT)
             getSystemService(NotificationManager::class.java).apply {
-                createNotificationChannel(serviceChannel)
+                this.createNotificationChannel(serviceChannel)
             }
         }
     }
@@ -52,9 +53,11 @@ class RouteService : Service() {
     companion object {
         private const val CHANNEL_ID = "TourRouteControllerService"
 
+        private const val INIT_MESSAGE_EXTRA = "initMessageExtra"
+
         fun startService(context: Context, message: String) {
             val startIntent = Intent(context, RouteService::class.java)
-            startIntent.putExtra("inputExtra", message)
+            startIntent.putExtra(INIT_MESSAGE_EXTRA, message)
             ContextCompat.startForegroundService(context, startIntent)
         }
 

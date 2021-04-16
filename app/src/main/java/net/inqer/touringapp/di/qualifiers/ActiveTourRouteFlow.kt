@@ -1,8 +1,10 @@
 package net.inqer.touringapp.di.qualifiers
 
+import java.lang.annotation.ElementType
+import java.lang.annotation.Target
 import javax.inject.Qualifier
 
 /** Annotation for an Application Context dependency. */
-@kotlin.annotation.Target(AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION, AnnotationTarget.FIELD)
 @Qualifier
+@Target(ElementType.METHOD, ElementType.PARAMETER, ElementType.FIELD)
 annotation class ActiveTourRouteFlow()

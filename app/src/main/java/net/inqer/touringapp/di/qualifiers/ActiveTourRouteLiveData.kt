@@ -5,4 +5,4 @@ import javax.inject.Qualifier
 /** Annotation for an Application Context dependency. */
 @Qualifier
 @kotlin.annotation.Target(AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION, AnnotationTarget.FIELD)
-annotation class ActiveTourRouteLiveData()
+annotation class ActiveTourRouteLiveData
