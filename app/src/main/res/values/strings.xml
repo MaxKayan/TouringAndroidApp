@@ -25,4 +25,5 @@
     <string name="my_location">My Location</string>
     <string name="step_backward">Step Backward</string>
     <string name="more_details">Подробнее</string>
+    <string name="route_following">Следование маршруту</string>
 </resources>

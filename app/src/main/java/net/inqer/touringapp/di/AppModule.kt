@@ -2,6 +2,8 @@ package net.inqer.touringapp.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import androidx.room.Room
 import dagger.Module
 import dagger.Provides
@@ -12,12 +14,13 @@ import net.inqer.touringapp.AppConfig
 import net.inqer.touringapp.R
 import net.inqer.touringapp.SettingsConstants.DEFAULT_URL
 import net.inqer.touringapp.data.local.AppDatabase
+import net.inqer.touringapp.data.models.TourRoute
 import net.inqer.touringapp.data.remote.RoutesApi
+import net.inqer.touringapp.di.qualifiers.ActiveTourRouteLiveData
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.text.DateFormat
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -73,4 +76,9 @@ object AppModule {
     @Singleton
     @Provides
     fun provideDateFormat(@ApplicationContext context: Context): DateFormat = android.text.format.DateFormat.getDateFormat(context)
+
+    @Singleton
+    @Provides
+    @ActiveTourRouteLiveData
+    fun provideActiveTourRouteLiveData(database: AppDatabase): LiveData<TourRoute?> = database.tourRouteDao().observeActiveRoute().asLiveData()
 }

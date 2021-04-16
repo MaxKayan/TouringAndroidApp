@@ -21,7 +21,7 @@ class MapViewModel @Inject constructor(
         dispatchers: DispatcherProvider,
         val gpsLocationProvider: GpsMyLocationProvider,
         val fusedLocationProviderClient: FusedLocationProviderClient,
-        @ActiveTourRouteFlow private val activeTourRouteFlow: Flow<TourRoute>
+        @ActiveTourRouteFlow private val activeTourRouteFlow: Flow<TourRoute?>
 ) : ViewModel() {
     private val _mutableCurrentLocation: MutableLiveData<GeoPoint?> = MutableLiveData()
 
