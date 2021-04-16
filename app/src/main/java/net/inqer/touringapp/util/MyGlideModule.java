@@ -1,4 +1,4 @@
-package net.inqer.touringapp.service;
+package net.inqer.touringapp.util;
 
 import com.bumptech.glide.annotation.GlideModule;
 import com.bumptech.glide.module.AppGlideModule;
