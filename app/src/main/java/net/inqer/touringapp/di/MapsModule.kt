@@ -16,8 +16,4 @@ object MapsModule {
     @Provides
     fun provideGpsMyLocationProvider(@ApplicationContext context: Context): GpsMyLocationProvider =
             GpsMyLocationProvider(context)
-
-    @Provides
-    fun provideFusedLocationProviderClient(@ApplicationContext context: Context): FusedLocationProviderClient =
-            LocationServices.getFusedLocationProviderClient(context)
 }

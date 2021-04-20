@@ -5,6 +5,8 @@ import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
 import androidx.room.Room
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -81,4 +83,8 @@ object AppModule {
     @Provides
     @ActiveTourRouteLiveData
     fun provideActiveTourRouteLiveData(database: AppDatabase): LiveData<TourRoute?> = database.tourRouteDao().observeActiveRoute().asLiveData()
+
+    @Provides
+    fun provideFusedLocationProviderClient(@ApplicationContext context: Context): FusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(context)
 }
