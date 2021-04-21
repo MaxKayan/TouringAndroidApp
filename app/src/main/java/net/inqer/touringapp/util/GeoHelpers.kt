@@ -1,5 +1,7 @@
 package net.inqer.touringapp.util
 
+import android.location.Location
+import net.inqer.touringapp.data.models.Waypoint
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 
@@ -11,7 +13,7 @@ object GeoHelpers {
         return p1.destinationPoint(distance / 2, bearing)
     }
 
-    fun calculateArea(points: List<GeoPoint>): BoundingBox? {
+    fun calculateArea(points: List<GeoPoint>): BoundingBox {
         var nord = 0.0
         var sud = 0.0
         var ovest = 0.0
@@ -25,5 +27,27 @@ object GeoHelpers {
             if (i == 0 || lon > est) est = lon
         }
         return BoundingBox(nord, est, sud, ovest)
+    }
+
+    data class DistanceResult(
+            val distance: Float,
+            val initialBearing: Float,
+            val finalBearing: Float
+    )
+
+
+    fun distanceBetween(location: Location, waypoint: Waypoint) =
+            distanceBetween(location.latitude, location.longitude, waypoint.latitude, waypoint.longitude)
+
+
+    fun distanceBetween(waypoint: Waypoint, waypoint2: Waypoint) =
+            distanceBetween(waypoint.latitude, waypoint.longitude, waypoint2.latitude, waypoint2.longitude)
+
+
+    private fun distanceBetween(startLatitude: Double, startLongitude: Double,
+                                endLatitude: Double, endLongitude: Double): DistanceResult {
+        val results = FloatArray(3)
+        Location.distanceBetween(startLatitude, startLongitude, endLatitude, endLongitude, results)
+        return DistanceResult(results[0], results[1], results[2])
     }
 }

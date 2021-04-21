@@ -26,4 +26,9 @@
     <string name="step_backward">Step Backward</string>
     <string name="more_details">Подробнее</string>
     <string name="route_following">Следование маршруту</string>
+    <string name="open_route">Открыть маршрут на карте</string>
+    <string name="cancel_route">Отменить маршрут</string>
+    <string name="route_service_ticker">Загрузка маршрута…</string>
+    <string name="route_service_text">Пройдите к следующей точке</string>
+    <string name="route_service_title">Следование маршруту</string>
 </resources>

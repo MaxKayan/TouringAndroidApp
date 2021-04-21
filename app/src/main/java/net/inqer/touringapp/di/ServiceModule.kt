@@ -22,32 +22,6 @@ object ServiceModule {
 
     @ServiceScoped
     @Provides
-    fun provideMainActivityPendingIntent(@ApplicationContext context: Context): PendingIntent =
-            PendingIntent.getActivity(
-                    context,
-                    420,
-                    Intent(context, MainActivity::class.java).apply {
-                        this.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    },
-                    PendingIntent.FLAG_UPDATE_CURRENT
-            )
-
-    @ServiceScoped
-    @Provides
-    @Named("RouteService")
-    fun provideNotificationBuilder(
-            @ApplicationContext context: Context,
-            pendingIntent: PendingIntent): NotificationCompat.Builder =
-            NotificationCompat.Builder(context, RouteService.CHANNEL_ID)
-                    .setAutoCancel(false)
-                    .setOngoing(true)
-                    .setSmallIcon(R.drawable.osm_ic_center_map)
-                    .setContentTitle(context.getString(R.string.route_following))
-                    .setContentText("00:00:00")
-                    .setContentIntent(pendingIntent)
-
-    @ServiceScoped
-    @Provides
     fun provideNotificationManager(@ApplicationContext context: Context): NotificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 

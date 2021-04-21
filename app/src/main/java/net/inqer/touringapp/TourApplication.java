@@ -42,7 +42,7 @@ public class TourApplication extends Application {
         activeRoute.observeForever(tourRoute -> {
             Log.d(TAG, "subscribeObservers: " + tourRoute);
             if (tourRoute != null) {
-                RouteService.Companion.startService(this, "Запускаем следование маршруту...");
+                RouteService.Companion.startService(this);
             } else {
                 RouteService.Companion.stopService(this);
             }
