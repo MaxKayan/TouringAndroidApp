@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -36,7 +37,15 @@ class RouteService : LifecycleService() {
     @Inject
     lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    @Inject
+    lateinit var notificationBuilder: NotificationCompat.Builder
+
+    @Inject
+    lateinit var notificationManager: NotificationManager
+
     private lateinit var serviceChannel: NotificationChannel
+
+    private var activeRoute: TourRoute? = null
 
     //    override fun onBind(intent: Intent?): IBinder? {
 //        return null
@@ -48,7 +57,11 @@ class RouteService : LifecycleService() {
         Log.d(TAG, "onStartCommand: $intent ; ${intent?.action} ; $flags ; $startId")
 
         val input = intent?.getStringExtra(INIT_MESSAGE_EXTRA)
-        createNotificationChannel()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel()
+        }
+
         val notificationIntent = Intent(this, MainActivity::class.java)
 
         val pendingIntent = PendingIntent.getActivity(
@@ -57,12 +70,13 @@ class RouteService : LifecycleService() {
                 notificationIntent, 0
         )
 
-        val notification = NotificationCompat.Builder(this, Companion.CHANNEL_ID)
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(getString(R.string.route_following))
                 .setContentText(input)
                 .setSmallIcon(R.drawable.ic_outline_map_24)
                 .setContentIntent(pendingIntent)
                 .build()
+
         startForeground(1, notification)
         return START_STICKY
     }
@@ -72,9 +86,8 @@ class RouteService : LifecycleService() {
         Log.d(TAG, "onCreate: called")
 
         activeTourRouteLiveData.observe(this) { route ->
-            Log.d(TAG, "onCreate: $route")
-
-
+            Log.d(TAG, "onCreate: got route - $route")
+            activeRoute = route
         }
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
@@ -93,6 +106,12 @@ class RouteService : LifecycleService() {
                 super.onLocationResult(p0)
                 Log.d(TAG, "onLocationResult: $p0")
                 Toast.makeText(applicationContext, "Локация: ${p0.lastLocation}", Toast.LENGTH_SHORT).show()
+
+                activeRoute?.let { route ->
+                    route.waypoints?.forEach {
+
+                    }
+                }
             }
 
             override fun onLocationAvailability(p0: LocationAvailability) {
@@ -102,19 +121,22 @@ class RouteService : LifecycleService() {
         }, Looper.getMainLooper())
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            serviceChannel = NotificationChannel(CHANNEL_ID, "Foreground Service Channel",
-                    NotificationManager.IMPORTANCE_DEFAULT)
-            getSystemService(NotificationManager::class.java).apply {
-                this.createNotificationChannel(serviceChannel)
-            }
-        }
+        val channel =
+                NotificationChannel(
+                        CHANNEL_ID,
+                        "Foreground Service Channel",
+                        NotificationManager.IMPORTANCE_LOW
+                )
+
+        notificationManager.createNotificationChannel(channel)
     }
 
     companion object {
         private const val TAG = "RouteService"
-        private const val CHANNEL_ID = "TourRouteControllerService"
+        const val CHANNEL_ID = "TourRouteControllerService"
+        const val CHANNEL_NAME = "Foreground Service Channel"
 
         private const val INIT_MESSAGE_EXTRA = "initMessageExtra"
 
