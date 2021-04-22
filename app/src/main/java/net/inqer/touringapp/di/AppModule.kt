@@ -16,6 +16,7 @@ import net.inqer.touringapp.AppConfig
 import net.inqer.touringapp.R
 import net.inqer.touringapp.SettingsConstants.DEFAULT_URL
 import net.inqer.touringapp.data.local.AppDatabase
+import net.inqer.touringapp.data.models.ActiveRouteDataBus
 import net.inqer.touringapp.data.models.TourRoute
 import net.inqer.touringapp.data.remote.RoutesApi
 import net.inqer.touringapp.di.qualifiers.ActiveTourRouteLiveData
@@ -87,4 +88,8 @@ object AppModule {
     @Provides
     fun provideFusedLocationProviderClient(@ApplicationContext context: Context): FusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(context)
+
+    @Singleton
+    @Provides
+    fun provideActiveRouteData() = ActiveRouteDataBus()
 }
