@@ -14,7 +14,7 @@ import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-object DrawableHelper {
+object DrawableHelpers {
     private const val TAG = "DrawableHelper"
 
     @JvmOverloads

@@ -29,8 +29,8 @@ import com.google.android.material.circularreveal.CircularRevealWidget
 import net.inqer.touringapp.R
 import net.inqer.touringapp.data.models.TourRoute
 import net.inqer.touringapp.databinding.ItemTourBinding
-import net.inqer.touringapp.util.DrawableHelper
-import net.inqer.touringapp.util.DrawableHelper.modifyButtonIcon
+import net.inqer.touringapp.util.DrawableHelpers
+import net.inqer.touringapp.util.DrawableHelpers.modifyButtonIcon
 import java.text.DateFormat
 import java.util.*
 import kotlin.collections.HashMap
@@ -127,7 +127,7 @@ class ToursAdapter constructor(
                             states[tour.id] = true
                         }
 
-                        DrawableHelper.modifyFab(context, binding.fabTour,
+                        DrawableHelpers.modifyFab(context, binding.fabTour,
                                 if (fabRevealed) R.drawable.ic_baseline_close_24 else R.drawable.ic_baseline_launch_24
                         )
                     }
@@ -222,7 +222,7 @@ class ToursAdapter constructor(
                 }
 
                 fabRevealed = states[tour.id] ?: fabRevealed
-                DrawableHelper.modifyFab(context, binding.fabTour,
+                DrawableHelpers.modifyFab(context, binding.fabTour,
                         if (fabRevealed) R.drawable.ic_baseline_close_24 else R.drawable.ic_baseline_launch_24
                 )
                 binding.innerCard.visibility = if (fabRevealed) View.VISIBLE else View.INVISIBLE

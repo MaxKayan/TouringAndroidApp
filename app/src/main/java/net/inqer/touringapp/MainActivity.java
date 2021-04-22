@@ -15,10 +15,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import net.inqer.touringapp.databinding.ActivityMainBinding;
-import net.inqer.touringapp.util.DrawableHelper;
-
-import javax.inject.Inject;
-import javax.inject.Named;
+import net.inqer.touringapp.util.DrawableHelpers;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -99,10 +96,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void setFabState(boolean active) {
         if (active) {
-            DrawableHelper.INSTANCE.modifyFab(this, binding.fab,
+            DrawableHelpers.INSTANCE.modifyFab(this, binding.fab,
                     R.drawable.ic_outline_map_24, R.color.purple_200);
         } else {
-            DrawableHelper.INSTANCE.modifyFab(this, binding.fab,
+            DrawableHelpers.INSTANCE.modifyFab(this, binding.fab,
                     R.drawable.ic_outline_map_24,
                     android.R.color.darker_gray,
                     R.color.bottom_panel);
