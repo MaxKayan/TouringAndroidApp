@@ -60,15 +60,19 @@ class RouteService : LifecycleService() {
             when (actionType) {
                 ServiceAction.START -> {
                     launchService()
+                    currentStatus = actionType
                 }
                 ServiceAction.STOP -> {
                     stopService()
+                    currentStatus = actionType
                 }
+                ServiceAction.NEXT_WAYPOINT -> {
 
-                else -> return@let
+                }
+                ServiceAction.PREVIOUS_WAYPOINT -> {
+
+                }
             }
-
-            currentStatus = actionType
         }
 
         return START_STICKY
@@ -90,6 +94,7 @@ class RouteService : LifecycleService() {
 
     private fun stopService() {
         removeLocationUpdates()
+        clearBusData()
         stopSelf()
     }
 
@@ -103,8 +108,24 @@ class RouteService : LifecycleService() {
     private fun subscribeObservers() {
         activeTourRouteLiveData.observe(this) { route ->
             Log.d(TAG, "onCreate: got route - $route")
-            activeRoute = route
+            onActiveRouteChanged(route)
         }
+    }
+
+
+    private fun onActiveRouteChanged(route: TourRoute?) {
+        activeRoute = route
+        if (routeDataBus.currentWaypointLiveData.value == null) {
+            activeRoute?.waypoints?.let {
+                if (it.isNotEmpty())
+                    routeDataBus.currentWaypointLiveData.postValue(it[0])
+            }
+        }
+    }
+
+
+    private fun nextWaypoint() {
+
     }
 
 
@@ -114,7 +135,7 @@ class RouteService : LifecycleService() {
                 NotificationChannel(
                         CHANNEL_ID,
                         CHANNEL_NAME,
-                        NotificationManager.IMPORTANCE_LOW
+                        NotificationManager.IMPORTANCE_HIGH
                 )
 
         notificationManager.createNotificationChannel(channel)
@@ -229,6 +250,15 @@ class RouteService : LifecycleService() {
         return builder.build()
     }
 
+
+    private fun clearBusData() {
+        routeDataBus.closestPoint.value = null
+        routeDataBus.activeDestinationLiveData.value = null
+        routeDataBus.currentWaypointLiveData.value = null
+        routeDataBus.targetWaypointLiveData.value = null
+    }
+
+
     companion object {
         private const val TAG = "RouteService"
         private const val NOTIFICATION_IDENTIFIER = 121212
@@ -242,6 +272,8 @@ class RouteService : LifecycleService() {
 
         private const val UPDATE_INTERVAL_IN_MILLISECONDS: Long = 10000
         private const val FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS: Long = UPDATE_INTERVAL_IN_MILLISECONDS / 2
+
+        private const val WAYPOINT_ENTER_RADIUS = 5f
 
         fun startService(context: Context) {
             val startIntent = Intent(context, RouteService::class.java).apply {
@@ -259,7 +291,9 @@ class RouteService : LifecycleService() {
 
         enum class ServiceAction {
             START,
-            STOP
+            STOP,
+            NEXT_WAYPOINT,
+            PREVIOUS_WAYPOINT
         }
     }
 }

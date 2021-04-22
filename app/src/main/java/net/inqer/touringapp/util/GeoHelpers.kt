@@ -41,7 +41,7 @@ object GeoHelpers {
     }
 
 
-    fun distanceBetween(location: Location, waypoint: Waypoint) =
+    private fun distanceBetween(location: Location, waypoint: Waypoint) =
             distanceBetween(location.latitude, location.longitude, waypoint.latitude, waypoint.longitude)
 
 
@@ -56,24 +56,32 @@ object GeoHelpers {
         return DistanceResult(results[0], results[1], results[2])
     }
 
-    fun findClosestWaypoint(location: Location, waypoints: Array<Waypoint>): TargetPoint? {
+    /**
+     * @param coherent - Used to ease the algorithm - compare waypoint distances one by one
+     * and return as soon as the next waypoint is farther than the previous.
+     */
+    fun findClosestWaypoint(location: Location, waypoints: Array<Waypoint>, coherent: Boolean = false): TargetPoint? {
         var lastResult: DistanceResult? = null
         var targetWaypoint: Waypoint? = null
+        val distances = ArrayList<DistanceResult>()
 
-        for (waypoint: Waypoint in waypoints) {
+        for (waypoint in waypoints) {
             val newResult = distanceBetween(location, waypoint)
 
-            if (lastResult != null && targetWaypoint != null && newResult.distance > lastResult.distance) {
-                Log.d(TAG, "findClosestWaypoint: found! $lastResult \n $newResult \n $waypoint \n ${waypoints.indexOf(waypoint)}")
+            if (coherent && lastResult != null && targetWaypoint != null && newResult.distance > lastResult.distance) {
+                Log.d(TAG, "findClosestWaypoint: found coherently! $lastResult \n $newResult \n $waypoint \n ${waypoints.indexOf(waypoint)}")
                 return TargetPoint(lastResult, targetWaypoint)
             }
 
+            distances.add(newResult)
             lastResult = newResult
             targetWaypoint = waypoint
         }
 
-        return if (lastResult != null && targetWaypoint != null)
-            TargetPoint(lastResult, targetWaypoint)
+        val minDistance = distances.minByOrNull { distanceResult: DistanceResult -> distanceResult.distance }
+
+        return if (minDistance != null)
+            TargetPoint(minDistance, waypoints[distances.indexOf(minDistance)])
         else null
     }
 }
