@@ -14,16 +14,13 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.location.*
 import dagger.hilt.android.AndroidEntryPoint
 import net.inqer.touringapp.MainActivity
 import net.inqer.touringapp.R
-import net.inqer.touringapp.data.models.Destination
-import net.inqer.touringapp.data.models.TourRoute
-import net.inqer.touringapp.data.models.Waypoint
+import net.inqer.touringapp.data.models.*
 import net.inqer.touringapp.di.qualifiers.ActiveTourRouteLiveData
-import net.inqer.touringapp.util.GeoHelpers
+import net.inqer.touringapp.util.GeoHelpers.findClosestWaypoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -37,6 +34,9 @@ class RouteService : LifecycleService() {
 
     @Inject
     lateinit var notificationManager: NotificationManager
+
+    @Inject
+    lateinit var routeDataBus: ActiveRouteDataBus
 
     private var currentStatus: ServiceAction = ServiceAction.STOP
 
@@ -132,36 +132,12 @@ class RouteService : LifecycleService() {
             super.onLocationResult(locationResult)
             Log.d(TAG, "onLocationResult: $locationResult")
 
-            // New location received
-            activeRoute?.let { route ->
-                var lastResult: GeoHelpers.DistanceResult? = null
-                var targetWaypoint: Waypoint? = null
+            activeRoute?.waypoints?.let { waypoints ->
+                Log.d(TAG, "onLocationResult: calculating closest point...")
+                val targetPoint = findClosestWaypoint(locationResult.lastLocation, waypoints)
+                Log.i(TAG, "onLocationResult: targetPoint - $targetPoint ; ${targetPoint?.distanceResult?.distance}")
 
-                Log.i(TAG, "onLocationResult: calculating target waypoint...")
-                route.waypoints?.forEach loop@{ waypoint ->
-//                    if (index + 1 >= route.waypoints.size) return@loop
-//                    val nextPoint = route.waypoints[index + 1]
-                    val newResult = GeoHelpers.distanceBetween(locationResult.lastLocation, waypoint)
-
-                    if (lastResult == null) {
-                        lastResult = newResult
-                        targetWaypoint = waypoint
-                        return
-                    }
-
-                    lastResult?.let {
-                        if (newResult.distance > it.distance) {
-                            return@loop
-                        }
-                    }
-
-                    lastResult = newResult
-                    targetWaypoint = waypoint
-                }
-
-                Log.i(TAG, "onLocationResult: our calculated target waypoint - $lastResult")
-
-                onNewTargetFound(targetWaypoint)
+                onNewTargetFound(targetPoint)
             }
         }
 
@@ -172,10 +148,19 @@ class RouteService : LifecycleService() {
     }
 
 
-    private fun onNewTargetFound(waypoint: Waypoint?) {
-        targetWaypointLiveData.postValue(waypoint)
+    private fun onNewTargetFound(point: TargetPoint?) {
+        if (point == null) {
+            Log.w(TAG, "onNewTargetFound: target point is null!")
+        }
+        routeDataBus.closestPoint.postValue(point)
 
-        notificationManager.notify(NOTIFICATION_IDENTIFIER, createForegroundNotification("Цель - ${waypoint?.latitude} ; ${waypoint?.longitude}"))
+        notificationManager.notify(
+                NOTIFICATION_IDENTIFIER,
+                createForegroundNotification("Цель - ${point?.waypoint?.latitude} ; ${point?.waypoint?.longitude}" +
+                        "Расстояние: ${point?.distanceResult?.distance}")
+        )
+
+        Log.i(TAG, "onNewTargetFound: notification sent. - $point")
     }
 
 
@@ -206,6 +191,8 @@ class RouteService : LifecycleService() {
 
 
     private fun createForegroundNotification(contentText: String = getString(R.string.route_service_text)): Notification? {
+        Log.d(TAG, "createForegroundNotification: $contentText")
+
         val serviceClosePendingIntent = PendingIntent.getActivity(
                 this,
                 NOTIFICATION_REQUEST_CODE,
@@ -221,14 +208,14 @@ class RouteService : LifecycleService() {
                 Intent(this, MainActivity::class.java), 0)
 
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-                .addAction(R.drawable.ic_baseline_launch_24, getString(R.string.open_route),
+                .addAction(R.drawable.ic_baseline_launch_24, getString(R.string.open),
                         activityPendingIntent)
-                .addAction(R.drawable.ic_baseline_close_24, getString(R.string.cancel_route),
+                .addAction(R.drawable.ic_baseline_close_24, getString(R.string.cancel),
                         serviceClosePendingIntent)
                 .setContentText(contentText)
                 .setContentTitle(getText(R.string.route_service_title))
                 .setOngoing(true)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.osm_ic_center_map)
                 .setTicker(getText(R.string.route_service_ticker))
 //                .setWhen(System.currentTimeMillis())
 
@@ -255,10 +242,6 @@ class RouteService : LifecycleService() {
 
         private const val UPDATE_INTERVAL_IN_MILLISECONDS: Long = 10000
         private const val FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS: Long = UPDATE_INTERVAL_IN_MILLISECONDS / 2
-
-        val activeDestinationLiveData: MutableLiveData<Destination> = MutableLiveData()
-        val currentWaypointLiveData: MutableLiveData<Waypoint> = MutableLiveData()
-        val targetWaypointLiveData: MutableLiveData<Waypoint> = MutableLiveData()
 
         fun startService(context: Context) {
             val startIntent = Intent(context, RouteService::class.java).apply {

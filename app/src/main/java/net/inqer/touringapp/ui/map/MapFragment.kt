@@ -20,6 +20,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
 import net.inqer.touringapp.R
+import net.inqer.touringapp.data.models.Waypoint
 import net.inqer.touringapp.databinding.FragmentMapBinding
 import net.inqer.touringapp.ui.map.overlays.LocationOverlay
 import net.inqer.touringapp.util.GeoHelpers.calculateArea
@@ -144,10 +145,14 @@ class MapFragment : Fragment() {
             route.destinations?.let { destinations ->
                 destinationsAdapter.submitList(destinations.toList())
             }
+        }
 
-            viewModel.currentLocation.observe(viewLifecycleOwner) { point ->
-                updateTargetLine(point)
-            }
+        viewModel.currentLocation.observe(viewLifecycleOwner) {
+            updateTargetLine()
+        }
+
+        viewModel.routeDataBus.closestPoint.observe(viewLifecycleOwner) {
+            updateTargetLine()
         }
     }
 
@@ -163,6 +168,11 @@ class MapFragment : Fragment() {
 
             binding.map.overlayManager.add(this)
         }
+    }
+
+
+    private fun displayClosestPoint(waypoint: Waypoint) {
+
     }
 
 
@@ -182,14 +192,18 @@ class MapFragment : Fragment() {
         )
 
         binding.map.zoomToBoundingBox(calculateArea(geoPoints), true, 100)
-
-        updateTargetLine(viewModel.currentLocation.value)
     }
 
 
-    private fun updateTargetLine(location: GeoPoint?) {
-        if (waypointsPolyline.actualPoints.isNotEmpty() && location !== null) {
-            targetPolyline.setPoints(listOf(location, waypointsPolyline.actualPoints[0]))
+    private fun updateTargetLine() {
+        viewModel.routeDataBus.closestPoint.value?.let {
+            updateTargetLine(it.waypoint.asGeoPoint())
+        }
+    }
+
+    private fun updateTargetLine(target: GeoPoint) {
+        viewModel.currentLocation.value?.let { location ->
+            targetPolyline.setPoints(listOf(location, target))
         }
     }
 
@@ -197,18 +211,22 @@ class MapFragment : Fragment() {
     /**
      * Kotlin extension to easily get GeoPoint from location instance
      */
-    private fun Location.geoPoint(): GeoPoint {
+    private fun Location.asGeoPoint(): GeoPoint {
         return GeoPoint(this)
     }
 
+    private fun Waypoint.asGeoPoint(): GeoPoint {
+        return GeoPoint(this.latitude, this.longitude)
+    }
 
-    private fun setupLocationOverlay(locationProvider: GpsMyLocationProvider) {
+
+    private fun setupLocationOverlay(locationProvider: GpsMyLocationProvider?) {
 //        val context: Context = binding.root.context
 
         targetPolyline.apply {
             this.outlinePaint.apply {
                 color = ContextCompat.getColor(binding.root.context, R.color.target_line)
-                pathEffect = DashPathEffect(floatArrayOf(10f, 20f), 0f)
+                pathEffect = DashPathEffect(floatArrayOf(20f, 15f), 0f)
 //                strokeJoin = Paint.Join.ROUND
 //                strokeCap = Paint.Cap.ROUND
             }
@@ -218,13 +236,15 @@ class MapFragment : Fragment() {
 
         //My Location
         //note you have handle the permissions yourself, the overlay did not do it for you
-        LocationOverlay(locationProvider, binding.map).apply {
-            setOnLocationChangedListener { location, source ->
-                viewModel.updateLocation(location)
-            }
+        locationProvider?.let {
+            LocationOverlay(it, binding.map).apply {
+                setOnLocationChangedListener { location, source ->
+                    viewModel.updateLocation(location)
+                }
 
-            enableMyLocation()
-            binding.map.overlayManager.add(this)
+                enableMyLocation()
+                binding.map.overlayManager.add(this)
+            }
         }
     }
 

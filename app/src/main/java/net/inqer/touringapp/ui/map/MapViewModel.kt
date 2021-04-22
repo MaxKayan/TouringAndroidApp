@@ -9,6 +9,7 @@ import androidx.lifecycle.asLiveData
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import net.inqer.touringapp.data.models.ActiveRouteDataBus
 import net.inqer.touringapp.data.models.TourRoute
 import net.inqer.touringapp.di.qualifiers.ActiveTourRouteFlow
 import net.inqer.touringapp.util.DispatcherProvider
@@ -21,15 +22,14 @@ class MapViewModel @Inject constructor(
         dispatchers: DispatcherProvider,
         val gpsLocationProvider: GpsMyLocationProvider,
         val fusedLocationProviderClient: FusedLocationProviderClient,
-        @ActiveTourRouteFlow private val activeTourRouteFlow: Flow<TourRoute?>
+        @ActiveTourRouteFlow private val activeTourRouteFlow: Flow<TourRoute?>,
+        val routeDataBus: ActiveRouteDataBus
 ) : ViewModel() {
     private val _mutableCurrentLocation: MutableLiveData<GeoPoint?> = MutableLiveData()
 
-    var lastLocation: Location? = null
-        private set
+    private var lastLocation: Location? = null
 
-    var lastLocationPoint: GeoPoint? = null
-        private set
+    private var lastLocationPoint: GeoPoint? = null
 
     fun updateLocation(location: Location?) {
         lastLocation = location
