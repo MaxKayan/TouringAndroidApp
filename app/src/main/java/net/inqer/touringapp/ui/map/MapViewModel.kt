@@ -17,7 +17,6 @@ import net.inqer.touringapp.service.RouteService
 import net.inqer.touringapp.util.DispatcherProvider
 import net.inqer.touringapp.util.GpsLocationProvider
 import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import javax.inject.Inject
 
 @HiltViewModel
