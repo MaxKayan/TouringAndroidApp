@@ -67,10 +67,10 @@ class RouteService : LifecycleService() {
                     currentStatus = actionType
                 }
                 ServiceAction.NEXT_WAYPOINT -> {
-
+                    nextWaypoint()
                 }
                 ServiceAction.PREVIOUS_WAYPOINT -> {
-
+                    previousWaypoint()
                 }
             }
         }
@@ -115,17 +115,35 @@ class RouteService : LifecycleService() {
 
     private fun onActiveRouteChanged(route: TourRoute?) {
         activeRoute = route
-        if (routeDataBus.currentWaypointLiveData.value == null) {
-            activeRoute?.waypoints?.let {
-                if (it.isNotEmpty())
-                    routeDataBus.currentWaypointLiveData.postValue(it[0])
-            }
-        }
+
+        Log.d(TAG, "onActiveRouteChanged: called, setting target to 0")
+        setTargetWaypoint(0)
     }
 
 
-    private fun nextWaypoint() {
+    private fun selectActiveWaypoint(step: Int) {
+        val currentIndex = routeDataBus.targetWaypointIndex.value
+        val nextIndex = currentIndex?.plus(step)
+        val waypoints = activeRoute?.waypoints
 
+        Log.d(TAG, "selectActiveWaypoint: moving waypoint. step = $step; index = $currentIndex ; nextIndex = $nextIndex ; waypoints = $waypoints")
+
+        if (nextIndex != null && waypoints != null && nextIndex in waypoints.indices) {
+            routeDataBus.targetWaypoint.postValue(waypoints[nextIndex])
+            routeDataBus.targetWaypointIndex.postValue(nextIndex)
+        } else {
+            Log.w(TAG, "nextWaypoint: failed to activate next waypoint ; $nextIndex ; $waypoints")
+        }
+    }
+
+    private fun previousWaypoint() {
+        Log.d(TAG, "previousWaypoint: called")
+        selectActiveWaypoint(-1)
+    }
+
+    private fun nextWaypoint() {
+        Log.d(TAG, "nextWaypoint: called")
+        selectActiveWaypoint(1)
     }
 
 
@@ -155,10 +173,10 @@ class RouteService : LifecycleService() {
 
             activeRoute?.waypoints?.let { waypoints ->
                 Log.d(TAG, "onLocationResult: calculating closest point...")
-                val targetPoint = findClosestWaypoint(locationResult.lastLocation, waypoints)
-                Log.i(TAG, "onLocationResult: targetPoint - $targetPoint ; ${targetPoint?.distanceResult?.distance}")
+                val closestPoint = findClosestWaypoint(locationResult.lastLocation, waypoints)
+                Log.i(TAG, "onLocationResult: targetPoint - $closestPoint ; ${closestPoint?.distanceResult?.distance}")
 
-                onNewTargetFound(targetPoint)
+                onClosestWaypointFound(closestPoint)
             }
         }
 
@@ -169,11 +187,11 @@ class RouteService : LifecycleService() {
     }
 
 
-    private fun onNewTargetFound(point: TargetPoint?) {
+    private fun onClosestWaypointFound(point: CalculatedPoint?) {
         if (point == null) {
             Log.w(TAG, "onNewTargetFound: target point is null!")
         }
-        routeDataBus.closestPoint.postValue(point)
+        routeDataBus.closestWaypoint.postValue(point)
 
         notificationManager.notify(
                 NOTIFICATION_IDENTIFIER,
@@ -182,6 +200,28 @@ class RouteService : LifecycleService() {
         )
 
         Log.i(TAG, "onNewTargetFound: notification sent. - $point")
+    }
+
+
+    private fun setTargetWaypoint(waypoint: Waypoint) =
+            activeRoute?.waypoints?.let {
+                setTargetWaypoint(it.indexOf(waypoint), waypoint)
+            }
+
+    private fun setTargetWaypoint(index: Int) {
+        activeRoute?.waypoints?.let {
+            if (index in it.indices) {
+                setTargetWaypoint(index, it[index])
+            } else {
+                Log.e(TAG, "setTargetWaypoint: out of bounds",
+                        IndexOutOfBoundsException("Index $index is not in active waypoints bounds"))
+            }
+        }
+    }
+
+    private fun setTargetWaypoint(index: Int, waypoint: Waypoint) {
+        routeDataBus.targetWaypoint.postValue(waypoint)
+        routeDataBus.targetWaypointIndex.postValue(index)
     }
 
 
@@ -252,10 +292,7 @@ class RouteService : LifecycleService() {
 
 
     private fun clearBusData() {
-        routeDataBus.closestPoint.value = null
-        routeDataBus.activeDestinationLiveData.value = null
-        routeDataBus.currentWaypointLiveData.value = null
-        routeDataBus.targetWaypointLiveData.value = null
+        routeDataBus.clear()
     }
 
 
@@ -287,6 +324,20 @@ class RouteService : LifecycleService() {
                 putExtra(EXTRA_INTENT_TYPE, ServiceAction.STOP)
             }
             context.startService(stopIntent)
+        }
+
+        fun nextWaypoint(context: Context) {
+            val nextWaypointIntent = Intent(context, RouteService::class.java).apply {
+                putExtra(EXTRA_INTENT_TYPE, ServiceAction.NEXT_WAYPOINT)
+            }
+            context.startService(nextWaypointIntent)
+        }
+
+        fun prevWaypoint(context: Context) {
+            val prevWaypointIntent = Intent(context, RouteService::class.java).apply {
+                putExtra(EXTRA_INTENT_TYPE, ServiceAction.PREVIOUS_WAYPOINT)
+            }
+            context.startService(prevWaypointIntent)
         }
 
         enum class ServiceAction {

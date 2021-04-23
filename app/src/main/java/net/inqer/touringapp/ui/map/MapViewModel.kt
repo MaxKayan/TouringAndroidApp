@@ -1,5 +1,6 @@
 package net.inqer.touringapp.ui.map
 
+import android.content.Context
 import android.location.Location
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import net.inqer.touringapp.data.models.ActiveRouteDataBus
 import net.inqer.touringapp.data.models.TourRoute
 import net.inqer.touringapp.di.qualifiers.ActiveTourRouteFlow
+import net.inqer.touringapp.service.RouteService
 import net.inqer.touringapp.util.DispatcherProvider
 import net.inqer.touringapp.util.GpsLocationProvider
 import org.osmdroid.util.GeoPoint
@@ -44,6 +46,12 @@ class MapViewModel @Inject constructor(
     val activeTourRoute: LiveData<TourRoute?> = activeTourRouteFlow.asLiveData(dispatchers.io)
 
     val currentLocation: LiveData<GeoPoint?> = _mutableCurrentLocation
+
+
+    fun nextWaypoint(context: Context) = RouteService.nextWaypoint(context)
+
+    fun prevWaypoint(context: Context) = RouteService.prevWaypoint(context)
+
 
     companion object {
         private const val TAG = "MapViewModel"
