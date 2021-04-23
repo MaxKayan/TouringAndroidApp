@@ -13,6 +13,7 @@ import net.inqer.touringapp.data.models.ActiveRouteDataBus
 import net.inqer.touringapp.data.models.TourRoute
 import net.inqer.touringapp.di.qualifiers.ActiveTourRouteFlow
 import net.inqer.touringapp.util.DispatcherProvider
+import net.inqer.touringapp.util.GpsLocationProvider
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import javax.inject.Inject
@@ -20,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(
         dispatchers: DispatcherProvider,
-        val gpsLocationProvider: GpsMyLocationProvider,
+        val gpsLocationProvider: GpsLocationProvider,
         val fusedLocationProviderClient: FusedLocationProviderClient,
         @ActiveTourRouteFlow private val activeTourRouteFlow: Flow<TourRoute?>,
         val routeDataBus: ActiveRouteDataBus
