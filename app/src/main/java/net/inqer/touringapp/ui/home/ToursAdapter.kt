@@ -16,7 +16,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
-import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -43,6 +42,7 @@ class ToursAdapter constructor(
         private val callbacks: TourViewHolder.OnTourViewInteraction,
         private val dateFormat: DateFormat
 ) : ListAdapter<TourRoute, ToursAdapter.Companion.TourViewHolder>(TOUR_BRIEF_ITEM_CALLBACK) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TourViewHolder {
         val binding: ItemTourBinding = ItemTourBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return TourViewHolder(this, binding, callbacks, revealedStates)
@@ -161,7 +161,6 @@ class ToursAdapter constructor(
                 val launchClick: View.OnClickListener
                 val launchIcon: Drawable?
 
-                @DrawableRes val launchIconRes: Int
                 if (!tour.isActive) {
                     launchText = context.getText(R.string.lets_go)
                     launchClick = View.OnClickListener { callbacks.launchClick(tour) }
