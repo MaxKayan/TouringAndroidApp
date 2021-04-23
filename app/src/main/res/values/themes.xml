@@ -16,9 +16,9 @@
 
         <item name="snackbarStyle">@style/Widget.Design.Snackbar</item>
 
-<!--        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>-->
-<!--        <item name="android:windowTranslucentStatus">true</item>-->
-<!--        <item name="android:windowTranslucentNavigation">true</item>-->
-<!--        <item name="android:windowActionBarOverlay">true</item>-->
+        <!--        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>-->
+        <!--        <item name="android:windowTranslucentStatus">true</item>-->
+        <!--        <item name="android:windowTranslucentNavigation">true</item>-->
+        <!--        <item name="android:windowActionBarOverlay">true</item>-->
     </style>
 </resources>
