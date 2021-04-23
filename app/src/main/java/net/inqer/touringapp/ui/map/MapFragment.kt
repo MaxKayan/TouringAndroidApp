@@ -8,6 +8,7 @@ import android.graphics.DashPathEffect
 import android.graphics.Paint
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +24,7 @@ import net.inqer.touringapp.R
 import net.inqer.touringapp.data.models.Waypoint
 import net.inqer.touringapp.databinding.FragmentMapBinding
 import net.inqer.touringapp.ui.map.overlays.LocationOverlay
+import net.inqer.touringapp.util.DrawableHelpers
 import net.inqer.touringapp.util.GeoHelpers.calculateArea
 import net.inqer.touringapp.util.GeoHelpers.calculatePointBetween
 import org.osmdroid.config.Configuration
@@ -31,6 +33,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.MapEventsOverlay
+import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.compass.CompassOverlay
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider
@@ -55,11 +58,23 @@ class MapFragment : Fragment() {
     private val waypointsPolyline: Polyline = Polyline()
     private val targetPolyline: Polyline = Polyline()
 
+    private lateinit var closestPointMarker: Marker
+    private lateinit var targetPointMarker: Marker
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentMapBinding.inflate(inflater, container, false)
-        destinationsAdapter = DestinationsMapAdapter(binding.map, layoutInflater)
+        onViewBindingReady()
         return binding.root
+    }
+
+    /**
+     *  Called as soon as the view binding has been inflated.
+     */
+    private fun onViewBindingReady() {
+        destinationsAdapter = DestinationsMapAdapter(binding.map, layoutInflater)
+
+        setupMarkers()
     }
 
 
@@ -76,7 +91,7 @@ class MapFragment : Fragment() {
 
         setDefaultView()
 
-        setMarkers()
+        setupMarkers()
 
         managePermissions(viewModel.fusedLocationProviderClient)
 
@@ -85,20 +100,6 @@ class MapFragment : Fragment() {
         setupButtonClickListeners()
 
         subscribeObservers()
-    }
-
-    private fun setupMapEvents() {
-        val eventsOverlay = MapEventsOverlay(object : MapEventsReceiver {
-            override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
-                destinationsAdapter.closeAllInfoWindows()
-                return true
-            }
-
-            override fun longPressHelper(p: GeoPoint?): Boolean {
-                return false
-            }
-        })
-        binding.map.overlayManager.add(eventsOverlay)
     }
 
 
@@ -119,6 +120,21 @@ class MapFragment : Fragment() {
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Configuration.getInstance().save(this, prefs);
         binding.map.onPause() //needed for compass, my location overlays, v6.0.0 and up
+    }
+
+
+    private fun setupMapEvents() {
+        val eventsOverlay = MapEventsOverlay(object : MapEventsReceiver {
+            override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
+                destinationsAdapter.closeAllInfoWindows()
+                return true
+            }
+
+            override fun longPressHelper(p: GeoPoint?): Boolean {
+                return false
+            }
+        })
+        binding.map.overlayManager.add(eventsOverlay)
     }
 
 
@@ -145,9 +161,7 @@ class MapFragment : Fragment() {
             }
 
             route.waypoints?.let { waypoints ->
-                setTourWaypointsLine(
-                        waypoints.map { GeoPoint(it.latitude, it.longitude) }.toList()
-                )
+                setTourWaypointsLine(waypoints)
             }
 
             route.destinations?.let { destinations ->
@@ -159,8 +173,15 @@ class MapFragment : Fragment() {
             updateTargetLine()
         }
 
-        viewModel.routeDataBus.closestPoint.observe(viewLifecycleOwner) {
-            updateTargetLine()
+        viewModel.routeDataBus.targetWaypoint.observe(viewLifecycleOwner) { waypoint ->
+            waypoint?.let {
+                updateTargetLine(it)
+                updateTargetPointMarker(it)
+            }
+        }
+
+        viewModel.routeDataBus.closestWaypoint.observe(viewLifecycleOwner) { point ->
+            point?.let { updateClosestPointMarker(point.waypoint) }
         }
     }
 
@@ -179,13 +200,24 @@ class MapFragment : Fragment() {
     }
 
 
-    private fun displayClosestPoint(waypoint: Waypoint) {
+    private fun updateClosestPointMarker(waypoint: Waypoint) {
+        if (!this::closestPointMarker.isInitialized) return
 
+        Log.d(TAG, "updateClosestPoint: settings closest waypoint position - $waypoint")
+        closestPointMarker.position = waypoint.asGeoPoint()
+    }
+
+    private fun updateTargetPointMarker(waypoint: Waypoint) {
+        Log.d(TAG, "updateTargetPoint: setting target waypoint marker position - $waypoint")
+        targetPointMarker.position = waypoint.asGeoPoint()
     }
 
 
     private fun clearWaypointsPolyline() = waypointsPolyline.setPoints(listOf())
 
+
+    private fun setTourWaypointsLine(waypoints: Array<Waypoint>) =
+            setTourWaypointsLine(waypoints.map { GeoPoint(it.latitude, it.longitude) }.toList())
 
     private fun setTourWaypointsLine(geoPoints: List<GeoPoint>) {
         waypointsPolyline.setPoints(geoPoints)
@@ -204,9 +236,13 @@ class MapFragment : Fragment() {
 
 
     private fun updateTargetLine() {
-        viewModel.routeDataBus.closestPoint.value?.let {
-            updateTargetLine(it.waypoint.asGeoPoint())
+        viewModel.routeDataBus.targetWaypoint.value?.let {
+            updateTargetLine(it)
         }
+    }
+
+    private fun updateTargetLine(waypoint: Waypoint) {
+        updateTargetLine(waypoint.asGeoPoint())
     }
 
     private fun updateTargetLine(target: GeoPoint) {
@@ -346,8 +382,37 @@ class MapFragment : Fragment() {
     }
 
 
-    private fun setMarkers() {
+    private fun setupMarkers() {
+        val context: Context = binding.root.context
 
+        closestPointMarker = Marker(binding.map).apply {
+//                position = destination.geoPoint()
+            icon = DrawableHelpers.getThemePaintedDrawable(context, R.drawable.circle, R.attr.colorPrimaryVariant)
+            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+            title = "Ближайшая точка"
+
+            setOnMarkerClickListener { _, _ ->
+                Log.d(TAG, "onViewBindingReady: closest point marker clicked")
+                true
+            }
+
+            binding.map.overlayManager.add(this)
+        }
+
+        targetPointMarker = Marker(binding.map).apply {
+//                position = destination.geoPoint()
+
+            icon = DrawableHelpers.getResPaintedDrawable(context, R.drawable.circle, R.color.target_line)
+            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+            title = "Целевая точка"
+
+            setOnMarkerClickListener { _, _ ->
+                Log.d(TAG, "onViewBindingReady: closest point marker clicked")
+                true
+            }
+
+            binding.map.overlayManager.add(this)
+        }
     }
 
 
