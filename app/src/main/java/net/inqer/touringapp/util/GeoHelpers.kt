@@ -2,7 +2,7 @@ package net.inqer.touringapp.util
 
 import android.location.Location
 import android.util.Log
-import net.inqer.touringapp.data.models.TargetPoint
+import net.inqer.touringapp.data.models.CalculatedPoint
 import net.inqer.touringapp.data.models.Waypoint
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
@@ -60,7 +60,7 @@ object GeoHelpers {
      * @param coherent - Used to ease the algorithm - compare waypoint distances one by one
      * and return as soon as the next waypoint is farther than the previous.
      */
-    fun findClosestWaypoint(location: Location, waypoints: Array<Waypoint>, coherent: Boolean = false): TargetPoint? {
+    fun findClosestWaypoint(location: Location, waypoints: Array<Waypoint>, coherent: Boolean = false): CalculatedPoint? {
         var lastResult: DistanceResult? = null
         var targetWaypoint: Waypoint? = null
         val distances = ArrayList<DistanceResult>()
@@ -70,7 +70,7 @@ object GeoHelpers {
 
             if (coherent && lastResult != null && targetWaypoint != null && newResult.distance > lastResult.distance) {
                 Log.d(TAG, "findClosestWaypoint: found coherently! $lastResult \n $newResult \n $waypoint \n ${waypoints.indexOf(waypoint)}")
-                return TargetPoint(lastResult, targetWaypoint)
+                return CalculatedPoint(lastResult, targetWaypoint)
             }
 
             distances.add(newResult)
@@ -81,7 +81,7 @@ object GeoHelpers {
         val minDistance = distances.minByOrNull { distanceResult: DistanceResult -> distanceResult.distance }
 
         return if (minDistance != null)
-            TargetPoint(minDistance, waypoints[distances.indexOf(minDistance)])
+            CalculatedPoint(minDistance, waypoints[distances.indexOf(minDistance)])
         else null
     }
 }

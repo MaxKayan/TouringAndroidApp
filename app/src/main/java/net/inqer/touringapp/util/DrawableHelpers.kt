@@ -7,6 +7,8 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.Drawable
 import android.util.Log
+import android.util.TypedValue
+import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
@@ -42,6 +44,7 @@ object DrawableHelpers {
             fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, fabColor))
     }
 
+
     fun modifyButtonIcon(
             context: Context, button: MaterialButton, @DrawableRes iconRes: Int? = null,
             @ColorRes iconColorRes: Int? = null,
@@ -51,6 +54,7 @@ object DrawableHelpers {
                 if (iconColorRes != null) ContextCompat.getColor(context, iconColorRes) else null
         )
     }
+
 
     fun modifyButtonIcon(button: MaterialButton, icon: Drawable? = null,
                          @ColorInt iconColor: Int? = null) {
@@ -66,5 +70,28 @@ object DrawableHelpers {
 
             button.icon = newIcon
         }
+    }
+
+
+    @ColorInt
+    fun getThemeColor(context: Context, @AttrRes attrRes: Int): Int =
+            TypedValue().let { context.theme.resolveAttribute(attrRes, it, true); it.data }
+
+
+    fun getThemePaintedDrawable(context: Context, @DrawableRes drawableRes: Int, @AttrRes colorAttribute: Int): Drawable? =
+            getPaintedDrawable(context, drawableRes, getThemeColor(context, colorAttribute))
+
+    fun getResPaintedDrawable(context: Context, @DrawableRes drawableRes: Int, @ColorRes colorRes: Int): Drawable? =
+            getPaintedDrawable(context, drawableRes, ContextCompat.getColor(context, colorRes))
+
+    private fun getPaintedDrawable(context: Context, @DrawableRes drawableRes: Int, @ColorInt color: Int = Color.WHITE): Drawable? {
+        val drawable = ContextCompat.getDrawable(context, drawableRes) ?: return null
+
+        drawable.mutate().colorFilter = PorterDuffColorFilter(
+                color,
+                PorterDuff.Mode.MULTIPLY
+        )
+
+        return drawable
     }
 }
