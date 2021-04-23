@@ -2,6 +2,7 @@ package net.inqer.touringapp.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.location.LocationManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
 import androidx.room.Room
@@ -92,4 +93,10 @@ object AppModule {
     @Singleton
     @Provides
     fun provideActiveRouteData() = ActiveRouteDataBus()
+
+
+    @Singleton
+    @Provides
+    fun provideLocationManager(@ApplicationContext context: Context): LocationManager =
+            context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 }
