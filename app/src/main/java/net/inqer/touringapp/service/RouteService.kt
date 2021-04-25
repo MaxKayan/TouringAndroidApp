@@ -108,7 +108,7 @@ class RouteService : LifecycleService() {
 
     private fun subscribeObservers() {
         activeTourRouteLiveData.observe(this) { route ->
-            Log.d(TAG, "onCreate: got route - $route")
+            Log.d(TAG, "activeTourRouteLiveData.observe: got route - $route")
             onActiveRouteChanged(route)
         }
     }
