@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private NavController navController;
-
     private MainViewModel viewModel;
 
     @Override
@@ -45,7 +44,17 @@ public class MainActivity extends AppCompatActivity {
         setupClickListeners();
 
         binding.fab.setCompatPressedTranslationZ(1f);
+
+        handleIntent(getIntent());
     }
+
+    @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        Window window = getWindow();
+        window.setFormat(PixelFormat.RGBA_8888);
+    }
+
 
     public void restartApp() {
         Intent intent = getBaseContext().getPackageManager().getLaunchIntentForPackage(
@@ -55,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         finish();
         startActivity(intent);
     }
+
 
     private void setupNavigation() {
         // Passing each menu ID as a set of Ids because each
@@ -78,13 +88,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
     private void setupClickListeners() {
         binding.fab.setOnClickListener(view -> {
             navigateTo(R.id.navigation_map);
-
-//            Snackbar.make(view, String.format("View model string - \n %s", viewModel.getTestString2()), Snackbar.LENGTH_LONG).show();
         });
     }
+
 
     private void navigateTo(final int navigationId) {
         NavDestination destination = navController.getCurrentDestination();
@@ -93,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
         navController.navigate(navigationId, null);
     }
+
 
     private void setFabState(boolean active) {
         if (active) {
@@ -106,11 +117,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        Window window = getWindow();
-        window.setFormat(PixelFormat.RGBA_8888);
+
+    private void handleIntent(Intent intent) {
+        IntentType intentType = (IntentType) intent.getSerializableExtra(EXTRA_MAIN_INTENT_TYPE);
+        if (intentType == IntentType.TO_MAP_FRAGMENT) {
+            navigateTo(R.id.navigation_map);
+        }
     }
 
+
+    public static final String EXTRA_MAIN_INTENT_TYPE = "EXTRA_MAIN_INTENT_TYPE";
+    public enum IntentType {
+        TO_MAP_FRAGMENT;
+    }
 }

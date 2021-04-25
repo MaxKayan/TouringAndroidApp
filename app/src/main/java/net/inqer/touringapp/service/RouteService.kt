@@ -266,7 +266,11 @@ class RouteService : LifecycleService() {
 
         // The PendingIntent to launch activity.
         val activityPendingIntent = PendingIntent.getActivity(this, 0,
-                Intent(this, MainActivity::class.java), 0)
+                Intent(this, MainActivity::class.java).apply {
+                    putExtra(MainActivity.EXTRA_MAIN_INTENT_TYPE, MainActivity.IntentType.TO_MAP_FRAGMENT)
+                },
+                0
+        )
 
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
                 .addAction(R.drawable.ic_baseline_launch_24, getString(R.string.open),
