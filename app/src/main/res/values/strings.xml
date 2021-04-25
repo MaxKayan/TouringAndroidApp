@@ -31,4 +31,5 @@
     <string name="route_service_ticker">Загрузка маршрута…</string>
     <string name="route_service_text">Пройдите к следующей точке</string>
     <string name="route_service_title">Следование маршруту</string>
+    <string name="location_poll_interval">LOCATION_POLL_INTERVAL</string>
 </resources>

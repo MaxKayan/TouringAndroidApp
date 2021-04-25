@@ -38,13 +38,19 @@ object AppModule {
             @ApplicationContext context: Context,
             preferences: SharedPreferences
     ): AppConfig {
-        val key = context.getString(R.string.main_server_address)
-        val url = preferences.getString(key, DEFAULT_URL)
-
         return object : AppConfig {
-            override val BASE_URL: String
-                get() = url
+            override val baseUrl: String
+                get() = preferences.getString(
+                        context.getString(R.string.main_server_address),
+                        DEFAULT_URL
+                )
                         ?: DEFAULT_URL
+
+            override val locationPollInterval: Int
+                get() = preferences.getInt(
+                        context.getString(R.string.location_poll_interval),
+                        10000
+                )
         }
     }
 
@@ -55,7 +61,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideRetrofitInstance(config: AppConfig, factory: Converter.Factory): Retrofit = Retrofit.Builder()
-            .baseUrl(config.BASE_URL)
+            .baseUrl(config.baseUrl)
             .addConverterFactory(factory)
             .build()
 

@@ -16,6 +16,7 @@ import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.LiveData
 import com.google.android.gms.location.*
 import dagger.hilt.android.AndroidEntryPoint
+import net.inqer.touringapp.AppConfig
 import net.inqer.touringapp.MainActivity
 import net.inqer.touringapp.R
 import net.inqer.touringapp.data.models.*
@@ -38,9 +39,10 @@ class RouteService : LifecycleService() {
     @Inject
     lateinit var routeDataBus: ActiveRouteDataBus
 
-    private var currentStatus: ServiceAction = ServiceAction.STOP
+    @Inject
+    lateinit var appConfig: AppConfig
 
-    private lateinit var serviceChannel: NotificationChannel
+    private var currentStatus: ServiceAction = ServiceAction.STOP
 
     private var activeRoute: TourRoute? = null
 
@@ -87,7 +89,6 @@ class RouteService : LifecycleService() {
         subscribeObservers()
         requestLocationUpdates()
 
-//        startService(Intent(applicationContext, RouteService::class.java))
         startForeground(NOTIFICATION_IDENTIFIER, createForegroundNotification())
     }
 
@@ -161,8 +162,9 @@ class RouteService : LifecycleService() {
 
 
     private fun createLocationRequest(): LocationRequest = LocationRequest.create().apply {
-        interval = UPDATE_INTERVAL_IN_MILLISECONDS
-        fastestInterval = FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS
+        val pollInterval = appConfig.locationPollInterval.toLong()
+        interval = pollInterval
+        fastestInterval = pollInterval / 2
         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
     }
 
@@ -226,7 +228,8 @@ class RouteService : LifecycleService() {
 
 
     private fun requestLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -247,7 +250,6 @@ class RouteService : LifecycleService() {
 
     private fun removeLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
-//        stopSelf()
     }
 
 
@@ -277,6 +279,7 @@ class RouteService : LifecycleService() {
                         activityPendingIntent)
                 .addAction(R.drawable.ic_baseline_close_24, getString(R.string.cancel),
                         serviceClosePendingIntent)
+                .setContentIntent(activityPendingIntent)
                 .setContentText(contentText)
                 .setContentTitle(getText(R.string.route_service_title))
                 .setOngoing(true)
@@ -310,9 +313,6 @@ class RouteService : LifecycleService() {
         private const val EXTRA_INTENT_TYPE = "EXTRA_INTENT_TYPE"
 
         private const val PENDING_INTENT_NOTIFICATION_CODE = 0
-
-        private const val UPDATE_INTERVAL_IN_MILLISECONDS: Long = 10000
-        private const val FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS: Long = UPDATE_INTERVAL_IN_MILLISECONDS / 2
 
         private const val WAYPOINT_ENTER_RADIUS = 5f
 

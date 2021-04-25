@@ -1,14 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        app:key="main_settings_category"
-        app:title="Параметры связи">
+        android:key="main_settings_category"
+        android:title="Параметры связи">
 
         <Preference
-            app:key="@string/main_server_address"
-            app:summary="IP-адрес, либо доменное имя"
-            app:title="Адрес сервера" />
+            android:key="@string/main_server_address"
+            android:summary="IP-адрес, либо доменное имя"
+            android:inputType="text"
+            android:title="Адрес сервера" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="location_settings_category"
+        android:title="Параметры сервиса гео-локации">
+
+        <Preference
+            android:key="@string/location_poll_interval"
+            android:inputType="number"
+            android:title="Интервал запроса текущей локации"
+            android:hint="В милисекундах"/>
 
     </PreferenceCategory>
 </PreferenceScreen>

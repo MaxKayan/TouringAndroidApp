@@ -3,11 +3,14 @@ package net.inqer.touringapp.components
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.XmlResourceParser
+import android.text.InputType
 import android.util.AttributeSet
 import android.util.Log
 import android.util.Xml
 import android.view.LayoutInflater
+import android.view.inputmethod.EditorInfo
 import android.widget.LinearLayout
+import androidx.core.view.children
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textview.MaterialTextView
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,7 +39,7 @@ class PreferencesView @JvmOverloads constructor(
 
     private val parser: XmlResourceParser
     private val layoutInflater: LayoutInflater
-    private val textFields: HashMap<String, TextInputLayout> = HashMap()
+    private val fieldsToSave: HashMap<String, TextInputLayout> = HashMap()
 
     init {
         orientation = VERTICAL
@@ -63,51 +66,126 @@ class PreferencesView @JvmOverloads constructor(
 
                 when (parser.name) {
                     "PreferenceCategory" -> {
-                        appendCategoryHeader(Xml.asAttributeSet(parser).getAttributeValue(xmlns, "title"))
+                        appendCategoryHeader(Xml.asAttributeSet(parser).getAttributeValue(xmlns, ATTR_TITLE))
                     }
                     "Preference" -> {
                         val attrs = Xml.asAttributeSet(parser)
-                        val keyString = attrs.getAttributeValue(xmlns, "key")
+                        val keyString = attrs.getAttributeValue(xmlns, ATTR_KEY)
                         val key = context.getString(keyString.substring(1).toInt())
-                        appendTextField(
-                                key,
-                                attrs.getAttributeValue(xmlns, "title"),
-                                sharedPreferences.getString(key, config.BASE_URL)
-                        )
+
+                        when (val type = attrs.getAttributeIntValue(xmlns, ATTR_TYPE, EditorInfo.TYPE_NULL)) {
+                            EditorInfo.TYPE_NULL, EditorInfo.TYPE_CLASS_TEXT -> {
+                                appendTextField(
+                                        key,
+                                        attrs.getAttributeValue(xmlns, ATTR_TITLE),
+                                        sharedPreferences.getString(key, config.baseUrl),
+                                        type
+                                )
+                            }
+                            EditorInfo.TYPE_CLASS_NUMBER -> {
+                                appendIntegerField(
+                                        key,
+                                        attrs.getAttributeValue(xmlns, ATTR_TITLE),
+                                        sharedPreferences.getInt(key, config.locationPollInterval),
+                                        type
+                                )
+                            }
+                            else -> {
+                                Log.e(TAG, "parseAndInflate: unknown preference type! - $type")
+                            }
+                        }
+
                     }
                 }
             }
         } while (state != XmlPullParser.END_DOCUMENT)
     }
 
+
     private fun appendCategoryHeader(title: String? = "Параметры") {
-        Log.d(TAG, "appendCategoryHeader: $title")
-        val view = layoutInflater.inflate(R.layout.item_category_header, this, true)
-        view.findViewById<MaterialTextView>(R.id.header_title)?.text = title
+        val view = layoutInflater.inflate(R.layout.item_category_header, this, false) as LinearLayout
+        val textView = view.children.find { child ->
+            Log.d(TAG, "appendCategoryHeader: child = $child")
+            child is MaterialTextView
+        } as MaterialTextView?
+        textView?.text = title
+
+        this.addView(view)
     }
 
-    private fun appendTextField(key: String, title: String?, value: String?) {
+
+    private fun appendTextField(key: String, title: String?, value: String?, fieldType: Int) {
         Log.d(TAG, "appendTextField: $key $title $value")
-        val view = layoutInflater.inflate(R.layout.item_setting, this, true)
-        val textInputLayout = view.findViewById<TextInputLayout>(R.id.text_field).apply {
+        val textInputLayout = layoutInflater.inflate(R.layout.item_setting, this, false) as TextInputLayout
+        textInputLayout.apply {
             hint = title
-            editText?.setText(value)
+            editText?.apply {
+                inputType = fieldType
+                setText(value)
+            }
         }
-        textFields[key] = textInputLayout
+        fieldsToSave[key] = textInputLayout
+
+        this.addView(textInputLayout)
     }
+
+
+    private fun appendIntegerField(key: String, title: String?, value: Int, fieldType: Int) {
+        val view = layoutInflater.inflate(R.layout.item_setting, this, false) as TextInputLayout
+        view.apply {
+            hint = title
+            editText?.apply {
+                inputType = fieldType
+                setText(value.toString())
+            }
+        }
+        fieldsToSave[key] = view
+
+        this.addView(view)
+    }
+
 
     fun save() {
         val editor = sharedPreferences.edit()
-        textFields.forEach {
-            Log.d(TAG, "save: ${it.key} ${it.value.editText?.text}")
-            editor.putString(it.key, it.value.editText?.text.toString())
+        fieldsToSave.forEach { entry ->
+            Log.d(TAG, "save: ${entry.key} ${entry.value.editText?.text}")
+
+            entry.value.editText?.let { editText ->
+                when (editText.inputType) {
+                    InputType.TYPE_CLASS_TEXT -> {
+                        editor.putString(entry.key, entry.value.editText?.text.toString())
+                    }
+
+                    InputType.TYPE_CLASS_NUMBER -> {
+                        try {
+                            val value = editText.text.toString().toInt()
+                            editor.putInt(entry.key, value)
+                        } catch (exception: NumberFormatException) {
+                            Log.e(TAG, "save: ${entry.key} value is not a valid number",
+                                    exception)
+                        }
+                    }
+
+                    else -> {
+                        Log.e(TAG, "save: can't save, unknown input type! - ${editText.inputType}")
+                    }
+                }
+            }
+
         }
 
         editor.apply()
     }
 
+
     companion object {
         private const val TAG = "PreferencesView"
-        private const val xmlns = "http://schemas.android.com/apk/res-auto"
+        private const val xmlns = "http://schemas.android.com/apk/res/android"
+
+        private const val ATTR_KEY = "key"
+        private const val ATTR_TITLE = "title"
+        private const val ATTR_TYPE = "inputType"
+        private const val TYPE_NUMBER = "number"
+        private const val TYPE_DECIMAL = "numberDecimal"
     }
 }
