@@ -13,6 +13,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.distinctUntilChanged
 import net.inqer.touringapp.AppConfig
 import net.inqer.touringapp.R
 import net.inqer.touringapp.SettingsConstants.DEFAULT_URL
@@ -85,12 +86,14 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideDateFormat(@ApplicationContext context: Context): DateFormat = android.text.format.DateFormat.getDateFormat(context)
+    fun provideDateFormat(@ApplicationContext context: Context): DateFormat =
+            android.text.format.DateFormat.getDateFormat(context)
 
     @Singleton
     @Provides
     @ActiveTourRouteLiveData
-    fun provideActiveTourRouteLiveData(database: AppDatabase): LiveData<TourRoute?> = database.tourRouteDao().observeActiveRoute().asLiveData()
+    fun provideActiveTourRouteLiveData(database: AppDatabase): LiveData<TourRoute?> =
+            database.tourRouteDao().observeActiveRoute().distinctUntilChanged().asLiveData()
 
     @Provides
     fun provideFusedLocationProviderClient(@ApplicationContext context: Context): FusedLocationProviderClient =
