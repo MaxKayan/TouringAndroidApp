@@ -450,8 +450,8 @@ class RouteService : LifecycleService() {
 
         val notificationText = "Следуйте к следующей путевой точке. " +
                 "${index}/${activeRoute?.waypoints?.size} \n" +
-                "Расстояние: ${bearingToAzimuth(point?.distanceResult?.distance)?.round(2)}м. \n" +
-                "Направление: ${point?.distanceResult?.finalBearing?.round(1)}°"
+                "Расстояние: ${point?.distanceResult?.distance?.round(2)}м. \n" +
+                "Направление: ${bearingToAzimuth(point?.distanceResult?.finalBearing)?.round(1)}°"
 
         notificationManager.notify(
                 NOTIFICATION_IDENTIFIER,
