@@ -59,6 +59,7 @@ class RouteService : LifecycleService() {
 
             if (actionType == currentStatus) return@let
 
+            // Handle service communication using intents with certain type extra
             when (actionType) {
                 ServiceAction.START -> {
                     launchService()
@@ -81,6 +82,9 @@ class RouteService : LifecycleService() {
     }
 
 
+    /**
+     * Initiate the foreground service start sequence.
+     */
     private fun launchService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel()
@@ -93,6 +97,9 @@ class RouteService : LifecycleService() {
     }
 
 
+    /**
+     * Initiate the service stop sequence.
+     */
     private fun stopService() {
         removeLocationUpdates()
         clearBusData()
@@ -106,6 +113,9 @@ class RouteService : LifecycleService() {
     }
 
 
+    /**
+     * Initialize live data observers.
+     */
     private fun subscribeObservers() {
         activeTourRouteLiveData.observe(this) { route ->
             Log.d(TAG, "activeTourRouteLiveData.observe: got route - $route")
@@ -114,6 +124,9 @@ class RouteService : LifecycleService() {
     }
 
 
+    /**
+     * Called each time the active route instance has been changed.
+     */
     private fun onActiveRouteChanged(route: TourRoute?) {
         activeRoute = route
 
@@ -122,6 +135,10 @@ class RouteService : LifecycleService() {
     }
 
 
+    /**
+     * Offset the select waypoint with the given step within the waypoints array.
+     * @param step Active waypoint selection offset. Could be positive or negative.
+     */
     private fun selectActiveWaypoint(step: Int) {
         val currentIndex = routeDataBus.targetWaypointIndex.value
         val nextIndex = currentIndex?.plus(step)
@@ -137,17 +154,26 @@ class RouteService : LifecycleService() {
         }
     }
 
+    /**
+     * Set active waypoint to the previous one.
+     */
     private fun previousWaypoint() {
         Log.d(TAG, "previousWaypoint: called")
         selectActiveWaypoint(-1)
     }
 
+    /**
+     * Set active waypoint to the next one.
+     */
     private fun nextWaypoint() {
         Log.d(TAG, "nextWaypoint: called")
         selectActiveWaypoint(1)
     }
 
 
+    /**
+     * Create the foreground service notification channel for API >= 26
+     */
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel() {
         val channel =
@@ -161,6 +187,10 @@ class RouteService : LifecycleService() {
     }
 
 
+    /**
+     * Create the location request with desired interval and priority parameters.
+     * @return Properly configured [LocationRequest]
+     */
     private fun createLocationRequest(): LocationRequest = LocationRequest.create().apply {
         val pollInterval = appConfig.locationPollInterval.toLong()
         interval = pollInterval
@@ -168,6 +198,11 @@ class RouteService : LifecycleService() {
         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
     }
 
+
+    /**
+     * Simple location callback interface implementation that maps the location event to the local
+     * method.
+     */
     private val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             super.onLocationResult(locationResult)
@@ -210,6 +245,9 @@ class RouteService : LifecycleService() {
                 setTargetWaypoint(it.indexOf(waypoint), waypoint)
             }
 
+    /**
+     * Sets the waypoint with the given id as target.
+     */
     private fun setTargetWaypoint(index: Int) {
         activeRoute?.waypoints?.let {
             if (index in it.indices) {
@@ -221,12 +259,19 @@ class RouteService : LifecycleService() {
         }
     }
 
+    /**
+     * Sets the given target values to the liveData bus.
+     */
     private fun setTargetWaypoint(index: Int, waypoint: Waypoint) {
         routeDataBus.targetWaypoint.postValue(waypoint)
         routeDataBus.targetWaypointIndex.postValue(index)
     }
 
 
+    /**
+     * Applies the [createLocationRequest] and [locationCallback] to the [fusedLocationClient], which
+     * activates the GPS location updates with the specified parameters.
+     */
     private fun requestLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -238,6 +283,7 @@ class RouteService : LifecycleService() {
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
             Log.e(TAG, "requestLocationUpdates: Missing required permissions!")
+            // TODO: Need to handle this situation as it is pretty common since service gets launched before the map fragment.
             return
         }
         fusedLocationClient.requestLocationUpdates(
@@ -248,12 +294,24 @@ class RouteService : LifecycleService() {
     }
 
 
+    /**
+     * Unsubscribe from the location updates of the [fusedLocationClient].
+     */
     private fun removeLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
 
-    private fun createForegroundNotification(contentText: String = getString(R.string.route_service_text)): Notification? {
+    /**
+     * Create new notification instance with the desired parameters.
+     *
+     * @param contentText Text to display in the notification. Default value is taken from the
+     * [R.string.route_service_text] resource.
+     * @param silent Do not use any sound or vibration for this notification. Default value is true.
+     *
+     * @return New foreground [Notification] instance with needed parameters and specified text.
+     */
+    private fun createForegroundNotification(contentText: String = getString(R.string.route_service_text), silent: Boolean = true): Notification? {
         Log.d(TAG, "createForegroundNotification: $contentText")
 
         val serviceClosePendingIntent = PendingIntent.getActivity(
@@ -316,6 +374,12 @@ class RouteService : LifecycleService() {
 
         private const val WAYPOINT_ENTER_RADIUS = 5f
 
+        /**
+         * Send the [ServiceAction.START] command to the service in order to launch it.
+         * Should be called once as the route has been activated.
+         *
+         * @param context Context of the caller.
+         */
         fun startService(context: Context) {
             val startIntent = Intent(context, RouteService::class.java).apply {
                 putExtra(EXTRA_INTENT_TYPE, ServiceAction.START)
@@ -323,6 +387,12 @@ class RouteService : LifecycleService() {
             ContextCompat.startForegroundService(context, startIntent)
         }
 
+        /**
+         * Send the [ServiceAction.STOP] command to the service in order to stop it.
+         * Usually called upon the deactivation of the route.
+         *
+         * @param context Context of the caller.
+         */
         fun stopService(context: Context) {
             val stopIntent = Intent(context, RouteService::class.java).apply {
                 putExtra(EXTRA_INTENT_TYPE, ServiceAction.STOP)
@@ -330,6 +400,12 @@ class RouteService : LifecycleService() {
             context.startService(stopIntent)
         }
 
+        /**
+         * Send the [ServiceAction.NEXT_WAYPOINT] command to the service in order to iterate
+         * the active waypoint forward by one.
+         *
+         * @param context Context of the caller.
+         */
         fun nextWaypoint(context: Context) {
             val nextWaypointIntent = Intent(context, RouteService::class.java).apply {
                 putExtra(EXTRA_INTENT_TYPE, ServiceAction.NEXT_WAYPOINT)
@@ -337,6 +413,12 @@ class RouteService : LifecycleService() {
             context.startService(nextWaypointIntent)
         }
 
+        /**
+         * Send the [ServiceAction.PREVIOUS_WAYPOINT] command to the service in order to iterate
+         * the active waypoint backwards by one.
+         *
+         * @param context Context of the caller.
+         */
         fun prevWaypoint(context: Context) {
             val prevWaypointIntent = Intent(context, RouteService::class.java).apply {
                 putExtra(EXTRA_INTENT_TYPE, ServiceAction.PREVIOUS_WAYPOINT)
