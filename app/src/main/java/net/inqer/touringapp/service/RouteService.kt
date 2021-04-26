@@ -143,15 +143,6 @@ class RouteService : LifecycleService() {
             }
         }
 
-        routeDataBus.closestWaypointCalculatedPoint.observe(this) { point ->
-            Log.d(TAG, "subscribeObservers: closestWaypointCalculatedPoint: $point")
-        }
-
-        routeDataBus.targetWaypointCalculatedDistance.observe(this) { point ->
-            Log.d(TAG, "subscribeObservers: targetWaypointCalculatedDistance: $point")
-
-            updateNotification(targetCalculatedPoint = point)
-        }
     }
 
 
@@ -291,6 +282,12 @@ class RouteService : LifecycleService() {
      */
     private fun onTargetWaypointCalculated(point: CalculatedPoint) {
         routeDataBus.targetWaypointCalculatedDistance.postValue(point)
+
+        updateNotification(targetCalculatedPoint = point)
+
+        if (point.distanceResult.distance < WAYPOINT_ENTER_RADIUS) {
+            nextWaypoint()
+        }
     }
 
 
