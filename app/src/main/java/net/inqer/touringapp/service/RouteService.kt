@@ -332,30 +332,59 @@ class RouteService : LifecycleService() {
                 0
         )
 
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-                .addAction(R.drawable.ic_baseline_launch_24, getString(R.string.open),
-                        activityPendingIntent)
-                .addAction(R.drawable.ic_baseline_close_24, getString(R.string.cancel),
-                        serviceClosePendingIntent)
-                .setContentIntent(activityPendingIntent)
-                .setContentText(contentText)
-                .setContentTitle(getText(R.string.route_service_title))
-                .setOngoing(true)
-                .setSmallIcon(R.drawable.osm_ic_center_map)
-                .setTicker(getText(R.string.route_service_ticker))
-//                .setWhen(System.currentTimeMillis())
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID).apply {
+            this.addAction(R.drawable.ic_baseline_launch_24, getString(R.string.open),
+                    activityPendingIntent)
+            this.addAction(R.drawable.ic_baseline_close_24, getString(R.string.cancel),
+                    serviceClosePendingIntent)
+            this.setContentIntent(activityPendingIntent)
+            this.setContentText(contentText)
+            this.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
+            this.setContentTitle(getText(R.string.route_service_title))
+            this.setOngoing(true)
+            this.setSmallIcon(R.drawable.osm_ic_center_map)
+            this.setTicker(getText(R.string.route_service_ticker))
 
-        // Set the Channel ID for Android O.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            builder.apply {
-                setChannelId(CHANNEL_ID)
-                priority = NotificationManager.IMPORTANCE_HIGH
+            if (!silent) this.setDefaults(NotificationCompat.DEFAULT_SOUND.or(NotificationCompat.DEFAULT_VIBRATE))
+
+            // Set the Channel ID for Android O.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                this.setChannelId(CHANNEL_ID)
+                this.priority = NotificationManager.IMPORTANCE_HIGH
             }
+
+            // setWhen(System.currentTimeMillis())
         }
         return builder.build()
     }
 
 
+    /**
+     * Create a new notification instance with the latest [targetCalculatedPoint] data displayed
+     * in the text content and notify user using the [notificationManager].
+     *
+     * @param targetCalculatedPoint The [findClosestWaypoint] result to display in the notification.
+     * @param indexInput The target waypoint's index in the waypoints array.
+     */
+    private fun updateNotification(targetCalculatedPoint: CalculatedPoint? = null, indexInput: Int? = null) {
+        val point = targetCalculatedPoint ?: routeDataBus.targetWaypointCalculatedDistance.value
+        val index = indexInput ?: routeDataBus.targetWaypointIndex.value
+
+        val notificationText = "Следуйте к следующей путевой точке. " +
+                "${index}/${activeRoute?.waypoints?.size} \n" +
+                "Расстояние: ${bearingToAzimuth(point?.distanceResult?.distance)?.round(2)}м. \n" +
+                "Направление: ${point?.distanceResult?.finalBearing?.round(1)}°"
+
+        notificationManager.notify(
+                NOTIFICATION_IDENTIFIER,
+                createForegroundNotification(notificationText)
+        )
+    }
+
+
+    /**
+     * Clear all liveData values in the [routeDataBus].
+     */
     private fun clearBusData() {
         routeDataBus.clear()
     }
