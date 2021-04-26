@@ -24,7 +24,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MAIN_INTENT_TYPE = "EXTRA_MAIN_INTENT_TYPE";
     private static final String TAG = "MainActivity";
-
     private ActivityMainBinding binding;
     private NavController navController;
     private MainViewModel viewModel;
@@ -56,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
         window.setFormat(PixelFormat.RGBA_8888);
     }
 
-
     public void restartApp() {
         Intent intent = getBaseContext().getPackageManager().getLaunchIntentForPackage(
                 getBaseContext().getPackageName());
@@ -65,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
         finish();
         startActivity(intent);
     }
-
 
     private void setupNavigation() {
         // Passing each menu ID as a set of Ids because each
@@ -89,13 +86,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
     private void setupClickListeners() {
         binding.fab.setOnClickListener(view -> {
             navigateTo(R.id.navigation_map);
         });
     }
-
 
     private void navigateTo(final int navigationId) {
         NavDestination destination = navController.getCurrentDestination();
@@ -104,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
 
         navController.navigate(navigationId, null);
     }
-
 
     private void setFabState(boolean active) {
         if (active) {
@@ -117,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
                     R.color.bottom_panel);
         }
     }
-
 
     private void handleIntent(Intent intent) {
         IntentType intentType = (IntentType) intent.getSerializableExtra(EXTRA_MAIN_INTENT_TYPE);
