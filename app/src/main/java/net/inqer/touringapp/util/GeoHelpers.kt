@@ -57,8 +57,23 @@ object GeoHelpers {
     }
 
     /**
-     * @param coherent - Used to ease the algorithm - compare waypoint distances one by one
-     * and return as soon as the next waypoint is farther than the previous.
+     * Iterate through the waypoints, calculate distance between each and our location,
+     * return closest waypoint distance and bearing, as well as the target's waypoint if one is specified.
+     *
+     * The reason of combining these 2 separate results into one task is simply to reduce the amount
+     * of calling the [distanceBetween] calculation. While looping all waypoints to find the closest one,
+     * we will get the target waypoint's result any way.
+     *
+     * We calculate both results within one distance calculation loop.
+     *
+     * @param location Location to measure distances from. Usually the current phone's location.
+     * @param waypoints Array of available waypoints on the current route.
+     * @param targetWaypoint If specified we check if encounter this waypoint's result
+     * and return it as the second value.
+     *
+     * @return A pair of:
+     * 1) Closest waypoint calculated distance & bearing (null if failed)
+     * 2) Target waypoint calculated distance & bearing (null if failed or target not specified)
      */
     fun findClosestWaypoint(location: Location, waypoints: Array<Waypoint>, coherent: Boolean = false): CalculatedPoint? {
         var lastResult: DistanceResult? = null
