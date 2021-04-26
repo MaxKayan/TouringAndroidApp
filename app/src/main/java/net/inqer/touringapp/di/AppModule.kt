@@ -13,6 +13,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import net.inqer.touringapp.AppConfig
 import net.inqer.touringapp.R
@@ -22,6 +24,7 @@ import net.inqer.touringapp.data.models.ActiveRouteDataBus
 import net.inqer.touringapp.data.models.TourRoute
 import net.inqer.touringapp.data.remote.RoutesApi
 import net.inqer.touringapp.di.qualifiers.ActiveTourRouteLiveData
+import net.inqer.touringapp.util.DispatcherProvider
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -53,6 +56,19 @@ object AppModule {
                         10000
                 )
         }
+    }
+
+    @Singleton
+    @Provides
+    fun provideDispatchers(): DispatcherProvider = object : DispatcherProvider {
+        override val main: CoroutineDispatcher
+            get() = Dispatchers.Main
+        override val io: CoroutineDispatcher
+            get() = Dispatchers.IO
+        override val default: CoroutineDispatcher
+            get() = Dispatchers.Main
+        override val unconfined: CoroutineDispatcher
+            get() = Dispatchers.Unconfined
     }
 
     @Singleton
