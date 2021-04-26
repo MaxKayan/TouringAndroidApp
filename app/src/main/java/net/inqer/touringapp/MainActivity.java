@@ -22,6 +22,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
+    public static final String EXTRA_MAIN_INTENT_TYPE = "EXTRA_MAIN_INTENT_TYPE";
     private static final String TAG = "MainActivity";
 
     private ActivityMainBinding binding;
@@ -131,8 +132,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    public static final String EXTRA_MAIN_INTENT_TYPE = "EXTRA_MAIN_INTENT_TYPE";
     public enum IntentType {
         TO_MAP_FRAGMENT;
     }
