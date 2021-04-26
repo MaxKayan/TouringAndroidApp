@@ -120,7 +120,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void handleIntent(Intent intent) {
         IntentType intentType = (IntentType) intent.getSerializableExtra(EXTRA_MAIN_INTENT_TYPE);
+
+        NavDestination destination = navController.getCurrentDestination();
+        Integer id = destination != null ? destination.getId() : null;
+
         if (intentType == IntentType.TO_MAP_FRAGMENT) {
+            if (id != null && id == R.id.navigation_map) return;
+
             navigateTo(R.id.navigation_map);
         }
     }
