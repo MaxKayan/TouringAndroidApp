@@ -5,6 +5,7 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Build
 import android.os.Looper
 import android.util.Log
@@ -14,14 +15,20 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.*
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import net.inqer.touringapp.AppConfig
 import net.inqer.touringapp.MainActivity
 import net.inqer.touringapp.R
 import net.inqer.touringapp.data.models.*
 import net.inqer.touringapp.di.qualifiers.ActiveTourRouteLiveData
+import net.inqer.touringapp.util.DispatcherProvider
+import net.inqer.touringapp.util.GeoHelpers
+import net.inqer.touringapp.util.GeoHelpers.bearingToAzimuth
 import net.inqer.touringapp.util.GeoHelpers.findClosestWaypoint
+import net.inqer.touringapp.util.round
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -32,6 +39,7 @@ class RouteService : LifecycleService() {
 
     @Inject
     lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var lastKnownLocation: Location? = null
 
     @Inject
     lateinit var notificationManager: NotificationManager
@@ -41,6 +49,9 @@ class RouteService : LifecycleService() {
 
     @Inject
     lateinit var appConfig: AppConfig
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private var currentStatus: ServiceAction = ServiceAction.STOP
 
@@ -120,6 +131,26 @@ class RouteService : LifecycleService() {
         activeTourRouteLiveData.observe(this) { route ->
             Log.d(TAG, "activeTourRouteLiveData.observe: got route - $route")
             onActiveRouteChanged(route)
+        }
+
+        routeDataBus.targetWaypointIndex.observe(this) { index ->
+            updateNotification(indexInput = index)
+
+            lifecycleScope.launchWhenCreated {
+                launch(dispatchers.default) {
+                    recalculateTargetWaypointDistance()
+                }
+            }
+        }
+
+        routeDataBus.closestWaypointCalculatedPoint.observe(this) { point ->
+            Log.d(TAG, "subscribeObservers: closestWaypointCalculatedPoint: $point")
+        }
+
+        routeDataBus.targetWaypointCalculatedDistance.observe(this) { point ->
+            Log.d(TAG, "subscribeObservers: targetWaypointCalculatedDistance: $point")
+
+            updateNotification(targetCalculatedPoint = point)
         }
     }
 
@@ -206,15 +237,7 @@ class RouteService : LifecycleService() {
     private val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             super.onLocationResult(locationResult)
-            Log.d(TAG, "onLocationResult: $locationResult")
-
-            activeRoute?.waypoints?.let { waypoints ->
-                Log.d(TAG, "onLocationResult: calculating closest point...")
-                val closestPoint = findClosestWaypoint(locationResult.lastLocation, waypoints)
-                Log.i(TAG, "onLocationResult: targetPoint - $closestPoint ; ${closestPoint?.distanceResult?.distance}")
-
-                onClosestWaypointFound(closestPoint)
-            }
+            onNewLocation(locationResult)
         }
 
         override fun onLocationAvailability(p0: LocationAvailability) {
@@ -224,22 +247,76 @@ class RouteService : LifecycleService() {
     }
 
 
-    private fun onClosestWaypointFound(point: CalculatedPoint?) {
-        if (point == null) {
-            Log.w(TAG, "onNewTargetFound: target point is null!")
+    /**
+     * Called each time we receive the new location result.
+     * The interval should depend on the [AppConfig.locationPollInterval] value.
+     * @param locationResult Result of the latest location request
+     */
+    private fun onNewLocation(locationResult: LocationResult) {
+        lastKnownLocation = locationResult.lastLocation
+
+        activeRoute?.waypoints?.let { waypoints ->
+
+            lifecycleScope.launchWhenCreated {
+                Log.d(TAG, "onNewLocation: launching coroutine...")
+                launch(dispatchers.default) {
+                    val (closestPoint, targetPoint) = findClosestWaypoint(locationResult.lastLocation, waypoints, routeDataBus.targetWaypoint.value)
+                    Log.i(TAG, "onLocationResult: closest waypoint - $closestPoint ; $targetPoint")
+
+                    onClosestWaypointCalculated(closestPoint)
+                    targetPoint?.let { onTargetWaypointCalculated(it) }
+                }
+                Log.d(TAG, "onNewLocation: launched!")
+            }
+
         }
-        routeDataBus.closestWaypoint.postValue(point)
-
-        notificationManager.notify(
-                NOTIFICATION_IDENTIFIER,
-                createForegroundNotification("Цель - ${point?.waypoint?.latitude} ; ${point?.waypoint?.longitude}" +
-                        "Расстояние: ${point?.distanceResult?.distance}")
-        )
-
-        Log.i(TAG, "onNewTargetFound: notification sent. - $point")
     }
 
 
+    /**
+     * Called on each calculated result of the closest waypoint.
+     * @param point Result of [findClosestWaypoint] function. Null if failed.
+     */
+    private fun onClosestWaypointCalculated(point: CalculatedPoint?) {
+        if (point == null) {
+            Log.w(TAG, "onClosestWaypointCalculated: target point is null!")
+        }
+        routeDataBus.closestWaypointCalculatedPoint.postValue(point)
+    }
+
+
+    /**
+     * Called on each successfully calculated result of the target waypoint.
+     * @param point Result of [findClosestWaypoint] function.
+     */
+    private fun onTargetWaypointCalculated(point: CalculatedPoint) {
+        routeDataBus.targetWaypointCalculatedDistance.postValue(point)
+    }
+
+
+    /**
+     * Manually recalculate current distance to target waypoint with existing [lastKnownLocation]
+     * and [routeDataBus] target waypoint values.
+     *
+     * @return True if successful, false otherwise.
+     */
+    private suspend fun recalculateTargetWaypointDistance(): Boolean {
+        lastKnownLocation?.let { location ->
+            routeDataBus.targetWaypoint.value?.let { waypoint ->
+                onTargetWaypointCalculated(
+                        CalculatedPoint(GeoHelpers.distanceBetween(location, waypoint), waypoint)
+                )
+                return true
+            }
+        }
+
+        return false
+    }
+
+
+    /**
+     * Set the given waypoint as active.
+     */
     private fun setTargetWaypoint(waypoint: Waypoint) =
             activeRoute?.waypoints?.let {
                 setTargetWaypoint(it.indexOf(waypoint), waypoint)
@@ -355,6 +432,7 @@ class RouteService : LifecycleService() {
 
             // setWhen(System.currentTimeMillis())
         }
+
         return builder.build()
     }
 
