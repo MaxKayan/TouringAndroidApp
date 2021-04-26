@@ -21,7 +21,7 @@ class GpsLocationProvider @Inject constructor(
         @ApplicationContext context: Context,
         private var mLocationManager: LocationManager
 ) : GpsMyLocationProvider(context) {
-//    private var mLocationManager: LocationManager?
+    //    private var mLocationManager: LocationManager?
     private var mLocation: Location? = null
     private var mMyLocationConsumer: IMyLocationConsumer? = null
 
@@ -41,6 +41,8 @@ class GpsLocationProvider @Inject constructor(
         mLocationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationSources.add(LocationManager.GPS_PROVIDER)
         locationSources.add(LocationManager.NETWORK_PROVIDER)
+
+        Log.d(TAG, "init: new GpsLocationProvider instance created! - $this")
     }
 
 
@@ -82,41 +84,37 @@ class GpsLocationProvider @Inject constructor(
         mMyLocationConsumer = myLocationConsumer
         var result = false
 
-        if (mLocationManager != null) {
-            mLocationManager?.let {
-                for (provider in it.getProviders(true)) {
-                    if (locationSources.contains(provider)) {
-                        try {
-                            it.requestLocationUpdates(provider, locationUpdateMinTime,
-                                    locationUpdateMinDistance, this)
-                            result = true
-                        } catch (ex: SecurityException) {
-                            Log.e(IMapView.LOGTAG, "Unable to attach listener for location provider $provider check permissions?", ex)
-                        }
+        mLocationManager.let {
+            for (provider in it.getProviders(true)) {
+                if (locationSources.contains(provider)) {
+                    try {
+                        it.requestLocationUpdates(provider, locationUpdateMinTime,
+                                locationUpdateMinDistance, this)
+                        result = true
+                        Log.i(TAG, "startLocationProvider: requested location updates.")
+                    } catch (ex: SecurityException) {
+                        Log.e(IMapView.LOGTAG, "Unable to attach listener for location provider $provider check permissions?", ex)
                     }
                 }
-                return result
             }
-        } else {
-            Log.e(TAG, "startLocationProvider: location manager is null! this instance - $this")
+            return result
         }
 
-        return false
     }
 
     @SuppressLint("MissingPermission")
     override fun stopLocationProvider() {
         mMyLocationConsumer = null
-        if (mLocationManager != null) {
-            try {
-                mLocationManager?.removeUpdates(this)
-            } catch (ex: Throwable) {
-                Log.w(IMapView.LOGTAG, "Unable to deattach location listener", ex)
-            }
+        try {
+            mLocationManager.removeUpdates(this)
+            Log.w(TAG, "stopLocationProvider: removed our updates listener")
+        } catch (ex: Throwable) {
+            Log.w(IMapView.LOGTAG, "Unable to deattach location listener", ex)
         }
     }
 
     override fun getLastKnownLocation(): Location? {
+        Log.d(TAG, "getLastKnownLocation: provided location - $mLocation")
         return mLocation
     }
 
@@ -126,6 +124,7 @@ class GpsLocationProvider @Inject constructor(
 //        mLocationManager = null
         mMyLocationConsumer = null
         mIgnorer = null
+        Log.w(TAG, "destroy: destroyed variables.")
     }
 
     //

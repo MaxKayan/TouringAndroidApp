@@ -180,7 +180,7 @@ class MapFragment : Fragment() {
             }
         }
 
-        viewModel.routeDataBus.closestWaypoint.observe(viewLifecycleOwner) { point ->
+        viewModel.routeDataBus.closestWaypointCalculatedPoint.observe(viewLifecycleOwner) { point ->
             point?.let { updateClosestPointMarker(point.waypoint) }
         }
     }

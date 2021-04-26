@@ -24,21 +24,6 @@ object MainModule {
     @Provides
     fun provideMainRepository(repository: DefaultMainRepository): MainRepository = repository
 
-
-    @ViewModelScoped
-    @Provides
-    fun provideDispatchers(): DispatcherProvider = object : DispatcherProvider {
-        override val main: CoroutineDispatcher
-            get() = Dispatchers.Main
-        override val io: CoroutineDispatcher
-            get() = Dispatchers.IO
-        override val default: CoroutineDispatcher
-            get() = Dispatchers.Main
-        override val unconfined: CoroutineDispatcher
-            get() = Dispatchers.Unconfined
-
-    }
-
     @ViewModelScoped
     @Provides
     fun provideTourRouteDao(database: AppDatabase): TourRouteDao = database.tourRouteDao()

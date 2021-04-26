@@ -3,6 +3,9 @@ package net.inqer.touringapp.data.models
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 
+/**
+ * TODO: This is probably a temporary solution. LiveData bus is not very fast. Should look into binding the [net.inqer.touringapp.service.RouteService]
+ */
 data class ActiveRouteDataBus(
         /**
          * The destination that is currently in active range if any.
@@ -21,19 +24,19 @@ data class ActiveRouteDataBus(
         /**
          *  The calculated distance and bearing to the current target waypoint.
          */
-        val distanceToTargetWaypoint: MutableLiveData<CalculatedPoint?> = MutableLiveData(),
+        val targetWaypointCalculatedDistance: MutableLiveData<CalculatedPoint?> = MutableLiveData(),
         /**
          *  The calculated distance and bearing to the closest waypoint.
          */
-        val closestWaypoint: MutableLiveData<CalculatedPoint?> = MutableLiveData()
+        val closestWaypointCalculatedPoint: MutableLiveData<CalculatedPoint?> = MutableLiveData()
 ) {
     fun clear() {
         Log.i(TAG, "clear: called! Setting all route bus data to null.")
-        closestWaypoint.value = null
+        closestWaypointCalculatedPoint.value = null
         activeDestination.value = null
         targetWaypoint.value = null
         targetWaypointIndex.value = null
-        distanceToTargetWaypoint.value = null
+        targetWaypointCalculatedDistance.value = null
     }
 
     companion object {
