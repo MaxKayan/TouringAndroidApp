@@ -314,7 +314,7 @@ class RouteService : LifecycleService() {
 
         private const val PENDING_INTENT_NOTIFICATION_CODE = 0
 
-        private const val WAYPOINT_ENTER_RADIUS = 5f
+        private const val WAYPOINT_ENTER_RADIUS = 15f
 
         fun startService(context: Context) {
             val startIntent = Intent(context, RouteService::class.java).apply {
