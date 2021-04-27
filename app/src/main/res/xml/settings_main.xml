@@ -3,7 +3,7 @@
 
     <PreferenceCategory
         android:key="main_settings_category"
-        android:title="Параметры связи">
+        android:title="Связь">
 
         <Preference
             android:key="@string/main_server_address"
@@ -15,13 +15,19 @@
 
     <PreferenceCategory
         android:key="location_settings_category"
-        android:title="Параметры сервиса гео-локации">
+        android:title="Сервис геолокации">
 
         <Preference
             android:key="@string/location_poll_interval"
             android:inputType="number"
             android:title="Интервал запроса текущей локации"
             android:hint="В милисекундах"/>
+
+        <Preference
+            android:key="@string/location_waypoint_radius"
+            android:inputType="number"
+            android:title="Радиус входа путевой точки"
+            android:hint="В метрах"/>
 
     </PreferenceCategory>
 </PreferenceScreen>

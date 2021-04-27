@@ -32,4 +32,5 @@
     <string name="route_service_text">Пройдите к следующей точке</string>
     <string name="route_service_title">Следование маршруту</string>
     <string name="location_poll_interval">LOCATION_POLL_INTERVAL</string>
+    <string name="location_waypoint_radius">LOCATION_WAYPOINT_RADIUS</string>
 </resources>

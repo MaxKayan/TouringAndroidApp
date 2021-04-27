@@ -36,7 +36,6 @@ import javax.inject.Singleton
 object AppModule {
     private const val TAG = "AppModule"
 
-    @Singleton
     @Provides
     fun provideAppConfig(
             @ApplicationContext context: Context,
@@ -54,6 +53,12 @@ object AppModule {
                 get() = preferences.getInt(
                         context.getString(R.string.location_poll_interval),
                         10000
+                )
+
+            override val waypointEnterRadius: Int
+                get() = preferences.getInt(
+                        context.getString(R.string.location_waypoint_radius),
+                        15
                 )
         }
     }
