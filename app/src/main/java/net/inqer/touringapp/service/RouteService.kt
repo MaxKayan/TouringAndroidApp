@@ -33,6 +33,10 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class RouteService : LifecycleService() {
+
+    /*
+        --- Dependency Injection ---
+     */
     @Inject
     @ActiveTourRouteLiveData
     lateinit var activeTourRouteLiveData: LiveData<TourRoute?>
@@ -53,15 +57,18 @@ class RouteService : LifecycleService() {
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
+
+    /*
+        --- STATE ---
+     */
     private var currentStatus: ServiceAction = ServiceAction.STOP
-
     private var activeRoute: TourRoute? = null
-
-    //    override fun onBind(intent: Intent?): IBinder? {
-//        return null
-//    }
+    private var routeStarted: Boolean = false
 
 
+    /*
+        --- Class Method Overrides ---
+     */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
 
@@ -93,6 +100,15 @@ class RouteService : LifecycleService() {
     }
 
 
+    override fun onCreate() {
+        super.onCreate()
+        Log.d(TAG, "onCreate: called")
+    }
+
+
+    /*
+        --- Private Methods ---
+     */
     /**
      * Initiate the foreground service start sequence.
      */
@@ -118,9 +134,21 @@ class RouteService : LifecycleService() {
     }
 
 
-    override fun onCreate() {
-        super.onCreate()
-        Log.d(TAG, "onCreate: called")
+    /**
+     * Set active waypoint to the next one.
+     */
+    private fun nextWaypoint() {
+        Log.d(TAG, "nextWaypoint: called")
+        selectActiveWaypoint(1)
+    }
+
+
+    /**
+     * Set active waypoint to the previous one.
+     */
+    private fun previousWaypoint() {
+        Log.d(TAG, "previousWaypoint: called")
+        selectActiveWaypoint(-1)
     }
 
 
@@ -147,13 +175,36 @@ class RouteService : LifecycleService() {
 
 
     /**
-     * Called each time the active route instance has been changed.
+     * Applies the [createLocationRequest] and [locationCallback] to the [fusedLocationClient], which
+     * activates the GPS location updates with the specified parameters.
      */
-    private fun onActiveRouteChanged(route: TourRoute?) {
-        activeRoute = route
+    private fun requestLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            Log.e(TAG, "requestLocationUpdates: Missing required permissions!")
+            // TODO: Need to handle this situation as it is pretty common since service gets launched before the map fragment.
+            return
+        }
+        fusedLocationClient.requestLocationUpdates(
+                createLocationRequest(),
+                locationCallback,
+                Looper.getMainLooper()
+        )
+    }
 
-        Log.d(TAG, "onActiveRouteChanged: called, setting target to 0")
-        setTargetWaypoint(0)
+
+    /**
+     * Set live data values to null
+     */
+    private fun clearBusData() {
+        routeDataBus.clear()
     }
 
 
@@ -174,22 +225,6 @@ class RouteService : LifecycleService() {
         } else {
             Log.w(TAG, "nextWaypoint: failed to activate next waypoint ; $nextIndex ; $waypoints")
         }
-    }
-
-    /**
-     * Set active waypoint to the previous one.
-     */
-    private fun previousWaypoint() {
-        Log.d(TAG, "previousWaypoint: called")
-        selectActiveWaypoint(-1)
-    }
-
-    /**
-     * Set active waypoint to the next one.
-     */
-    private fun nextWaypoint() {
-        Log.d(TAG, "nextWaypoint: called")
-        selectActiveWaypoint(1)
     }
 
 
@@ -218,76 +253,6 @@ class RouteService : LifecycleService() {
         interval = pollInterval
         fastestInterval = pollInterval / 2
         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-    }
-
-
-    /**
-     * Simple location callback interface implementation that maps the location event to the local
-     * method.
-     */
-    private val locationCallback: LocationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult) {
-            super.onLocationResult(locationResult)
-            onNewLocation(locationResult)
-        }
-
-        override fun onLocationAvailability(p0: LocationAvailability) {
-            super.onLocationAvailability(p0)
-            Log.d(TAG, "onLocationAvailability: $p0")
-        }
-    }
-
-
-    /**
-     * Called each time we receive the new location result.
-     * The interval should depend on the [AppConfig.locationPollInterval] value.
-     * @param locationResult Result of the latest location request
-     */
-    private fun onNewLocation(locationResult: LocationResult) {
-        lastKnownLocation = locationResult.lastLocation
-
-        activeRoute?.waypoints?.let { waypoints ->
-
-            lifecycleScope.launchWhenCreated {
-                Log.d(TAG, "onNewLocation: launching coroutine...")
-                launch(dispatchers.default) {
-                    val (closestPoint, targetPoint) = findClosestWaypoint(locationResult.lastLocation, waypoints, routeDataBus.targetWaypoint.value)
-                    Log.i(TAG, "onLocationResult: closest waypoint - $closestPoint ; $targetPoint")
-
-                    onClosestWaypointCalculated(closestPoint)
-                    targetPoint?.let { onTargetWaypointCalculated(it) }
-                }
-                Log.d(TAG, "onNewLocation: launched!")
-            }
-
-        }
-    }
-
-
-    /**
-     * Called on each calculated result of the closest waypoint.
-     * @param point Result of [findClosestWaypoint] function. Null if failed.
-     */
-    private fun onClosestWaypointCalculated(point: CalculatedPoint?) {
-        if (point == null) {
-            Log.w(TAG, "onClosestWaypointCalculated: target point is null!")
-        }
-        routeDataBus.closestWaypointCalculatedPoint.postValue(point)
-    }
-
-
-    /**
-     * Called on each successfully calculated result of the target waypoint.
-     * @param point Result of [findClosestWaypoint] function.
-     */
-    private fun onTargetWaypointCalculated(point: CalculatedPoint) {
-        routeDataBus.targetWaypointCalculatedDistance.postValue(point)
-
-        updateNotification(targetCalculatedPoint = point)
-
-        if (point.distanceResult.distance < WAYPOINT_ENTER_RADIUS) {
-            nextWaypoint()
-        }
     }
 
 
@@ -339,32 +304,6 @@ class RouteService : LifecycleService() {
     private fun setTargetWaypoint(index: Int, waypoint: Waypoint) {
         routeDataBus.targetWaypoint.postValue(waypoint)
         routeDataBus.targetWaypointIndex.postValue(index)
-    }
-
-
-    /**
-     * Applies the [createLocationRequest] and [locationCallback] to the [fusedLocationClient], which
-     * activates the GPS location updates with the specified parameters.
-     */
-    private fun requestLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            Log.e(TAG, "requestLocationUpdates: Missing required permissions!")
-            // TODO: Need to handle this situation as it is pretty common since service gets launched before the map fragment.
-            return
-        }
-        fusedLocationClient.requestLocationUpdates(
-                createLocationRequest(),
-                locationCallback,
-                Looper.getMainLooper()
-        )
     }
 
 
@@ -457,11 +396,87 @@ class RouteService : LifecycleService() {
     }
 
 
-    /**
-     * Clear all liveData values in the [routeDataBus].
+    /*
+        --- Event Callback Methods ---
      */
-    private fun clearBusData() {
-        routeDataBus.clear()
+    /**
+     * Simple location callback interface implementation that maps the location event to the local
+     * method.
+     */
+    private val locationCallback: LocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            super.onLocationResult(locationResult)
+            onNewLocation(locationResult)
+        }
+
+        override fun onLocationAvailability(p0: LocationAvailability) {
+            super.onLocationAvailability(p0)
+            Log.d(TAG, "onLocationAvailability: $p0")
+        }
+    }
+
+
+    /**
+     * Called each time we receive the new location result.
+     * The interval should depend on the [AppConfig.locationPollInterval] value.
+     * @param locationResult Result of the latest location request
+     */
+    private fun onNewLocation(locationResult: LocationResult) {
+        lastKnownLocation = locationResult.lastLocation
+
+        activeRoute?.waypoints?.let { waypoints ->
+
+            lifecycleScope.launchWhenCreated {
+                Log.d(TAG, "onNewLocation: launching coroutine...")
+                launch(dispatchers.default) {
+                    val (closestPoint, targetPoint) = findClosestWaypoint(locationResult.lastLocation, waypoints, routeDataBus.targetWaypoint.value)
+                    Log.i(TAG, "onLocationResult: closest waypoint - $closestPoint ; $targetPoint")
+
+                    onClosestWaypointCalculated(closestPoint)
+                    targetPoint?.let { onTargetWaypointCalculated(it) }
+                }
+                Log.d(TAG, "onNewLocation: launched!")
+            }
+
+        }
+    }
+
+
+    /**
+     * Called each time the active route instance has been changed.
+     */
+    private fun onActiveRouteChanged(route: TourRoute?) {
+        activeRoute = route
+
+        Log.d(TAG, "onActiveRouteChanged: called, setting target to 0")
+        setTargetWaypoint(0)
+    }
+
+
+    /**
+     * Called on each calculated result of the closest waypoint.
+     * @param point Result of [findClosestWaypoint] function. Null if failed.
+     */
+    private fun onClosestWaypointCalculated(point: CalculatedPoint?) {
+        if (point == null) {
+            Log.w(TAG, "onClosestWaypointCalculated: target point is null!")
+        }
+        routeDataBus.closestWaypointCalculatedPoint.postValue(point)
+    }
+
+
+    /**
+     * Called on each successfully calculated result of the target waypoint.
+     * @param point Result of [findClosestWaypoint] function.
+     */
+    private fun onTargetWaypointCalculated(point: CalculatedPoint) {
+        routeDataBus.targetWaypointCalculatedDistance.postValue(point)
+
+        updateNotification(targetCalculatedPoint = point)
+
+        if (point.distanceResult.distance < WAYPOINT_ENTER_RADIUS) {
+            nextWaypoint()
+        }
     }
 
 
