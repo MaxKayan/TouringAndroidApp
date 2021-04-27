@@ -448,6 +448,7 @@ class RouteService : LifecycleService() {
                             closestPoint.distanceResult.distance <= appConfig.waypointEnterRadius) {  // Then if closest point is close enough to the user
                         // Then set the closest waypoint as active
                         setTargetWaypoint(closestPoint.waypoint)
+                        Toast.makeText(this@RouteService, "Маршрут сокращён! \n $closestPoint", Toast.LENGTH_LONG).show()
 
                     } else if (targetPoint != null &&
                             targetPoint.distanceResult.distance <= appConfig.waypointEnterRadius) {
