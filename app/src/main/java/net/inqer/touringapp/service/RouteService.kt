@@ -9,6 +9,7 @@ import android.location.Location
 import android.os.Build
 import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -129,26 +130,8 @@ class RouteService : LifecycleService() {
      */
     private fun stopService() {
         removeLocationUpdates()
-        clearBusData()
+        clearData()
         stopSelf()
-    }
-
-
-    /**
-     * Set active waypoint to the next one.
-     */
-    private fun nextWaypoint() {
-        Log.d(TAG, "nextWaypoint: called")
-        selectActiveWaypoint(1)
-    }
-
-
-    /**
-     * Set active waypoint to the previous one.
-     */
-    private fun previousWaypoint() {
-        Log.d(TAG, "previousWaypoint: called")
-        selectActiveWaypoint(-1)
     }
 
 
@@ -171,6 +154,46 @@ class RouteService : LifecycleService() {
             }
         }
 
+    }
+
+
+    /**
+     * Set active waypoint to the next one.
+     */
+    private fun nextWaypoint(notifyUser: Boolean = false, message: String? = null) {
+        Log.d(TAG, "nextWaypoint: message = $message")
+        iterateActiveWaypoint(1)
+
+        if (notifyUser) {
+            Toast.makeText(this, message
+                    ?: "Достигнута путевая точка! ${routeDataBus.targetWaypoint.value}",
+                    Toast.LENGTH_LONG).show()
+        }
+    }
+
+
+    /**
+     * Set active waypoint to the previous one.
+     */
+    private fun previousWaypoint() {
+        Log.d(TAG, "previousWaypoint: called")
+        iterateActiveWaypoint(-1)
+    }
+
+
+    /**
+     * Offset the select waypoint with the given step within the waypoints array.
+     * @param step Active waypoint selection offset. Could be positive or negative.
+     */
+    private fun iterateActiveWaypoint(step: Int) {
+        val currentIndex = routeDataBus.targetWaypointIndex.value
+        val nextIndex = currentIndex?.plus(step)
+
+        if (nextIndex != null) {
+            setTargetWaypoint(nextIndex)
+        } else {
+            Log.e(TAG, "iterateActiveWaypoint: failed! nextIndex is null ; $nextIndex")
+        }
     }
 
 
@@ -203,28 +226,9 @@ class RouteService : LifecycleService() {
     /**
      * Set live data values to null
      */
-    private fun clearBusData() {
+    private fun clearData() {
         routeDataBus.clear()
-    }
-
-
-    /**
-     * Offset the select waypoint with the given step within the waypoints array.
-     * @param step Active waypoint selection offset. Could be positive or negative.
-     */
-    private fun selectActiveWaypoint(step: Int) {
-        val currentIndex = routeDataBus.targetWaypointIndex.value
-        val nextIndex = currentIndex?.plus(step)
-        val waypoints = activeRoute?.waypoints
-
-        Log.d(TAG, "selectActiveWaypoint: moving waypoint. step = $step; index = $currentIndex ; nextIndex = $nextIndex ; waypoints = $waypoints")
-
-        if (nextIndex != null && waypoints != null && nextIndex in waypoints.indices) {
-            routeDataBus.targetWaypoint.postValue(waypoints[nextIndex])
-            routeDataBus.targetWaypointIndex.postValue(nextIndex)
-        } else {
-            Log.w(TAG, "nextWaypoint: failed to activate next waypoint ; $nextIndex ; $waypoints")
-        }
+        routeStarted = false
     }
 
 
@@ -279,22 +283,25 @@ class RouteService : LifecycleService() {
     /**
      * Set the given waypoint as active.
      */
-    private fun setTargetWaypoint(waypoint: Waypoint) =
-            activeRoute?.waypoints?.let {
-                setTargetWaypoint(it.indexOf(waypoint), waypoint)
-            }
+    private fun setTargetWaypoint(waypoint: Waypoint) {
+        val waypoints = activeRoute?.waypoints
+        val index = waypoints?.let { it.indexOfFirst { item -> item.id == waypoint.id } }
+
+        if (index != null && index > -1) {
+            setTargetWaypoint(index, waypoint)
+        }
+    }
+
 
     /**
-     * Sets the waypoint with the given id as target.
+     * Sets the waypoint with the given index as target.
      */
     private fun setTargetWaypoint(index: Int) {
-        activeRoute?.waypoints?.let {
-            if (index in it.indices) {
-                setTargetWaypoint(index, it[index])
-            } else {
-                Log.e(TAG, "setTargetWaypoint: out of bounds",
-                        IndexOutOfBoundsException("Index $index is not in active waypoints bounds"))
-            }
+        val waypoints = activeRoute?.waypoints
+        if (waypoints != null && index in waypoints.indices) {
+            setTargetWaypoint(index, waypoints[index])
+        } else {
+            Log.e(TAG, "setTargetWaypoint: failed! waypoints = $waypoints ; index = $index")
         }
     }
 
@@ -427,15 +434,26 @@ class RouteService : LifecycleService() {
         activeRoute?.waypoints?.let { waypoints ->
 
             lifecycleScope.launchWhenCreated {
-                Log.d(TAG, "onNewLocation: launching coroutine...")
                 launch(dispatchers.default) {
                     val (closestPoint, targetPoint) = findClosestWaypoint(locationResult.lastLocation, waypoints, routeDataBus.targetWaypoint.value)
                     Log.i(TAG, "onLocationResult: closest waypoint - $closestPoint ; $targetPoint")
 
                     onClosestWaypointCalculated(closestPoint)
                     targetPoint?.let { onTargetWaypointCalculated(it) }
+
+                    if ((routeStarted && closestPoint != null) &&  // If first waypoint was reached before and closest point is not null
+                            (targetPoint == null || targetPoint.waypoint.id != closestPoint.waypoint.id) &&  // Then if target point is null or not the same as the closest point
+                            closestPoint.distanceResult.distance <= appConfig.waypointEnterRadius) {  // Then if closest point is close enough to the user
+                        // Then set the closest waypoint as active
+                        setTargetWaypoint(closestPoint.waypoint)
+
+                    } else if (targetPoint != null &&
+                            targetPoint.distanceResult.distance <= appConfig.waypointEnterRadius) {
+                        // Otherwise if target waypoint is close enough, iterate route forward
+                        nextWaypoint(true)
+                        routeStarted = true // Indicating that we can cut the path in the future
+                    }
                 }
-                Log.d(TAG, "onNewLocation: launched!")
             }
 
         }
@@ -458,10 +476,10 @@ class RouteService : LifecycleService() {
      * @param point Result of [findClosestWaypoint] function. Null if failed.
      */
     private fun onClosestWaypointCalculated(point: CalculatedPoint?) {
-        if (point == null) {
-            Log.w(TAG, "onClosestWaypointCalculated: target point is null!")
-        }
         routeDataBus.closestWaypointCalculatedPoint.postValue(point)
+        if (point == null) {
+            Log.w(TAG, "onClosestWaypointCalculated: closest point is null!")
+        }
     }
 
 
@@ -474,9 +492,6 @@ class RouteService : LifecycleService() {
 
         updateNotification(targetCalculatedPoint = point)
 
-        if (point.distanceResult.distance < WAYPOINT_ENTER_RADIUS) {
-            nextWaypoint()
-        }
     }
 
 
