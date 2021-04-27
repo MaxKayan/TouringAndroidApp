@@ -442,7 +442,9 @@ class RouteService : LifecycleService() {
                     targetPoint?.let { onTargetWaypointCalculated(it) }
 
                     if ((routeStarted && closestPoint != null) &&  // If first waypoint was reached before and closest point is not null
-                            (targetPoint == null || targetPoint.waypoint.id != closestPoint.waypoint.id) &&  // Then if target point is null or not the same as the closest point
+                            (targetPoint == null ||
+                                    targetPoint.waypoint.id < closestPoint.waypoint.id && // Then if target point is not the same
+                                    targetPoint.waypoint.index < closestPoint.waypoint.index) && // And if target's index is behind the closest waypoint
                             closestPoint.distanceResult.distance <= appConfig.waypointEnterRadius) {  // Then if closest point is close enough to the user
                         // Then set the closest waypoint as active
                         setTargetWaypoint(closestPoint.waypoint)
