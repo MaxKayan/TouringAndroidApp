@@ -17,8 +17,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import net.inqer.touringapp.AppConfig
+import net.inqer.touringapp.DefaultAppConfig
 import net.inqer.touringapp.R
-import net.inqer.touringapp.SettingsConstants.DEFAULT_URL
 import net.inqer.touringapp.data.local.AppDatabase
 import net.inqer.touringapp.data.models.ActiveRouteDataBus
 import net.inqer.touringapp.data.models.TourRoute
@@ -40,28 +40,7 @@ object AppModule {
     fun provideAppConfig(
             @ApplicationContext context: Context,
             preferences: SharedPreferences
-    ): AppConfig {
-        return object : AppConfig {
-            override val baseUrl: String
-                get() = preferences.getString(
-                        context.getString(R.string.main_server_address),
-                        DEFAULT_URL
-                )
-                        ?: DEFAULT_URL
-
-            override val locationPollInterval: Int
-                get() = preferences.getInt(
-                        context.getString(R.string.location_poll_interval),
-                        10000
-                )
-
-            override val waypointEnterRadius: Int
-                get() = preferences.getInt(
-                        context.getString(R.string.location_waypoint_radius),
-                        15
-                )
-        }
-    }
+    ): AppConfig = DefaultAppConfig(context, preferences)
 
     @Singleton
     @Provides

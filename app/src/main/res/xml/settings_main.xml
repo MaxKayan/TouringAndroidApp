@@ -6,7 +6,7 @@
         android:title="Связь">
 
         <Preference
-            android:key="@string/main_server_address"
+            android:key="@string/key_main_server_address"
             android:summary="IP-адрес, либо доменное имя"
             android:inputType="text"
             android:title="Адрес сервера" />
@@ -18,13 +18,13 @@
         android:title="Сервис геолокации">
 
         <Preference
-            android:key="@string/location_poll_interval"
+            android:key="@string/key_location_poll_interval"
             android:inputType="number"
             android:title="Интервал запроса текущей локации"
             android:hint="В милисекундах"/>
 
         <Preference
-            android:key="@string/location_waypoint_radius"
+            android:key="@string/key_location_waypoint_radius"
             android:inputType="number"
             android:title="Радиус входа путевой точки"
             android:hint="В метрах"/>

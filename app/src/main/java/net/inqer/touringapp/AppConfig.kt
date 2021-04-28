@@ -1,19 +1,28 @@
 package net.inqer.touringapp
 
+import androidx.lifecycle.LiveData
+
 interface AppConfig {
+    val liveData: LiveData<AppConfig>
+
     /**
      * Full URL for the API root.
      * Example: https://tour-up.ru/api/
      */
-    val baseUrl: String
+    var baseUrl: String
 
     /**
      * Location request interval in milliseconds.
      */
-    val locationPollInterval: Int
+    var locationPollInterval: Int
 
     /**
      * Enter radius for the waypoint in meters.
      */
-    val waypointEnterRadius: Int
+    var waypointEnterRadius: Int
+
+    /**
+     * Always shorten path to the closest waypoint forwards.
+     */
+    var alwaysShortenPaths: Boolean
 }

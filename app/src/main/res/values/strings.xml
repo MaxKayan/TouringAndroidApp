@@ -7,7 +7,7 @@
 
     <string name="string_to_inject">Second injected string from resources</string>
     <string name="main_preference_file_key">TOURING_APP_PREFERENCES</string>
-    <string name="main_server_address">server_address</string>
+    <string name="key_main_server_address">server_address</string>
     <string name="tour_item">Tour Item</string>
     <string name="open">Открыть</string>
     <string name="image_overlay">Image Overlay</string>
@@ -31,7 +31,7 @@
     <string name="route_service_ticker">Загрузка маршрута…</string>
     <string name="route_service_text">Пройдите к следующей точке</string>
     <string name="route_service_title">Следование маршруту</string>
-    <string name="location_poll_interval">LOCATION_POLL_INTERVAL</string>
-    <string name="location_waypoint_radius">LOCATION_WAYPOINT_RADIUS</string>
-    <string name="always_shorten_path">Всегда сокращать путь</string>
+    <string name="key_location_poll_interval">LOCATION_POLL_INTERVAL</string>
+    <string name="key_location_waypoint_radius">LOCATION_WAYPOINT_RADIUS</string>
+    <string name="key_always_shorten_path">Всегда сокращать путь</string>
 </resources>

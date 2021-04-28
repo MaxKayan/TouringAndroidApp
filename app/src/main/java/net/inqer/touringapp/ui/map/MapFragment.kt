@@ -107,7 +107,7 @@ class MapFragment : Fragment() {
         val popupMenu = PopupMenu(context, binding.buttonExtrasMenu)
         popupMenu.inflate(R.menu.map_extras_menu)
 
-        popupMenu.menu.findItem(R.id.menu_shorten_paths).isChecked = false
+        popupMenu.menu.findItem(R.id.menu_shorten_paths).isChecked = viewModel.appConfig.alwaysShortenPaths
 
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
@@ -115,6 +115,7 @@ class MapFragment : Fragment() {
                     Log.d(TAG, "setupPopupMenu: $item")
                     Log.d(TAG, "setupPopupMenu: ${item.isChecked}")
                     item.isChecked = !item.isChecked
+                    viewModel.appConfig.alwaysShortenPaths = item.isChecked
                     true
                 }
 
@@ -432,7 +433,7 @@ class MapFragment : Fragment() {
         private const val REQUEST_PERMISSIONS_REQUEST_CODE = 1
 
         private const val LOCATION_ZOOM = 16.0
-        private const val LOCATION_ZOOM_SPEED = 4000L
+        private const val LOCATION_ZOOM_SPEED = 3000L
 
         private val POINT_RGUTIS = LabelledGeoPoint(55.4331145, 37.5562910, "RGUTIS")
     }

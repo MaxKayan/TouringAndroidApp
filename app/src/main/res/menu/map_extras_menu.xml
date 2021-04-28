@@ -6,7 +6,7 @@
         <item
             android:id="@+id/menu_shorten_paths"
             android:checkable="true"
-            android:title="@string/always_shorten_path"
+            android:title="@string/key_always_shorten_path"
             app:showAsAction="withText" />
     </group>
 
