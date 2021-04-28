@@ -35,8 +35,6 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
-import org.osmdroid.views.overlay.compass.CompassOverlay
-import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.simplefastpoint.LabelledGeoPoint
@@ -141,7 +139,11 @@ class MapFragment : Fragment() {
     private fun setupButtonClickListeners() {
         val context: Context = binding.root.context
         binding.fabMyLocation.setOnClickListener {
-            viewModel.currentLocation.value.let { binding.map.controller.animateTo(it) }
+            viewModel.currentLocation.value.let {
+                binding.map.controller.animateTo(it,
+                        LOCATION_ZOOM,
+                        LOCATION_ZOOM_SPEED)
+            }
         }
 
         binding.fabForward.setOnClickListener {
@@ -347,26 +349,8 @@ class MapFragment : Fragment() {
         //scales tiles to the current screen's DPI, helps with readability of labels
 //        binding.map.isTilesScaledToDpi = true
 
-//        //Mini map
-//        val minimapOverlay = MinimapOverlay(ctx, binding.map.tileRequestCompleteHandler)
-//        minimapOverlay.width = dm.widthPixels / 5
-//        minimapOverlay.height = dm.heightPixels / 5
-//        binding.map.overlays.add(minimapOverlay)
-//
         // Zoom buttons visibility
         binding.map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
-
-//        //Copyright overlay
-//        val copyrightOverlay = CopyrightOverlay(ctx)
-//        //i hate this very much, but it seems as if certain versions of android and/or
-//        //device types handle screen offsets differently
-//        binding.map.overlays.add(copyrightOverlay)
-
-        //On screen compass
-        val compassOverlay = CompassOverlay(ctx, InternalCompassOrientationProvider(ctx),
-                binding.map)
-        compassOverlay.enableCompass()
-        binding.map.overlays.add(compassOverlay)
 
         //support for map rotation
         val rotationGestureOverlay = RotationGestureOverlay(binding.map)
@@ -419,6 +403,10 @@ class MapFragment : Fragment() {
     companion object {
         private const val TAG = "MapFragment"
         private const val REQUEST_PERMISSIONS_REQUEST_CODE = 1
+
+        private const val LOCATION_ZOOM = 16.0
+        private const val LOCATION_ZOOM_SPEED = 4000L
+
         private val POINT_RGUTIS = LabelledGeoPoint(55.4331145, 37.5562910, "RGUTIS")
     }
 }
