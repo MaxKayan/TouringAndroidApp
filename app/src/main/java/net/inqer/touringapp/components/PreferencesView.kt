@@ -71,23 +71,26 @@ class PreferencesView @JvmOverloads constructor(
                     "Preference" -> {
                         val attrs = Xml.asAttributeSet(parser)
                         val keyString = attrs.getAttributeValue(xmlns, ATTR_KEY)
+                        val hint: String? = attrs.getAttributeValue(xmlns, ATTR_HINT)
                         val key = context.getString(keyString.substring(1).toInt())
 
                         when (val type = attrs.getAttributeIntValue(xmlns, ATTR_TYPE, EditorInfo.TYPE_NULL)) {
                             EditorInfo.TYPE_NULL, EditorInfo.TYPE_CLASS_TEXT -> {
-                                appendTextField(
+                                appendField(
                                         key,
                                         attrs.getAttributeValue(xmlns, ATTR_TITLE),
                                         sharedPreferences.getString(key, config.baseUrl),
-                                        type
+                                        type,
+                                        hint
                                 )
                             }
                             EditorInfo.TYPE_CLASS_NUMBER -> {
-                                appendIntegerField(
+                                appendField(
                                         key,
                                         attrs.getAttributeValue(xmlns, ATTR_TITLE),
-                                        sharedPreferences.getInt(key, config.locationPollInterval),
-                                        type
+                                        sharedPreferences.getInt(key, config.locationPollInterval).toString(),
+                                        type,
+                                        hint
                                 )
                             }
                             else -> {
@@ -114,12 +117,13 @@ class PreferencesView @JvmOverloads constructor(
     }
 
 
-    private fun appendTextField(key: String, title: String?, value: String?, fieldType: Int) {
+    private fun appendField(key: String, title: String?, value: String?, fieldType: Int, helperText: String? = null) {
         Log.d(TAG, "appendTextField: $key $title $value")
         val textInputLayout = layoutInflater.inflate(R.layout.item_setting, this, false) as TextInputLayout
         textInputLayout.apply {
-            hint = title
-            editText?.apply {
+            this.hint = title
+            this.helperText = helperText
+            this.editText?.apply {
                 inputType = fieldType
                 setText(value)
             }
@@ -127,21 +131,6 @@ class PreferencesView @JvmOverloads constructor(
         fieldsToSave[key] = textInputLayout
 
         this.addView(textInputLayout)
-    }
-
-
-    private fun appendIntegerField(key: String, title: String?, value: Int, fieldType: Int) {
-        val view = layoutInflater.inflate(R.layout.item_setting, this, false) as TextInputLayout
-        view.apply {
-            hint = title
-            editText?.apply {
-                inputType = fieldType
-                setText(value.toString())
-            }
-        }
-        fieldsToSave[key] = view
-
-        this.addView(view)
     }
 
 
@@ -184,6 +173,7 @@ class PreferencesView @JvmOverloads constructor(
 
         private const val ATTR_KEY = "key"
         private const val ATTR_TITLE = "title"
+        private const val ATTR_HINT = "hint"
         private const val ATTR_TYPE = "inputType"
         private const val TYPE_NUMBER = "number"
         private const val TYPE_DECIMAL = "numberDecimal"
