@@ -115,7 +115,7 @@ class ToursAdapter constructor(
 
             @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
             fun performCardReveal(tour: TourRoute) {
-                binding.fabTour.isClickable = false
+                binding.fabOpenTour.isClickable = false
                 animateCircularReveal(context, binding.innerCard, !fabRevealed, object : AnimationCallback {
                     override fun onStart() {
                         fabRevealed = !fabRevealed
@@ -127,13 +127,13 @@ class ToursAdapter constructor(
                             states[tour.id] = true
                         }
 
-                        DrawableHelpers.modifyFab(context, binding.fabTour,
+                        DrawableHelpers.modifyFab(context, binding.fabOpenTour,
                                 if (fabRevealed) R.drawable.ic_baseline_close_24 else R.drawable.ic_baseline_launch_24
                         )
                     }
 
                     override fun onEnd() {
-                        binding.fabTour.isClickable = true
+                        binding.fabOpenTour.isClickable = true
                         if (fabRevealed) callbacks.cardOpened(tour)
                     }
                 })
@@ -221,7 +221,7 @@ class ToursAdapter constructor(
                 }
 
                 fabRevealed = states[tour.id] ?: fabRevealed
-                DrawableHelpers.modifyFab(context, binding.fabTour,
+                DrawableHelpers.modifyFab(context, binding.fabOpenTour,
                         if (fabRevealed) R.drawable.ic_baseline_close_24 else R.drawable.ic_baseline_launch_24
                 )
                 binding.innerCard.visibility = if (fabRevealed) View.VISIBLE else View.INVISIBLE
@@ -247,7 +247,7 @@ class ToursAdapter constructor(
                     callbacks.rootClick(tour)
                 }
 
-                binding.fabTour.setOnClickListener {
+                binding.fabOpenTour.setOnClickListener {
                     adapter.closeOthers(tour.id)
                     callbacks.fabClick(tour)
                     performCardReveal(tour)
