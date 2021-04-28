@@ -13,5 +13,7 @@
 
     <color name="black_overlay">#66000000</color>
 
+    <color name="status_bar_translucent_dark">#40000000</color>
+
     <color name="target_line">#80BB86FC</color>
 </resources>

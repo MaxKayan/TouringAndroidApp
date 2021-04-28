@@ -6,4 +6,5 @@
     <dimen name="fragment_fab_bottom_margin">76dp</dimen>
 
     <dimen name="info_window_content_width">250dp</dimen>
+    <dimen name="content_top_padding">26dp</dimen>
 </resources>
