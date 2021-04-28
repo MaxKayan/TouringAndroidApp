@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -97,7 +98,33 @@ class MapFragment : Fragment() {
 
         setupButtonClickListeners()
 
+        setupPopupMenu()
+
         subscribeObservers()
+    }
+
+    private fun setupPopupMenu() {
+        val popupMenu = PopupMenu(context, binding.buttonExtrasMenu)
+        popupMenu.inflate(R.menu.map_extras_menu)
+
+        popupMenu.menu.findItem(R.id.menu_shorten_paths).isChecked = false
+
+        popupMenu.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.menu_shorten_paths -> {
+                    Log.d(TAG, "setupPopupMenu: $item")
+                    Log.d(TAG, "setupPopupMenu: ${item.isChecked}")
+                    item.isChecked = !item.isChecked
+                    true
+                }
+
+                else -> false
+            }
+        }
+
+        binding.buttonExtrasMenu.setOnClickListener {
+            popupMenu.show()
+        }
     }
 
 

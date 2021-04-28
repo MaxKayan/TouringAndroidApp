@@ -9,7 +9,23 @@
     <org.osmdroid.views.MapView
         android:id="@+id/map"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_extras_menu"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="12dp"
+        app:icon="@drawable/ic_baseline_menu_24"
+        app:iconGravity="textTop"
+        app:iconPadding="0dp"
+        app:iconTint="@color/material_on_background_emphasis_high_type"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_my_location"
@@ -17,6 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="@dimen/fragment_fab_bottom_margin"
+        android:alpha="0.95"
         android:backgroundTint="?attr/colorBackgroundFloating"
         android:contentDescription="@string/my_location"
         android:src="@drawable/ic_baseline_my_location_24"
@@ -30,6 +47,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginBottom="@dimen/fragment_fab_bottom_margin"
+        android:alpha="0.95"
         android:backgroundTint="?attr/colorBackgroundFloating"
         android:contentDescription="@string/step_backward"
         android:scaleType="center"
@@ -45,6 +63,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="6dp"
+        android:alpha="0.95"
         android:backgroundTint="?attr/colorBackgroundFloating"
         android:contentDescription="@string/step_backward"
         android:scaleType="center"
