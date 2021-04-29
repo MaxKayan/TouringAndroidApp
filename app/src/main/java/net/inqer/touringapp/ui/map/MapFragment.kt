@@ -187,6 +187,7 @@ class MapFragment : Fragment() {
         viewModel.activeTourRoute.observe(viewLifecycleOwner) { route ->
             if (route == null) {
                 clearWaypointsPolyline()
+                binding.activeRouteTitle.clearComposingText()
                 return@observe
             }
 
@@ -197,6 +198,8 @@ class MapFragment : Fragment() {
             route.destinations?.let { destinations ->
                 destinationsAdapter.submitList(destinations.toList())
             }
+
+            binding.activeRouteTitle.text = route.title
         }
 
         viewModel.currentLocation.observe(viewLifecycleOwner) {
