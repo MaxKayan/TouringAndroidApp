@@ -1,6 +1,5 @@
 package net.inqer.touringapp.ui.home
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,7 +12,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.collect
 import net.inqer.touringapp.R
 import net.inqer.touringapp.data.models.TourRoute
@@ -29,10 +27,6 @@ class HomeFragment : Fragment() {
 
     @Inject
     lateinit var dateFormat: DateFormat
-
-    @Inject
-    @ApplicationContext
-    lateinit var appContext: Context
 
     private val viewModel: HomeViewModel by viewModels()
 
