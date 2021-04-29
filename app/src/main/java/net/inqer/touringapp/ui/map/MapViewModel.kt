@@ -23,7 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(
         val appConfig: AppConfig,
-        
+
         dispatchers: DispatcherProvider,
         val gpsLocationProvider: GpsLocationProvider,
         val fusedLocationProviderClient: FusedLocationProviderClient,
