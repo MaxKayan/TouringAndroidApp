@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingHorizontal="12dp"
+    android:paddingTop="@dimen/content_top_padding"
     tools:context=".ui.settings.SettingsFragment">
 
     <!--    <LinearLayout-->
@@ -21,7 +21,10 @@
         android:id="@+id/preferences"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent">
+        android:clipToPadding="false"
+        android:paddingHorizontal="12dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:preferences="@xml/settings_main">
 
     </net.inqer.touringapp.components.PreferencesView>
 

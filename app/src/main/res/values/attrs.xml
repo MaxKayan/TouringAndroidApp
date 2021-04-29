@@ -6,4 +6,8 @@
         <attr name="cradle_vertical_offset" format="dimension" />
         <attr name="fab_size" format="dimension" />
     </declare-styleable>
+
+    <declare-styleable name="PreferencesView">
+        <attr name="preferences" format="reference"/>
+    </declare-styleable>
 </resources>

@@ -25,7 +25,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class PreferencesView @JvmOverloads constructor(
         context: Context,
-//        sharedPreferences: SharedPreferences? = null,
         attrs: AttributeSet? = null,
 //        defStyle: Int = 0,
 //        defStyleRes: Int = 0
@@ -37,7 +36,7 @@ class PreferencesView @JvmOverloads constructor(
     @Inject
     lateinit var config: AppConfig
 
-    private val parser: XmlResourceParser
+    private var parser: XmlResourceParser? = null
     private val layoutInflater: LayoutInflater
     private val fieldsToSave: HashMap<String, TextInputLayout> = HashMap()
 
@@ -46,12 +45,31 @@ class PreferencesView @JvmOverloads constructor(
 
         layoutInflater = LayoutInflater.from(context)
 
-        parser = context.resources.getXml(R.xml.settings_main)
+        context.theme.obtainStyledAttributes(
+                attrs,
+                R.styleable.PreferencesView,
+                0, 0).apply {
 
-        parseAndInflate();
+            try {
+                val preferences = this.getResourceId(R.styleable.PreferencesView_preferences, 0)
+                if (preferences == 0) {
+                    Log.e(TAG, "init: resource id not found, aborting!")
+                    return@apply
+                }
+
+                parser = context.resources.getXml(preferences)
+
+                parser?.let { parseAndInflate(it) }
+
+            } catch (reason: Throwable) {
+                Log.e(TAG, "init: failed to obtain settings res", reason)
+            } finally {
+                recycle()
+            }
+        }
     }
 
-    private fun parseAndInflate() {
+    private fun parseAndInflate(parser: XmlResourceParser) {
         var state = 0
         do {
             try {
@@ -70,34 +88,25 @@ class PreferencesView @JvmOverloads constructor(
                     }
                     "Preference" -> {
                         val attrs = Xml.asAttributeSet(parser)
-                        val keyString = attrs.getAttributeValue(xmlns, ATTR_KEY)
+                        val keyRes: Int = attrs.getAttributeValue(xmlns, ATTR_KEY).substring(1).toInt()
+                        val type = attrs.getAttributeIntValue(xmlns, ATTR_TYPE, EditorInfo.TYPE_NULL)
                         val hint: String? = attrs.getAttributeValue(xmlns, ATTR_HINT)
-                        val key = context.getString(keyString.substring(1).toInt())
+                        val title: String? = attrs.getAttributeValue(xmlns, ATTR_TITLE)
+                        val key = context.getString(keyRes)
 
-                        when (val type = attrs.getAttributeIntValue(xmlns, ATTR_TYPE, EditorInfo.TYPE_NULL)) {
-                            EditorInfo.TYPE_NULL, EditorInfo.TYPE_CLASS_TEXT -> {
-                                appendField(
-                                        key,
-                                        attrs.getAttributeValue(xmlns, ATTR_TITLE),
-                                        sharedPreferences.getString(key, config.baseUrl),
-                                        type,
-                                        hint
-                                )
-                            }
-                            EditorInfo.TYPE_CLASS_NUMBER -> {
-                                appendField(
-                                        key,
-                                        attrs.getAttributeValue(xmlns, ATTR_TITLE),
-                                        sharedPreferences.getInt(key, config.locationPollInterval).toString(),
-                                        type,
-                                        hint
-                                )
-                            }
-                            else -> {
+                        when (keyRes) {
+                            R.string.key_main_server_address ->
+                                appendField(key, title, config.baseUrl, type, hint)
+
+                            R.string.key_location_poll_interval ->
+                                appendField(key, title, config.locationPollInterval.toString(), type, hint)
+
+                            R.string.key_location_waypoint_radius ->
+                                appendField(key, title, config.waypointEnterRadius.toString(), type, hint)
+
+                            else ->
                                 Log.e(TAG, "parseAndInflate: unknown preference type! - $type")
-                            }
                         }
-
                     }
                 }
             }
