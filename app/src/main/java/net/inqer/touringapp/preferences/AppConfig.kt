@@ -1,4 +1,4 @@
-package net.inqer.touringapp
+package net.inqer.touringapp.preferences
 
 import androidx.lifecycle.LiveData
 

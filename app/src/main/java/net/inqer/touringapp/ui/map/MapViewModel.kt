@@ -14,6 +14,7 @@ import net.inqer.touringapp.AppConfig
 import net.inqer.touringapp.data.models.ActiveRouteDataBus
 import net.inqer.touringapp.data.models.TourRoute
 import net.inqer.touringapp.di.qualifiers.ActiveTourRouteFlow
+import net.inqer.touringapp.preferences.AppConfig
 import net.inqer.touringapp.service.RouteService
 import net.inqer.touringapp.util.DispatcherProvider
 import net.inqer.touringapp.util.GpsLocationProvider

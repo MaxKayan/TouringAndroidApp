@@ -14,8 +14,8 @@ import androidx.core.view.children
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textview.MaterialTextView
 import dagger.hilt.android.AndroidEntryPoint
-import net.inqer.touringapp.AppConfig
 import net.inqer.touringapp.R
+import net.inqer.touringapp.preferences.AppConfig
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException

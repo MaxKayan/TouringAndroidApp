@@ -20,7 +20,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import net.inqer.touringapp.AppConfig
+import net.inqer.touringapp.preferences.AppConfig
 import net.inqer.touringapp.MainActivity
 import net.inqer.touringapp.R
 import net.inqer.touringapp.data.models.*

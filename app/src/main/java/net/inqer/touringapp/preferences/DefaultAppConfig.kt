@@ -1,4 +1,4 @@
-package net.inqer.touringapp
+package net.inqer.touringapp.preferences
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -6,6 +6,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
+import net.inqer.touringapp.R
+import net.inqer.touringapp.SettingsConstants
 import javax.inject.Inject
 
 
@@ -65,10 +67,16 @@ class DefaultAppConfig @Inject constructor(
 
     private val waypointEnterRadiusKey = context.getString(R.string.key_location_waypoint_radius)
     override var waypointEnterRadius: Int
-        get() = preferences.getInt(
-                waypointEnterRadiusKey,
-                15
-        )
+        get() {
+            val result = preferences.getInt(
+                    waypointEnterRadiusKey,
+                    15
+            )
+
+            Log.d(TAG, "waypointEnterRadius: $result ; ${preferences.all}")
+
+            return result
+        }
         set(value) = write(waypointEnterRadiusKey, value)
 
     private val alwaysShortenPathsKey = context.getString(R.string.key_always_shorten_path)

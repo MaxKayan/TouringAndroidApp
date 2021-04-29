@@ -16,14 +16,14 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
-import net.inqer.touringapp.AppConfig
-import net.inqer.touringapp.DefaultAppConfig
 import net.inqer.touringapp.R
 import net.inqer.touringapp.data.local.AppDatabase
 import net.inqer.touringapp.data.models.ActiveRouteDataBus
 import net.inqer.touringapp.data.models.TourRoute
 import net.inqer.touringapp.data.remote.RoutesApi
 import net.inqer.touringapp.di.qualifiers.ActiveTourRouteLiveData
+import net.inqer.touringapp.preferences.AppConfig
+import net.inqer.touringapp.preferences.DefaultAppConfig
 import net.inqer.touringapp.util.DispatcherProvider
 import retrofit2.Converter
 import retrofit2.Retrofit
