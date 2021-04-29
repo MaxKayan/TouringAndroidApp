@@ -10,7 +10,6 @@ import androidx.lifecycle.asLiveData
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import net.inqer.touringapp.AppConfig
 import net.inqer.touringapp.data.models.ActiveRouteDataBus
 import net.inqer.touringapp.data.models.TourRoute
 import net.inqer.touringapp.di.qualifiers.ActiveTourRouteFlow
