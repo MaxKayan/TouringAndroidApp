@@ -3,15 +3,14 @@ package net.inqer.touringapp.ui.map
 import android.content.Context
 import android.location.Location
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import net.inqer.touringapp.data.models.ActiveRouteDataBus
 import net.inqer.touringapp.data.models.TourRoute
+import net.inqer.touringapp.data.repository.main.MainRepository
 import net.inqer.touringapp.di.qualifiers.ActiveTourRouteFlow
 import net.inqer.touringapp.preferences.AppConfig
 import net.inqer.touringapp.service.RouteService
@@ -23,6 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(
         val appConfig: AppConfig,
+
+        private val mainRepository: MainRepository,
 
         dispatchers: DispatcherProvider,
         val gpsLocationProvider: GpsLocationProvider,
@@ -54,6 +55,11 @@ class MapViewModel @Inject constructor(
 
     fun prevWaypoint(context: Context) = RouteService.prevWaypoint(context)
 
+    fun cancelTourRoute() {
+        viewModelScope.launch {
+            mainRepository.deactivateRoutes()
+        }
+    }
 
     companion object {
         private const val TAG = "MapViewModel"

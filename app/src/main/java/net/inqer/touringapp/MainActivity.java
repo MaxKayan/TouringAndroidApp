@@ -54,6 +54,12 @@ public class MainActivity extends AppCompatActivity {
         window.setFormat(PixelFormat.RGBA_8888);
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.d(TAG, "onNewIntent: called; " + intent);
+    }
+
     public void restartApp() {
         Intent intent = getBaseContext().getPackageManager().getLaunchIntentForPackage(
                 getBaseContext().getPackageName());
@@ -113,18 +119,26 @@ public class MainActivity extends AppCompatActivity {
 
     private void handleIntent(Intent intent) {
         IntentType intentType = (IntentType) intent.getSerializableExtra(EXTRA_MAIN_INTENT_TYPE);
+        Log.d(TAG, String.format("handleIntent: %s ; %s", intent, intentType));
+        if (intentType == null) return;
 
-        NavDestination destination = navController.getCurrentDestination();
-        Integer id = destination != null ? destination.getId() : null;
+        switch (intentType) {
+            case TO_MAP_FRAGMENT:
+                navigateTo(R.id.navigation_map);
+                break;
 
-        if (intentType == IntentType.TO_MAP_FRAGMENT) {
-            if (id != null && id == R.id.navigation_map) return;
+            case DEACTIVATE_ROUTE:
+                viewModel.deactivateRoutes();
+                break;
 
-            navigateTo(R.id.navigation_map);
+            default:
+                Log.e(TAG, String.format("handleIntent: received unexpected intent type! - %s ; %s", intent, intentType));
         }
+
     }
 
     public enum IntentType {
-        TO_MAP_FRAGMENT;
+        TO_MAP_FRAGMENT,
+        DEACTIVATE_ROUTE
     }
 }

@@ -20,11 +20,11 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import net.inqer.touringapp.preferences.AppConfig
 import net.inqer.touringapp.MainActivity
 import net.inqer.touringapp.R
 import net.inqer.touringapp.data.models.*
 import net.inqer.touringapp.di.qualifiers.ActiveTourRouteLiveData
+import net.inqer.touringapp.preferences.AppConfig
 import net.inqer.touringapp.util.DispatcherProvider
 import net.inqer.touringapp.util.GeoHelpers
 import net.inqer.touringapp.util.GeoHelpers.bearingToAzimuth
@@ -336,12 +336,13 @@ class RouteService : LifecycleService() {
 
         val serviceClosePendingIntent = PendingIntent.getActivity(
                 this,
-                NOTIFICATION_REQUEST_CODE,
-                Intent(this, RouteService::class.java).apply {
+                0,
+                Intent(this, MainActivity::class.java).apply {
 //                    this.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    putExtra(EXTRA_INTENT_TYPE, ServiceAction.STOP)
+                    putExtra(MainActivity.EXTRA_MAIN_INTENT_TYPE, MainActivity.IntentType.DEACTIVATE_ROUTE)
                 },
-                PendingIntent.FLAG_UPDATE_CURRENT
+                0
+//                PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         // The PendingIntent to launch activity.

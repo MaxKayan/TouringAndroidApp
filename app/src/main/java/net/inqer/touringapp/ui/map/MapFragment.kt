@@ -60,6 +60,8 @@ class MapFragment : Fragment() {
     private lateinit var closestPointMarker: Marker
     private lateinit var targetPointMarker: Marker
 
+    private var popupMenu: PopupMenu? = null
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentMapBinding.inflate(inflater, container, false)
@@ -104,27 +106,37 @@ class MapFragment : Fragment() {
     }
 
     private fun setupPopupMenu() {
-        val popupMenu = PopupMenu(context, binding.buttonExtrasMenu)
-        popupMenu.inflate(R.menu.map_extras_menu)
+        popupMenu = PopupMenu(context, binding.buttonExtrasMenu).apply {
+            this.inflate(R.menu.map_extras_menu)
 
-        popupMenu.menu.findItem(R.id.menu_shorten_paths).isChecked = viewModel.appConfig.alwaysShortenPaths
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                this.setForceShowIcon(true)
+            }
 
-        popupMenu.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.menu_shorten_paths -> {
-                    Log.d(TAG, "setupPopupMenu: $item")
-                    Log.d(TAG, "setupPopupMenu: ${item.isChecked}")
-                    item.isChecked = !item.isChecked
-                    viewModel.appConfig.alwaysShortenPaths = item.isChecked
-                    true
+            this.menu.findItem(R.id.menu_shorten_paths)?.isChecked = viewModel.appConfig.alwaysShortenPaths
+
+            this.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.menu_shorten_paths -> {
+                        Log.d(TAG, "setupPopupMenu: $item")
+                        Log.d(TAG, "setupPopupMenu: ${item.isChecked}")
+                        item.isChecked = !item.isChecked
+                        viewModel.appConfig.alwaysShortenPaths = item.isChecked
+                        true
+                    }
+
+                    R.id.menu_cancel_route -> {
+                        viewModel.cancelTourRoute()
+                        true
+                    }
+
+                    else -> false
                 }
-
-                else -> false
             }
         }
 
         binding.buttonExtrasMenu.setOnClickListener {
-            popupMenu.show()
+            popupMenu?.show()
         }
     }
 
@@ -187,9 +199,12 @@ class MapFragment : Fragment() {
         viewModel.activeTourRoute.observe(viewLifecycleOwner) { route ->
             if (route == null) {
                 clearWaypointsPolyline()
-                binding.activeRouteTitle.clearComposingText()
+                binding.activeRouteTitle.text = null
+                popupMenu?.let { it.menu.findItem(R.id.menu_cancel_route)?.isVisible = false }
                 return@observe
             }
+
+            popupMenu?.let { it.menu.findItem(R.id.menu_cancel_route)?.isVisible = true }
 
             route.waypoints?.let { waypoints ->
                 setTourWaypointsLine(waypoints)
