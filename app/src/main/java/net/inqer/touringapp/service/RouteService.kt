@@ -144,8 +144,8 @@ class RouteService : LifecycleService() {
             onActiveRouteChanged(route)
         }
 
-        routeDataBus.targetWaypointIndex.observe(this) { index ->
-            updateNotification(indexInput = index)
+        routeDataBus.targetWaypointIndex.observe(this) {
+            updateNotification()
 
             lifecycleScope.launchWhenCreated {
                 launch(dispatchers.default) {
@@ -380,19 +380,31 @@ class RouteService : LifecycleService() {
     }
 
 
+    private fun getWaypointsProgress(): Pair<Int?, Int?> =
+            Pair(
+                    routeDataBus.targetWaypointIndex.value,
+                    activeRoute?.waypoints?.size
+            )
+
+    private val waypointsProgressString: String
+        get() {
+            val progress = getWaypointsProgress()
+            return "${progress.first}/${progress.second}"
+        }
+
+
     /**
      * Create a new notification instance with the latest [targetCalculatedPoint] data displayed
      * in the text content and notify user using the [notificationManager].
      *
      * @param targetCalculatedPoint The [findClosestWaypoint] result to display in the notification.
-     * @param indexInput The target waypoint's index in the waypoints array.
      */
-    private fun updateNotification(targetCalculatedPoint: CalculatedPoint? = null, indexInput: Int? = null) {
+    private fun updateNotification(targetCalculatedPoint: CalculatedPoint? = null) {
         val point = targetCalculatedPoint ?: routeDataBus.targetWaypointCalculatedDistance.value
-        val index = indexInput ?: routeDataBus.targetWaypointIndex.value
 
-        val notificationText = "Следуйте к следующей путевой точке. " +
-                "${index}/${activeRoute?.waypoints?.size} \n" +
+        val notificationText = (if (!routeStarted && !appConfig.alwaysShortenPaths)
+            "Достигните стартовой точки! " else "Следуйте к следующей путевой точке. ") +
+                "$waypointsProgressString \n" +
                 "Расстояние: ${point?.distanceResult?.distance?.round(2)}м. \n" +
                 "Направление: ${bearingToAzimuth(point?.distanceResult?.finalBearing)?.round(1)}°"
 
@@ -470,7 +482,9 @@ class RouteService : LifecycleService() {
         activeRoute = route
 
         Log.d(TAG, "onActiveRouteChanged: called, setting target to 0")
-        setTargetWaypoint(0)
+        route?.waypoints?.let {
+            if (it.isNotEmpty()) setTargetWaypoint(0)
+        }
     }
 
 
@@ -501,15 +515,15 @@ class RouteService : LifecycleService() {
     companion object {
         private const val TAG = "RouteService"
         private const val NOTIFICATION_IDENTIFIER = 121212
-        private const val NOTIFICATION_REQUEST_CODE = 420
+//        private const val NOTIFICATION_REQUEST_CODE = 420
         private const val CHANNEL_ID = "TourRouteControllerService"
         private const val CHANNEL_NAME = "Foreground Service Channel"
 
         private const val EXTRA_INTENT_TYPE = "EXTRA_INTENT_TYPE"
 
-        private const val PENDING_INTENT_NOTIFICATION_CODE = 0
+//        private const val PENDING_INTENT_NOTIFICATION_CODE = 0
 
-        private const val WAYPOINT_ENTER_RADIUS = 15f
+//        private const val WAYPOINT_ENTER_RADIUS = 15f
 
         /**
          * Send the [ServiceAction.START] command to the service in order to launch it.
