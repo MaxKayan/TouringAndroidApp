@@ -36,6 +36,7 @@ import javax.inject.Singleton
 object AppModule {
     private const val TAG = "AppModule"
 
+    @Singleton
     @Provides
     fun provideAppConfig(
             @ApplicationContext context: Context,

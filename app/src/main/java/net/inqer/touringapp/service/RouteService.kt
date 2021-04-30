@@ -156,9 +156,8 @@ class RouteService : LifecycleService() {
         }
 
         appConfig.liveData.observe(this) { config ->
-            config?.let {
-                alwaysShortenPaths = it.alwaysShortenPaths
-            }
+            onPreferencesChanged(config)
+            Log.d(TAG, "subscribeObservers: appConfig = $config")
         }
     }
 
@@ -516,6 +515,20 @@ class RouteService : LifecycleService() {
 
         updateNotification(targetCalculatedPoint = point)
 
+    }
+
+
+    /**
+     * Called each time the [AppConfig] field has been updated.
+     * @param appConfig Config instance with latest preference values.
+     */
+    private fun onPreferencesChanged(appConfig: AppConfig?) {
+        Log.d(TAG, "onPreferencesChanged: $appConfig")
+        appConfig?.let {
+            alwaysShortenPaths = it.alwaysShortenPaths
+
+            updateNotification()
+        }
     }
 
 

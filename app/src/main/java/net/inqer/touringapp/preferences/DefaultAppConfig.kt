@@ -17,7 +17,7 @@ class DefaultAppConfig @Inject constructor(
 ) : AppConfig {
 
     private val mutableLiveData: MutableLiveData<AppConfig> = MutableLiveData(this)
-    override val liveData: LiveData<AppConfig> = mutableLiveData
+    override val liveData: LiveData<AppConfig> get() = mutableLiveData
 
     /**
      * @param key String key to access a value from shared preferences.
@@ -43,6 +43,8 @@ class DefaultAppConfig @Inject constructor(
             }
 
             if (it.commit() && notify) {
+                Log.d(TAG, "write: posting live data. ; ${mutableLiveData.hasObservers()} " +
+                        "${mutableLiveData.hasActiveObservers()} \n $this")
                 mutableLiveData.postValue(this)
             }
         }
