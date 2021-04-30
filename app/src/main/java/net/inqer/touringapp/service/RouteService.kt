@@ -336,13 +336,12 @@ class RouteService : LifecycleService() {
 
         val serviceClosePendingIntent = PendingIntent.getActivity(
                 this,
-                0,
+                1,
                 Intent(this, MainActivity::class.java).apply {
 //                    this.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
                     putExtra(MainActivity.EXTRA_MAIN_INTENT_TYPE, MainActivity.IntentType.DEACTIVATE_ROUTE)
                 },
-                0
-//                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         // The PendingIntent to launch activity.
@@ -350,7 +349,7 @@ class RouteService : LifecycleService() {
                 Intent(this, MainActivity::class.java).apply {
                     putExtra(MainActivity.EXTRA_MAIN_INTENT_TYPE, MainActivity.IntentType.TO_MAP_FRAGMENT)
                 },
-                0
+                PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         val builder = NotificationCompat.Builder(this, CHANNEL_ID).apply {
