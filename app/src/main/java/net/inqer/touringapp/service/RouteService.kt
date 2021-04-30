@@ -66,6 +66,7 @@ class RouteService : LifecycleService() {
     private var activeRoute: TourRoute? = null
     private var routeStarted: Boolean = false
 
+    private var alwaysShortenPaths: Boolean = false // Shared preference cache
 
     /*
         --- Class Method Overrides ---
@@ -154,6 +155,11 @@ class RouteService : LifecycleService() {
             }
         }
 
+        appConfig.liveData.observe(this) { config ->
+            config?.let {
+                alwaysShortenPaths = it.alwaysShortenPaths
+            }
+        }
     }
 
 
@@ -402,7 +408,7 @@ class RouteService : LifecycleService() {
     private fun updateNotification(targetCalculatedPoint: CalculatedPoint? = null) {
         val point = targetCalculatedPoint ?: routeDataBus.targetWaypointCalculatedDistance.value
 
-        val notificationText = (if (!routeStarted && !appConfig.alwaysShortenPaths)
+        val notificationText = (if (!alwaysShortenPaths && !routeStarted)
             "Достигните стартовой точки! " else "Следуйте к следующей путевой точке. ") +
                 "$waypointsProgressString \n" +
                 "Расстояние: ${point?.distanceResult?.distance?.round(2)}м. \n" +
@@ -453,7 +459,8 @@ class RouteService : LifecycleService() {
                     onClosestWaypointCalculated(closestPoint)
                     targetPoint?.let { onTargetWaypointCalculated(it) }
 
-                    if ((routeStarted && closestPoint != null) &&  // If first waypoint was reached before and closest point is not null
+                    // If first waypoint was reached before or 'alwaysShortenPaths' enabled and closest point is not null
+                    if (((alwaysShortenPaths || routeStarted) && closestPoint != null) &&
                             (targetPoint == null ||
                                     targetPoint.waypoint.id < closestPoint.waypoint.id && // Then if target point is not the same
                                     targetPoint.waypoint.index < closestPoint.waypoint.index) && // And if target's index is behind the closest waypoint
@@ -515,7 +522,8 @@ class RouteService : LifecycleService() {
     companion object {
         private const val TAG = "RouteService"
         private const val NOTIFICATION_IDENTIFIER = 121212
-//        private const val NOTIFICATION_REQUEST_CODE = 420
+
+        //        private const val NOTIFICATION_REQUEST_CODE = 420
         private const val CHANNEL_ID = "TourRouteControllerService"
         private const val CHANNEL_NAME = "Foreground Service Channel"
 
