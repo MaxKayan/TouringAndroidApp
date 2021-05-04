@@ -35,10 +35,23 @@ class DataUpdaterService : LifecycleService() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-
+        super.onStartCommand(intent, flags, startId)
         Log.d(TAG, "onStartCommand: $intent")
 
-        return super.onStartCommand(intent, flags, startId)
+        intent?.let {
+            val routeId = intent.getLongExtra(EXTRA_ROUTE_ID, -1L)
+            if (routeId != -1L) {
+                updateRouteData(routeId)
+
+                if (Build.VERSION.SDK_INT == Build.VERSION_CODES.O) {
+                    createNotificationChannel()
+                }
+
+                startForeground(NOTIFICATION_ID, createNotification())
+            }
+        }
+
+        return START_NOT_STICKY
     }
 
     private fun updateRouteData(routeId: Long) {
