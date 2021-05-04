@@ -4,6 +4,9 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.LifecycleService
 
+/**
+ * Updates full [net.inqer.touringapp.data.models.TourRoute] data from the API.
+ */
 class DataUpdaterService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
