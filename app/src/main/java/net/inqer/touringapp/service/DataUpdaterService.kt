@@ -30,10 +30,12 @@ class DataUpdaterService : LifecycleService() {
     @Inject
     lateinit var routeRepository: MainRepository
 
+
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "onCreate: called")
     }
+
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
@@ -54,6 +56,7 @@ class DataUpdaterService : LifecycleService() {
 
         return START_NOT_STICKY
     }
+
 
     private fun updateRouteData(routeId: Long) {
         lifecycleScope.launchWhenCreated {
