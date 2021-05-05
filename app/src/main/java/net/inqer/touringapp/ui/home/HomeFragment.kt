@@ -78,19 +78,20 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
+        val context = binding.root.context
         adapter = ToursAdapter(object : ToursAdapter.Companion.TourViewHolder.OnTourViewInteraction {
             override fun rootClick(item: TourRoute) {
             }
 
             override fun cardOpened(item: TourRoute) {
-                viewModel.refreshFullRouteData(item.id)
+                viewModel.refreshFullRouteData(context, item.id)
             }
 
             override fun fabClick(item: TourRoute) {
             }
 
             override fun launchClick(item: TourRoute) {
-                viewModel.refreshFullRouteData(item.id)
+                viewModel.refreshFullRouteData(context, item.id)
                 viewModel.activateRoute(item.id)
                 navigateToRouteMap()
             }

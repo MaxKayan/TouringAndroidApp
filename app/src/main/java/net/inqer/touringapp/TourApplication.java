@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData;
 
 import net.inqer.touringapp.data.models.TourRoute;
 import net.inqer.touringapp.di.qualifiers.ActiveTourRouteLiveData;
+import net.inqer.touringapp.service.DataUpdaterService;
 import net.inqer.touringapp.service.RouteService;
 
 import javax.inject.Inject;
@@ -43,6 +44,7 @@ public class TourApplication extends Application {
             Log.d(TAG, "subscribeObservers: " + tourRoute);
             if (tourRoute != null) {
                 RouteService.Companion.startService(this);
+                DataUpdaterService.Companion.initiateRouteSync(this, tourRoute.getId());
             } else {
                 RouteService.Companion.stopService(this);
             }
