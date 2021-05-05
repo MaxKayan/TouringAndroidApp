@@ -14,6 +14,7 @@ import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import net.inqer.touringapp.R
 import net.inqer.touringapp.data.repository.main.MainRepository
 import javax.inject.Inject
 
@@ -84,6 +85,7 @@ class DataUpdaterService : LifecycleService() {
     private fun createNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID).let {
             it.setContentTitle("Синхронизация данных маршрута...")
+            it.setSmallIcon(R.drawable.ic_baseline_downloading_24)
             it.setProgress(100, 50, true)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
