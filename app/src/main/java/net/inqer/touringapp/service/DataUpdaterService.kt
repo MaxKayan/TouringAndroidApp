@@ -44,7 +44,7 @@ class DataUpdaterService : LifecycleService() {
             if (routeId != -1L) {
                 updateRouteData(routeId)
 
-                if (Build.VERSION.SDK_INT == Build.VERSION_CODES.O) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     createNotificationChannel()
                 }
 
@@ -82,8 +82,8 @@ class DataUpdaterService : LifecycleService() {
     }
 
 
-    private fun createNotification(): Notification {
-        return NotificationCompat.Builder(this, CHANNEL_ID).let {
+    private fun createNotification(): Notification =
+        NotificationCompat.Builder(this, CHANNEL_ID).let {
             it.setContentTitle("Синхронизация данных маршрута...")
             it.setSmallIcon(R.drawable.ic_baseline_downloading_24)
             it.setProgress(100, 50, true)
@@ -95,7 +95,7 @@ class DataUpdaterService : LifecycleService() {
 
             return@let it.build()
         }
-    }
+
 
     companion object {
         private const val TAG = "DataUpdaterService"
