@@ -1,7 +1,10 @@
 package net.inqer.touringapp.data.repository.main
 
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.withContext
 import net.inqer.touringapp.data.local.dao.TourRouteDao
 import net.inqer.touringapp.data.models.TourRoute
@@ -14,13 +17,13 @@ import javax.inject.Inject
 
 
 class DefaultMainRepository @Inject constructor(
-        private val api: RoutesApi,
-        private val routeDao: TourRouteDao,
-        private val dispatchers: DispatcherProvider
+    private val api: RoutesApi,
+    private val routeDao: TourRouteDao,
+    private val dispatchers: DispatcherProvider
 ) : Repository(), MainRepository {
 
     override fun getRoutesFlow(): Flow<List<TourRoute>> =
-            routeDao.getRoutesFlow()
+        routeDao.getRoutesFlow()
 
     override fun getRoutesEvents() = routesEvents.asStateFlow()
 
@@ -51,8 +54,10 @@ class DefaultMainRepository @Inject constructor(
 
                 routesEvents.value = Resource.Updated()
             } else {
-                routesEvents.value = Resource.Error(apiResponse.message
-                        ?: "Неизвестная ошибка загрузки данных с сервера!")
+                routesEvents.value = Resource.Error(
+                    apiResponse.message
+                        ?: "Неизвестная ошибка загрузки данных с сервера!"
+                )
             }
         }
     }
@@ -79,19 +84,12 @@ class DefaultMainRepository @Inject constructor(
 
     override fun observeActiveRoute(): Flow<TourRoute> =
         routeDao.observeActiveRoute()
-                .distinctUntilChanged()
+            .distinctUntilChanged()
 //                .flowOn(dispatchers.io)
 
 
-    override suspend fun getRoute(id: Long): Resource<TourRoute> {
-        // TODO: Add 'getRoute' implementation
-//        return try {
-//            processResponse({ api.fetchRoute(id) })
-//        } catch (e: Exception) {
-//            Resource.Error(e.message ?: "")
-//        }
-        return Resource.Empty()
-    }
+    override suspend fun getRoute(id: Long): TourRoute? =
+        routeDao.getRoute(id)
 
     companion object {
         private const val TAG = "DefaultMainRepository"

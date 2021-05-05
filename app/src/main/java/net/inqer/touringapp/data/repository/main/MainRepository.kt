@@ -9,7 +9,7 @@ interface MainRepository {
     fun getRoutesFlow(): Flow<List<TourRoute>>
     fun getRoutesEvents(): StateFlow<Resource<List<TourRoute>>>
 
-    suspend fun getRoute(id: Long): Resource<TourRoute>
+    suspend fun getRoute(id: Long): TourRoute?
     suspend fun refreshTourRoutes()
     suspend fun refreshFullRouteData(id: Long)
 

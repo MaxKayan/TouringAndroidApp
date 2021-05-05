@@ -19,7 +19,7 @@ interface TourRouteDao : BaseDao<TourRoute> {
     suspend fun createByBriefList(list: List<TourRouteBrief>)
 
     @Query("SELECT * FROM routes WHERE id = :id")
-    suspend fun getRoute(id: Long): TourRoute
+    suspend fun getRoute(id: Long): TourRoute?
 
     @Update(entity = TourRoute::class)
     suspend fun updateFullRoute(fullRoute: TourRouteResponse)
