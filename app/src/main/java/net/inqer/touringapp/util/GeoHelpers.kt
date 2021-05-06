@@ -2,6 +2,7 @@ package net.inqer.touringapp.util
 
 import android.location.Location
 import net.inqer.touringapp.data.models.CalculatedPoint
+import net.inqer.touringapp.data.models.Destination
 import net.inqer.touringapp.data.models.Waypoint
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
@@ -40,6 +41,14 @@ object GeoHelpers {
         return BoundingBox(nord, est, sud, ovest)
     }
 
+
+    suspend fun distanceBetween(location: Location, destination: Destination) =
+        distanceBetween(
+            location.latitude,
+            location.longitude,
+            destination.latitude,
+            destination.longitude
+        )
 
     suspend fun distanceBetween(location: Location, waypoint: Waypoint) =
             distanceBetween(location.latitude, location.longitude, waypoint.latitude, waypoint.longitude)
@@ -99,6 +108,22 @@ object GeoHelpers {
                 closestPointResult,
                 targetPointResult
         )
+    }
+
+
+    suspend fun findActiveDestination(
+        location: Location,
+        destinations: Array<Destination>,
+        targetDistance: Float
+    ): Destination? {
+        for (destination in destinations) {
+            val result = distanceBetween(location, destination)
+            if (result.distance <= targetDistance) {
+                return destination
+            }
+        }
+
+        return null
     }
 
 
