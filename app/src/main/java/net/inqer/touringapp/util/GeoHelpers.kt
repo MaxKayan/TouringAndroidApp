@@ -13,9 +13,9 @@ object GeoHelpers {
     private const val TAG = "GeoHelpers"
 
     data class DistanceResult(
-            val distance: Float,
-            val initialBearing: Float,
-            val finalBearing: Float
+        val distance: Float,
+        val initialBearing: Float,
+        val finalBearing: Float
     )
 
 
@@ -51,15 +51,27 @@ object GeoHelpers {
         )
 
     suspend fun distanceBetween(location: Location, waypoint: Waypoint) =
-            distanceBetween(location.latitude, location.longitude, waypoint.latitude, waypoint.longitude)
+        distanceBetween(
+            location.latitude,
+            location.longitude,
+            waypoint.latitude,
+            waypoint.longitude
+        )
 
 
     suspend fun distanceBetween(waypoint: Waypoint, waypoint2: Waypoint) =
-            distanceBetween(waypoint.latitude, waypoint.longitude, waypoint2.latitude, waypoint2.longitude)
+        distanceBetween(
+            waypoint.latitude,
+            waypoint.longitude,
+            waypoint2.latitude,
+            waypoint2.longitude
+        )
 
 
-    private suspend fun distanceBetween(startLatitude: Double, startLongitude: Double,
-                                endLatitude: Double, endLongitude: Double): DistanceResult {
+    private suspend fun distanceBetween(
+        startLatitude: Double, startLongitude: Double,
+        endLatitude: Double, endLongitude: Double
+    ): DistanceResult {
         val results = FloatArray(3)
         Location.distanceBetween(startLatitude, startLongitude, endLatitude, endLongitude, results)
         return DistanceResult(results[0], results[1], results[2])
@@ -85,7 +97,11 @@ object GeoHelpers {
      * 1) Closest waypoint calculated distance & bearing (null if failed)
      * 2) Target waypoint calculated distance & bearing (null if failed or target not specified)
      */
-    suspend fun findClosestWaypoint(location: Location, waypoints: Array<Waypoint>, targetWaypoint: Waypoint? = null): Pair<CalculatedPoint?, CalculatedPoint?> {
+    suspend fun findClosestWaypoint(
+        location: Location,
+        waypoints: Array<Waypoint>,
+        targetWaypoint: Waypoint? = null
+    ): Pair<CalculatedPoint?, CalculatedPoint?> {
         var targetDistance: DistanceResult? = null
         val distances = ArrayList<DistanceResult>()
 
@@ -99,14 +115,17 @@ object GeoHelpers {
             distances.add(newResult)
         }
 
-        val minDistance = distances.minByOrNull { distanceResult: DistanceResult -> distanceResult.distance }
+        val minDistance =
+            distances.minByOrNull { distanceResult: DistanceResult -> distanceResult.distance }
 
-        val closestPointResult = minDistance?.let { CalculatedPoint(it, waypoints[distances.indexOf(minDistance)]) }
-        val targetPointResult = targetDistance?.let { targetWaypoint?.let { wp -> CalculatedPoint(it, wp) } }
+        val closestPointResult =
+            minDistance?.let { CalculatedPoint(it, waypoints[distances.indexOf(minDistance)]) }
+        val targetPointResult =
+            targetDistance?.let { targetWaypoint?.let { wp -> CalculatedPoint(it, wp) } }
 
         return Pair(
-                closestPointResult,
-                targetPointResult
+            closestPointResult,
+            targetPointResult
         )
     }
 
