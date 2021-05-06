@@ -170,9 +170,11 @@ class RouteService : LifecycleService() {
         iterateActiveWaypoint(1)
 
         if (notifyUser) {
-            Toast.makeText(this, message
+            Toast.makeText(
+                this, message
                     ?: "Достигнута путевая точка! ${routeDataBus.targetWaypoint.value}",
-                    Toast.LENGTH_LONG).show()
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
@@ -207,8 +209,15 @@ class RouteService : LifecycleService() {
      * activates the GPS location updates with the specified parameters.
      */
     private fun requestLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -221,9 +230,9 @@ class RouteService : LifecycleService() {
             return
         }
         fusedLocationClient.requestLocationUpdates(
-                createLocationRequest(),
-                locationCallback,
-                Looper.getMainLooper()
+            createLocationRequest(),
+            locationCallback,
+            Looper.getMainLooper()
         )
     }
 
@@ -243,11 +252,11 @@ class RouteService : LifecycleService() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel() {
         val channel =
-                NotificationChannel(
-                        CHANNEL_ID,
-                        CHANNEL_NAME,
-                        NotificationManager.IMPORTANCE_HIGH
-                )
+            NotificationChannel(
+                CHANNEL_ID,
+                CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_HIGH
+            )
 
         notificationManager.createNotificationChannel(channel)
     }
@@ -275,7 +284,7 @@ class RouteService : LifecycleService() {
         lastKnownLocation?.let { location ->
             routeDataBus.targetWaypoint.value?.let { waypoint ->
                 onTargetWaypointCalculated(
-                        CalculatedPoint(GeoHelpers.distanceBetween(location, waypoint), waypoint)
+                    CalculatedPoint(GeoHelpers.distanceBetween(location, waypoint), waypoint)
                 )
                 return true
             }
@@ -336,32 +345,46 @@ class RouteService : LifecycleService() {
      *
      * @return New foreground [Notification] instance with needed parameters and specified text.
      */
-    private fun createForegroundNotification(contentText: String = getString(R.string.route_service_text), silent: Boolean = true): Notification? {
+    private fun createForegroundNotification(
+        contentText: String = getString(R.string.route_service_text),
+        silent: Boolean = true
+    ): Notification? {
         Log.d(TAG, "createForegroundNotification: $contentText")
 
         val serviceClosePendingIntent = PendingIntent.getActivity(
-                this,
-                1,
-                Intent(this, MainActivity::class.java).apply {
+            this,
+            1,
+            Intent(this, MainActivity::class.java).apply {
 //                    this.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    putExtra(MainActivity.EXTRA_MAIN_INTENT_TYPE, MainActivity.IntentType.DEACTIVATE_ROUTE)
-                },
-                PendingIntent.FLAG_UPDATE_CURRENT
+                putExtra(
+                    MainActivity.EXTRA_MAIN_INTENT_TYPE,
+                    MainActivity.IntentType.DEACTIVATE_ROUTE
+                )
+            },
+            PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         // The PendingIntent to launch activity.
-        val activityPendingIntent = PendingIntent.getActivity(this, 0,
-                Intent(this, MainActivity::class.java).apply {
-                    putExtra(MainActivity.EXTRA_MAIN_INTENT_TYPE, MainActivity.IntentType.TO_MAP_FRAGMENT)
-                },
-                PendingIntent.FLAG_UPDATE_CURRENT
+        val activityPendingIntent = PendingIntent.getActivity(
+            this, 0,
+            Intent(this, MainActivity::class.java).apply {
+                putExtra(
+                    MainActivity.EXTRA_MAIN_INTENT_TYPE,
+                    MainActivity.IntentType.TO_MAP_FRAGMENT
+                )
+            },
+            PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         val builder = NotificationCompat.Builder(this, CHANNEL_ID).apply {
-            this.addAction(R.drawable.ic_baseline_launch_24, getString(R.string.open),
-                    activityPendingIntent)
-            this.addAction(R.drawable.ic_baseline_close_24, getString(R.string.cancel),
-                    serviceClosePendingIntent)
+            this.addAction(
+                R.drawable.ic_baseline_launch_24, getString(R.string.open),
+                activityPendingIntent
+            )
+            this.addAction(
+                R.drawable.ic_baseline_close_24, getString(R.string.cancel),
+                serviceClosePendingIntent
+            )
             this.setContentIntent(activityPendingIntent)
             this.setContentText(contentText)
             this.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
@@ -386,10 +409,10 @@ class RouteService : LifecycleService() {
 
 
     private fun getWaypointsProgress(): Pair<Int?, Int?> =
-            Pair(
-                    routeDataBus.targetWaypointIndex.value,
-                    activeRoute?.waypoints?.size
-            )
+        Pair(
+            routeDataBus.targetWaypointIndex.value,
+            activeRoute?.waypoints?.size
+        )
 
     private val waypointsProgressString: String
         get() {
@@ -414,8 +437,8 @@ class RouteService : LifecycleService() {
                 "Направление: ${bearingToAzimuth(point?.distanceResult?.finalBearing)?.round(1)}°"
 
         notificationManager.notify(
-                NOTIFICATION_IDENTIFIER,
-                createForegroundNotification(notificationText)
+            NOTIFICATION_IDENTIFIER,
+            createForegroundNotification(notificationText)
         )
     }
 
@@ -449,10 +472,14 @@ class RouteService : LifecycleService() {
         lastKnownLocation = locationResult.lastLocation
 
         activeRoute?.waypoints?.let { waypoints ->
-
+            // Processing waypoints
             lifecycleScope.launchWhenCreated {
                 launch(dispatchers.default) {
-                    val (closestPoint, targetPoint) = findClosestWaypoint(locationResult.lastLocation, waypoints, routeDataBus.targetWaypoint.value)
+                    val (closestPoint, targetPoint) = findClosestWaypoint(
+                        locationResult.lastLocation,
+                        waypoints,
+                        routeDataBus.targetWaypoint.value
+                    )
                     Log.i(TAG, "onLocationResult: closest waypoint - $closestPoint ; $targetPoint")
 
                     onClosestWaypointCalculated(closestPoint)
@@ -460,23 +487,28 @@ class RouteService : LifecycleService() {
 
                     // If first waypoint was reached before or 'alwaysShortenPaths' enabled and closest point is not null
                     if (((alwaysShortenPaths || routeStarted) && closestPoint != null) &&
-                            (targetPoint == null ||
-                                    targetPoint.waypoint.id < closestPoint.waypoint.id && // Then if target point is not the same
-                                    targetPoint.waypoint.index < closestPoint.waypoint.index) && // And if target's index is behind the closest waypoint
-                            closestPoint.distanceResult.distance <= appConfig.waypointEnterRadius) {  // Then if closest point is close enough to the user
+                        (targetPoint == null ||
+                                targetPoint.waypoint.id < closestPoint.waypoint.id && // Then if target point is not the same
+                                targetPoint.waypoint.index < closestPoint.waypoint.index) && // And if target's index is behind the closest waypoint
+                        closestPoint.distanceResult.distance <= appConfig.waypointEnterRadius
+                    ) {  // Then if closest point is close enough to the user
                         // Then set the closest waypoint as active
                         setTargetWaypoint(closestPoint.waypoint)
-                        Toast.makeText(this@RouteService, "Маршрут сокращён! \n $closestPoint", Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            this@RouteService,
+                            "Маршрут сокращён! \n $closestPoint",
+                            Toast.LENGTH_LONG
+                        ).show()
 
                     } else if (targetPoint != null &&
-                            targetPoint.distanceResult.distance <= appConfig.waypointEnterRadius) {
+                        targetPoint.distanceResult.distance <= appConfig.waypointEnterRadius
+                    ) {
                         // Otherwise if target waypoint is close enough, iterate route forward
                         nextWaypoint(true)
                         routeStarted = true // Indicating that we can cut the path in the future
                     }
                 }
             }
-
         }
     }
 
