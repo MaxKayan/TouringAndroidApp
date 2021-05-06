@@ -28,6 +28,7 @@ import net.inqer.touringapp.preferences.AppConfig
 import net.inqer.touringapp.util.DispatcherProvider
 import net.inqer.touringapp.util.GeoHelpers
 import net.inqer.touringapp.util.GeoHelpers.bearingToAzimuth
+import net.inqer.touringapp.util.GeoHelpers.findActiveDestination
 import net.inqer.touringapp.util.GeoHelpers.findClosestWaypoint
 import net.inqer.touringapp.util.round
 import javax.inject.Inject
@@ -506,6 +507,19 @@ class RouteService : LifecycleService() {
                         // Otherwise if target waypoint is close enough, iterate route forward
                         nextWaypoint(true)
                         routeStarted = true // Indicating that we can cut the path in the future
+                    }
+                }
+            }
+        }
+
+        val context: Context = this
+        activeRoute?.destinations?.let { destinations ->
+            // Processing destinations
+            lifecycleScope.launchWhenCreated {
+                launch(dispatchers.default) {
+                    findActiveDestination(locationResult.lastLocation, destinations, appConfig.waypointEnterRadius.toFloat())?.let { result ->
+                        Toast.makeText(context, "Точка притяжения поблизости! \n" +
+                                "$result", Toast.LENGTH_LONG).show()
                     }
                 }
             }
