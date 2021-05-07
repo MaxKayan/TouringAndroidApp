@@ -517,10 +517,18 @@ class RouteService : LifecycleService() {
             // Processing destinations
             lifecycleScope.launchWhenCreated {
                 launch(dispatchers.default) {
-                    findActiveDestination(locationResult.lastLocation, destinations, appConfig.waypointEnterRadius.toFloat())?.let { result ->
-                        Toast.makeText(context, "Точка притяжения поблизости! \n" +
-                                "$result", Toast.LENGTH_LONG).show()
-                    }
+                    val result =
+                        findActiveDestination(
+                            locationResult.lastLocation,
+                            destinations,
+                            appConfig.waypointEnterRadius.toFloat()
+                        )
+                            ?: return@launch
+
+                    Toast.makeText(
+                        context, "Точка притяжения поблизости! \n" +
+                                "$result", Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }
