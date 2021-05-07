@@ -68,6 +68,7 @@ object GeoHelpers {
         )
 
 
+    // TODO: Suspending these functions might be redundant
     private suspend fun distanceBetween(
         startLatitude: Double, startLongitude: Double,
         endLatitude: Double, endLongitude: Double
