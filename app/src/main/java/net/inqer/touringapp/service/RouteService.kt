@@ -523,12 +523,16 @@ class RouteService : LifecycleService() {
                             destinations,
                             appConfig.waypointEnterRadius.toFloat()
                         )
-                            ?: return@launch
 
-                    Toast.makeText(
-                        context, "Точка притяжения поблизости! \n" +
-                                "$result", Toast.LENGTH_LONG
-                    ).show()
+                    routeDataBus.activeDestination.postValue(result)
+
+                    result?.let {
+                        Toast.makeText(
+                            context, "Точка притяжения поблизости! \n" +
+                                    "$it", Toast.LENGTH_LONG
+                        ).show()
+                    }
+
                 }
             }
         }
