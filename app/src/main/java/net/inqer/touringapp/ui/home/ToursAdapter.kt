@@ -10,12 +10,9 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.AttrRes
-import androidx.annotation.ColorInt
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -30,21 +27,21 @@ import net.inqer.touringapp.data.models.TourRoute
 import net.inqer.touringapp.databinding.ItemTourBinding
 import net.inqer.touringapp.util.DrawableHelpers
 import net.inqer.touringapp.util.DrawableHelpers.modifyButtonIcon
+import net.inqer.touringapp.util.getThemeColor
 import java.text.DateFormat
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.math.sqrt
 
-@ColorInt
-fun Context.getThemeColor(@AttrRes attribute: Int) = TypedValue().let { theme.resolveAttribute(attribute, it, true); it.data }
 
 class ToursAdapter constructor(
-        private val callbacks: TourViewHolder.OnTourViewInteraction,
-        private val dateFormat: DateFormat
+    private val callbacks: TourViewHolder.OnTourViewInteraction,
+    private val dateFormat: DateFormat
 ) : ListAdapter<TourRoute, ToursAdapter.Companion.TourViewHolder>(TOUR_BRIEF_ITEM_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TourViewHolder {
-        val binding: ItemTourBinding = ItemTourBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding: ItemTourBinding =
+            ItemTourBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return TourViewHolder(this, binding, callbacks, revealedStates)
     }
 
@@ -95,7 +92,10 @@ class ToursAdapter constructor(
         this.recyclerView = recyclerView
     }
 
-    override fun onCurrentListChanged(previousList: MutableList<TourRoute>, currentList: MutableList<TourRoute>) {
+    override fun onCurrentListChanged(
+        previousList: MutableList<TourRoute>,
+        currentList: MutableList<TourRoute>
+    ) {
         super.onCurrentListChanged(previousList, currentList)
         updateStatesWithList(currentList)
     }
@@ -104,10 +104,10 @@ class ToursAdapter constructor(
         private const val TAG = "ToursAdapter"
 
         class TourViewHolder constructor(
-                private val adapter: ToursAdapter,
-                val binding: ItemTourBinding,
-                private val callbacks: OnTourViewInteraction,
-                private val states: HashMap<Long, Boolean>
+            private val adapter: ToursAdapter,
+            val binding: ItemTourBinding,
+            private val callbacks: OnTourViewInteraction,
+            private val states: HashMap<Long, Boolean>
         ) : RecyclerView.ViewHolder(binding.root) {
 
             private var fabRevealed = false
@@ -116,27 +116,32 @@ class ToursAdapter constructor(
             @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
             fun performCardReveal(tour: TourRoute) {
                 binding.fabOpenTour.isClickable = false
-                animateCircularReveal(context, binding.innerCard, !fabRevealed, object : AnimationCallback {
-                    override fun onStart() {
-                        fabRevealed = !fabRevealed
+                animateCircularReveal(
+                    context,
+                    binding.innerCard,
+                    !fabRevealed,
+                    object : AnimationCallback {
+                        override fun onStart() {
+                            fabRevealed = !fabRevealed
 
-                        val revealed = states[tour.id]
-                        if (revealed != null) {
-                            states[tour.id] = !revealed
-                        } else {
-                            states[tour.id] = true
+                            val revealed = states[tour.id]
+                            if (revealed != null) {
+                                states[tour.id] = !revealed
+                            } else {
+                                states[tour.id] = true
+                            }
+
+                            DrawableHelpers.modifyFab(
+                                context, binding.fabOpenTour,
+                                if (fabRevealed) R.drawable.ic_baseline_close_24 else R.drawable.ic_baseline_launch_24
+                            )
                         }
 
-                        DrawableHelpers.modifyFab(context, binding.fabOpenTour,
-                                if (fabRevealed) R.drawable.ic_baseline_close_24 else R.drawable.ic_baseline_launch_24
-                        )
-                    }
-
-                    override fun onEnd() {
-                        binding.fabOpenTour.isClickable = true
-                        if (fabRevealed) callbacks.cardOpened(tour)
-                    }
-                })
+                        override fun onEnd() {
+                            binding.fabOpenTour.isClickable = true
+                            if (fabRevealed) callbacks.cardOpened(tour)
+                        }
+                    })
             }
 
             interface OnTourViewInteraction {
@@ -205,10 +210,14 @@ class ToursAdapter constructor(
                     binding.innerDestinations.visibility = View.VISIBLE
                     binding.innerBtnStart.isClickable = false
 
-                    binding.innerTourLength.text = context.getString(R.string.tour_length, tour.totalDistance)
-                    binding.innerWaypoints.text = context.getString(R.string.n_waypoints, tour.waypoints?.size)
-                    binding.innerTime.text = context.getString(R.string.estimated_n_minutes, tour.estimatedDuration)
-                    binding.innerDestinations.text = context.getString(R.string.n_destinations, tour.destinations?.size)
+                    binding.innerTourLength.text =
+                        context.getString(R.string.tour_length, tour.totalDistance)
+                    binding.innerWaypoints.text =
+                        context.getString(R.string.n_waypoints, tour.waypoints?.size)
+                    binding.innerTime.text =
+                        context.getString(R.string.estimated_n_minutes, tour.estimatedDuration)
+                    binding.innerDestinations.text =
+                        context.getString(R.string.n_destinations, tour.destinations?.size)
                 } else {
                     // The data we have is currently partial
                     binding.innerProgressBar.show()
@@ -221,11 +230,13 @@ class ToursAdapter constructor(
                 }
 
                 fabRevealed = states[tour.id] ?: fabRevealed
-                DrawableHelpers.modifyFab(context, binding.fabOpenTour,
-                        if (fabRevealed) R.drawable.ic_baseline_close_24 else R.drawable.ic_baseline_launch_24
+                DrawableHelpers.modifyFab(
+                    context, binding.fabOpenTour,
+                    if (fabRevealed) R.drawable.ic_baseline_close_24 else R.drawable.ic_baseline_launch_24
                 )
                 binding.innerCard.visibility = if (fabRevealed) View.VISIBLE else View.INVISIBLE
-                binding.innerCard.circularRevealScrimColor = ContextCompat.getColor(context, android.R.color.transparent)
+                binding.innerCard.circularRevealScrimColor =
+                    ContextCompat.getColor(context, android.R.color.transparent)
 
                 val progress = CircularProgressDrawable(context)
                 progress.centerRadius = 30f
@@ -234,14 +245,14 @@ class ToursAdapter constructor(
                 progress.start()
 
                 Glide.with(binding.root)
-                        .load(tour.image)
-                        .placeholder(progress)
-                        .into(binding.image)
+                    .load(tour.image)
+                    .placeholder(progress)
+                    .into(binding.image)
 
                 Glide.with(binding.root)
-                        .load(tour.image)
-                        .placeholder(progress)
-                        .into(binding.innerImage)
+                    .load(tour.image)
+                    .placeholder(progress)
+                    .into(binding.innerImage)
 
                 binding.root.setOnClickListener {
                     callbacks.rootClick(tour)
@@ -256,38 +267,46 @@ class ToursAdapter constructor(
         }
 
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-        private fun <T> animateCircularReveal(context: Context, circularRevealWidget: T, expand: Boolean = true, callbacks: AnimationCallback) where T : View?, T : CircularRevealWidget? {
+        private fun <T> animateCircularReveal(
+            context: Context,
+            circularRevealWidget: T,
+            expand: Boolean = true,
+            callbacks: AnimationCallback
+        ) where T : View?, T : CircularRevealWidget? {
             val primaryColor = ContextCompat.getColor(context, R.color.purple_200)
 
             circularRevealWidget?.post {
                 val viewWidth = circularRevealWidget.width
                 val viewHeight = circularRevealWidget.height
-                val viewDiagonal = sqrt((viewWidth * viewWidth + viewHeight * viewHeight).toDouble()).toInt()
+                val viewDiagonal =
+                    sqrt((viewWidth * viewWidth + viewHeight * viewHeight).toDouble()).toInt()
 
                 val objectAnimator =
-                        if (expand)
-                            ObjectAnimator.ofArgb(
-                                    circularRevealWidget,
-                                    CircularRevealWidget.CircularRevealScrimColorProperty.CIRCULAR_REVEAL_SCRIM_COLOR,
-                                    primaryColor,
-                                    Color.TRANSPARENT)
-                        else
-                            ObjectAnimator.ofArgb(
-                                    circularRevealWidget,
-                                    CircularRevealWidget.CircularRevealScrimColorProperty.CIRCULAR_REVEAL_SCRIM_COLOR,
-                                    Color.TRANSPARENT,
-                                    primaryColor)
+                    if (expand)
+                        ObjectAnimator.ofArgb(
+                            circularRevealWidget,
+                            CircularRevealWidget.CircularRevealScrimColorProperty.CIRCULAR_REVEAL_SCRIM_COLOR,
+                            primaryColor,
+                            Color.TRANSPARENT
+                        )
+                    else
+                        ObjectAnimator.ofArgb(
+                            circularRevealWidget,
+                            CircularRevealWidget.CircularRevealScrimColorProperty.CIRCULAR_REVEAL_SCRIM_COLOR,
+                            Color.TRANSPARENT,
+                            primaryColor
+                        )
 
                 val animatorSet = AnimatorSet().apply {
                     playTogether(
-                            CircularRevealCompat.createCircularReveal(
-                                    circularRevealWidget,
-                                    (viewWidth - 120).toFloat(),
-                                    (viewHeight / 2).toFloat() + 42f,
-                                    if (expand) 10f else 1000f,
-                                    if (expand) (viewDiagonal / 1.2).toFloat() else 10f
-                            ),
-                            objectAnimator
+                        CircularRevealCompat.createCircularReveal(
+                            circularRevealWidget,
+                            (viewWidth - 120).toFloat(),
+                            (viewHeight / 2).toFloat() + 42f,
+                            if (expand) 10f else 1000f,
+                            if (expand) (viewDiagonal / 1.2).toFloat() else 10f
+                        ),
+                        objectAnimator
                     )
 
                     duration = 512
@@ -316,32 +335,33 @@ class ToursAdapter constructor(
             fun onEnd()
         }
 
-        private val TOUR_BRIEF_ITEM_CALLBACK: DiffUtil.ItemCallback<TourRoute> = object : DiffUtil.ItemCallback<TourRoute>() {
-            override fun areItemsTheSame(oldItem: TourRoute, newItem: TourRoute): Boolean {
-                return oldItem.id == newItem.id
-            }
+        private val TOUR_BRIEF_ITEM_CALLBACK: DiffUtil.ItemCallback<TourRoute> =
+            object : DiffUtil.ItemCallback<TourRoute>() {
+                override fun areItemsTheSame(oldItem: TourRoute, newItem: TourRoute): Boolean {
+                    return oldItem.id == newItem.id
+                }
 
-            override fun areContentsTheSame(oldItem: TourRoute, newItem: TourRoute): Boolean {
+                override fun areContentsTheSame(oldItem: TourRoute, newItem: TourRoute): Boolean {
 //                if (oldItem.id != newItem.id) return false
-                if (oldItem.title != newItem.title) return false
-                if (oldItem.description != newItem.description) return false
-                if (oldItem.image != newItem.image) return false
-                if (oldItem.createdAt != newItem.createdAt) return false
-                if (oldItem.isActive != newItem.isActive) return false
-                if (oldItem.updatedAt != newItem.updatedAt) return false
-                if (oldItem.totalDistance != newItem.totalDistance) return false
-                if (oldItem.estimatedDuration != newItem.estimatedDuration) return false
-                if (oldItem.waypoints != null) {
-                    if (newItem.waypoints == null) return false
-                    if (!oldItem.waypoints.contentEquals(newItem.waypoints)) return false
-                } else if (newItem.waypoints != null) return false
-                if (oldItem.destinations != null) {
-                    if (newItem.destinations == null) return false
-                    if (!oldItem.destinations.contentEquals(newItem.destinations)) return false
-                } else if (newItem.destinations != null) return false
+                    if (oldItem.title != newItem.title) return false
+                    if (oldItem.description != newItem.description) return false
+                    if (oldItem.image != newItem.image) return false
+                    if (oldItem.createdAt != newItem.createdAt) return false
+                    if (oldItem.isActive != newItem.isActive) return false
+                    if (oldItem.updatedAt != newItem.updatedAt) return false
+                    if (oldItem.totalDistance != newItem.totalDistance) return false
+                    if (oldItem.estimatedDuration != newItem.estimatedDuration) return false
+                    if (oldItem.waypoints != null) {
+                        if (newItem.waypoints == null) return false
+                        if (!oldItem.waypoints.contentEquals(newItem.waypoints)) return false
+                    } else if (newItem.waypoints != null) return false
+                    if (oldItem.destinations != null) {
+                        if (newItem.destinations == null) return false
+                        if (!oldItem.destinations.contentEquals(newItem.destinations)) return false
+                    } else if (newItem.destinations != null) return false
 
-                return true
+                    return true
+                }
             }
-        }
     }
 }

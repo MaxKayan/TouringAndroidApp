@@ -1,14 +1,19 @@
 package net.inqer.touringapp.data.models
 
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
 data class Destination(
+        @PrimaryKey
+        @SerializedName("pk")
+        val id: Long,
+
         val description: String,
         val latitude: Double,
         val longitude: Double,
         val photos: List<Photo>,
-        val radius: Int,
+        val radius: Float,
 
         @SerializedName("route")
         val routeId: Long,

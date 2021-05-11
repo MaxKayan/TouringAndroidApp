@@ -525,14 +525,6 @@ class RouteService : LifecycleService() {
                         )
 
                     routeDataBus.activeDestination.postValue(result)
-
-                    result?.let {
-                        Toast.makeText(
-                            context, "Точка притяжения поблизости! \n" +
-                                    "$it", Toast.LENGTH_LONG
-                        ).show()
-                    }
-
                 }
             }
         }

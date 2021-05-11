@@ -73,13 +73,8 @@ object DrawableHelpers {
     }
 
 
-    @ColorInt
-    fun getThemeColor(context: Context, @AttrRes attrRes: Int): Int =
-            TypedValue().let { context.theme.resolveAttribute(attrRes, it, true); it.data }
-
-
     fun getThemePaintedDrawable(context: Context, @DrawableRes drawableRes: Int, @AttrRes colorAttribute: Int): Drawable? =
-            getPaintedDrawable(context, drawableRes, getThemeColor(context, colorAttribute))
+            getPaintedDrawable(context, drawableRes, context.getThemeColor(colorAttribute))
 
     fun getResPaintedDrawable(context: Context, @DrawableRes drawableRes: Int, @ColorRes colorRes: Int): Drawable? =
             getPaintedDrawable(context, drawableRes, ContextCompat.getColor(context, colorRes))
@@ -95,3 +90,6 @@ object DrawableHelpers {
         return drawable
     }
 }
+
+@ColorInt
+fun Context.getThemeColor(@AttrRes attribute: Int) = TypedValue().let { theme.resolveAttribute(attribute, it, true); it.data }

@@ -131,14 +131,19 @@ object GeoHelpers {
     }
 
 
+    /**
+     * @param location Location to measure distances from. Usually the current phone's location.
+     * @param destinations Array of available destinations at the current route.
+     * @param targetDistance Optional parameter to override destination's own enter radius values.
+     */
     suspend fun findActiveDestination(
         location: Location,
         destinations: Array<Destination>,
-        targetDistance: Float
+        targetDistance: Float? = null
     ): Destination? {
         for (destination in destinations) {
             val result = distanceBetween(location, destination)
-            if (result.distance <= targetDistance) {
+            if (result.distance <= targetDistance ?: destination.radius) {
                 return destination
             }
         }

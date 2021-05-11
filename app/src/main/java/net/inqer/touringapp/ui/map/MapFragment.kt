@@ -17,6 +17,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.LifecycleOwner
 import androidx.preference.PreferenceManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.AndroidEntryPoint
@@ -102,7 +103,7 @@ class MapFragment : Fragment() {
 
         setupPopupMenu()
 
-        subscribeObservers()
+        subscribeObservers(viewLifecycleOwner)
     }
 
     private fun setupPopupMenu() {
@@ -195,8 +196,8 @@ class MapFragment : Fragment() {
     }
 
 
-    private fun subscribeObservers() {
-        viewModel.activeTourRoute.observe(viewLifecycleOwner) { route ->
+    private fun subscribeObservers(owner: LifecycleOwner) {
+        viewModel.activeTourRoute.observe(owner) { route ->
             if (route == null) {
                 clearWaypointsPolyline()
                 binding.activeRouteTitle.text = null
@@ -217,18 +218,22 @@ class MapFragment : Fragment() {
             binding.activeRouteTitle.text = route.title
         }
 
-        viewModel.currentLocation.observe(viewLifecycleOwner) {
+        viewModel.routeDataBus.activeDestination.observe(owner) {
+            destinationsAdapter.setActiveDestination(it)
+        }
+
+        viewModel.currentLocation.observe(owner) {
             updateTargetLine()
         }
 
-        viewModel.routeDataBus.targetWaypoint.observe(viewLifecycleOwner) { waypoint ->
+        viewModel.routeDataBus.targetWaypoint.observe(owner) { waypoint ->
             waypoint?.let {
                 updateTargetLine(it)
                 updateTargetPointMarker(it)
             }
         }
 
-        viewModel.routeDataBus.closestWaypointCalculatedPoint.observe(viewLifecycleOwner) { point ->
+        viewModel.routeDataBus.closestWaypointCalculatedPoint.observe(owner) { point ->
             point?.let { updateClosestPointMarker(point.waypoint) }
         }
     }
