@@ -93,11 +93,6 @@ class DestinationsMapAdapter(
             }
         }
 
-        onActiveDestinationChanged(destination)
-    }
-
-
-    private fun onActiveDestinationChanged(destination: Destination?) {
         // Set previous active destination as visited, if any.
         activeDestination?.let { updateMarkerAppearance(it, DestinationMarkerStatus.VISITED) }
         // Update current destination variable field
