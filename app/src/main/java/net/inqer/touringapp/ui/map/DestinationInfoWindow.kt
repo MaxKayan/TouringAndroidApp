@@ -7,6 +7,7 @@ import android.view.animation.AnimationUtils
 import android.widget.Toast
 import net.inqer.touringapp.data.models.Destination
 import net.inqer.touringapp.databinding.DestinationInfoWindowBinding
+import net.inqer.touringapp.ui.map.overlays.CirclePlottingOverlay
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.infowindow.InfoWindow
 
@@ -23,6 +24,8 @@ class DestinationInfoWindow(
 
     private val openAnimation = AnimationUtils.loadAnimation(context, android.R.anim.fade_in)
     private val closeAnimation = AnimationUtils.loadAnimation(context, android.R.anim.fade_out)
+
+    private var rangeCircle: CirclePlottingOverlay? = null
 
     override fun onOpen(item: Any?) {
         binding.root.visibility = View.INVISIBLE

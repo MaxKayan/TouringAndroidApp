@@ -1,6 +1,7 @@
 package net.inqer.touringapp.util
 
 import android.location.Location
+import android.util.Log
 import net.inqer.touringapp.data.models.CalculatedPoint
 import net.inqer.touringapp.data.models.Destination
 import net.inqer.touringapp.data.models.Waypoint
@@ -144,6 +145,7 @@ object GeoHelpers {
         for (destination in destinations) {
             val result = distanceBetween(location, destination)
             if (result.distance <= targetDistance ?: destination.radius) {
+                Log.i(TAG, "findActiveDestination: found - $destination ; distance - $result")
                 return destination
             }
         }

@@ -519,8 +519,7 @@ class RouteService : LifecycleService() {
                     val result =
                         findActiveDestination(
                             locationResult.lastLocation,
-                            destinations,
-                            appConfig.waypointEnterRadius.toFloat()
+                            destinations
                         )
 
                     routeDataBus.activeDestination.postValue(result)

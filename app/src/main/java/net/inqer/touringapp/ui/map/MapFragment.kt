@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.DashPathEffect
 import android.graphics.Paint
-import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -19,7 +18,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.preference.PreferenceManager
-import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
 import net.inqer.touringapp.R
@@ -64,7 +62,11 @@ class MapFragment : Fragment() {
     private var popupMenu: PopupMenu? = null
 
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = FragmentMapBinding.inflate(inflater, container, false)
         onViewBindingReady()
         return binding.root
@@ -83,7 +85,8 @@ class MapFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Configuration.getInstance().load(appContext, PreferenceManager.getDefaultSharedPreferences(appContext))
+        Configuration.getInstance()
+            .load(appContext, PreferenceManager.getDefaultSharedPreferences(appContext))
 
         initMap()
 
@@ -95,7 +98,7 @@ class MapFragment : Fragment() {
 
         setupMarkers()
 
-        managePermissions(viewModel.fusedLocationProviderClient)
+        managePermissions()
 
         setupLocationOverlay(viewModel.gpsLocationProvider)
 
@@ -114,7 +117,8 @@ class MapFragment : Fragment() {
                 this.setForceShowIcon(true)
             }
 
-            this.menu.findItem(R.id.menu_shorten_paths)?.isChecked = viewModel.appConfig.alwaysShortenPaths
+            this.menu.findItem(R.id.menu_shorten_paths)?.isChecked =
+                viewModel.appConfig.alwaysShortenPaths
 
             this.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
@@ -181,9 +185,11 @@ class MapFragment : Fragment() {
         val context: Context = binding.root.context
         binding.fabMyLocation.setOnClickListener {
             viewModel.currentLocation.value.let {
-                binding.map.controller.animateTo(it,
-                        LOCATION_ZOOM,
-                        LOCATION_ZOOM_SPEED)
+                binding.map.controller.animateTo(
+                    it,
+                    LOCATION_ZOOM,
+                    LOCATION_ZOOM_SPEED
+                )
             }
         }
 
@@ -270,7 +276,7 @@ class MapFragment : Fragment() {
 
 
     private fun setTourWaypointsLine(waypoints: Array<Waypoint>) =
-            setTourWaypointsLine(waypoints.map { GeoPoint(it.latitude, it.longitude) }.toList())
+        setTourWaypointsLine(waypoints.map { GeoPoint(it.latitude, it.longitude) }.toList())
 
     private fun setTourWaypointsLine(geoPoints: List<GeoPoint>) {
         waypointsPolyline.setPoints(geoPoints)
@@ -280,8 +286,8 @@ class MapFragment : Fragment() {
         }
 
         binding.map.controller.animateTo(
-                if (geoPoints.size > 1) calculatePointBetween(geoPoints[0], geoPoints[1])
-                else geoPoints[0]
+            if (geoPoints.size > 1) calculatePointBetween(geoPoints[0], geoPoints[1])
+            else geoPoints[0]
         )
 
         binding.map.zoomToBoundingBox(calculateArea(geoPoints), true, 100)
@@ -304,13 +310,6 @@ class MapFragment : Fragment() {
         }
     }
 
-
-    /**
-     * Kotlin extension to easily get GeoPoint from location instance
-     */
-    private fun Location.asGeoPoint(): GeoPoint {
-        return GeoPoint(this)
-    }
 
     private fun Waypoint.asGeoPoint(): GeoPoint {
         return GeoPoint(this.latitude, this.longitude)
@@ -335,7 +334,7 @@ class MapFragment : Fragment() {
         //note you have handle the permissions yourself, the overlay did not do it for you
         locationProvider?.let {
             LocationOverlay(it, binding.map).apply {
-                setOnLocationChangedListener { location, source ->
+                setOnLocationChangedListener { location, _ ->
                     viewModel.updateLocation(location)
                 }
 
@@ -350,7 +349,8 @@ class MapFragment : Fragment() {
         val permissionsToRequest = ArrayList<String>()
         for (permission in permissions) {
             if (ContextCompat.checkSelfPermission(appContext, permission)
-                    != PackageManager.PERMISSION_GRANTED) {
+                != PackageManager.PERMISSION_GRANTED
+            ) {
                 // Permission is not granted
                 permissionsToRequest.add(permission)
             }
@@ -358,20 +358,23 @@ class MapFragment : Fragment() {
         if (permissionsToRequest.size > 0) {
             activity?.let {
                 ActivityCompat.requestPermissions(
-                        it,
-                        permissionsToRequest.toTypedArray(),
-                        REQUEST_PERMISSIONS_REQUEST_CODE)
+                    it,
+                    permissionsToRequest.toTypedArray(),
+                    REQUEST_PERMISSIONS_REQUEST_CODE
+                )
             }
         }
     }
 
 
-    private fun managePermissions(fusedLocationClient: FusedLocationProviderClient) {
-        requestPermissionsIfNecessary(arrayOf( // if you need to show the current location, uncomment the line below
+    private fun managePermissions() {
+        requestPermissionsIfNecessary(
+            arrayOf( // if you need to show the current location, uncomment the line below
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE  // WRITE_EXTERNAL_STORAGE is required in order to show the map
-        ))
+            )
+        )
 
 //        if (ActivityCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
 //                && ActivityCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -391,7 +394,6 @@ class MapFragment : Fragment() {
 
 
     private fun initMap() {
-        val ctx: Context = appContext
 //        val dm = ctx.resources.displayMetrics
         binding.map.setTileSource(TileSourceFactory.MAPNIK)
         //needed for pinch zooms
@@ -422,7 +424,11 @@ class MapFragment : Fragment() {
 
         closestPointMarker = Marker(binding.map).apply {
 //                position = destination.geoPoint()
-            icon = DrawableHelpers.getThemePaintedDrawable(context, R.drawable.circle, R.attr.colorPrimaryVariant)
+            icon = DrawableHelpers.getThemePaintedDrawable(
+                context,
+                R.drawable.circle,
+                R.attr.colorPrimaryVariant
+            )
             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
             title = "Ближайшая точка"
 
@@ -437,7 +443,11 @@ class MapFragment : Fragment() {
         targetPointMarker = Marker(binding.map).apply {
 //                position = destination.geoPoint()
 
-            icon = DrawableHelpers.getResPaintedDrawable(context, R.drawable.circle, R.color.target_line)
+            icon = DrawableHelpers.getResPaintedDrawable(
+                context,
+                R.drawable.circle,
+                R.color.target_line
+            )
             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
             title = "Целевая точка"
 
