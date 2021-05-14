@@ -4,11 +4,13 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import net.inqer.touringapp.R
 import net.inqer.touringapp.data.models.Destination
 import net.inqer.touringapp.util.DrawableHelpers
+import org.osmdroid.util.TileSystem
 import org.osmdroid.views.MapView
 import org.osmdroid.views.Projection
 import org.osmdroid.views.overlay.Marker
@@ -49,13 +51,13 @@ class DestinationMarkerOverlay(
 
             when (value) {
                 Destination.Companion.DestinationStatus.UNVISITED -> {
-                    icon = DrawableHelpers.getResPaintedDrawable(
-                        context, ICON_RES, android.R.color.holo_blue_bright
+                    icon = DrawableHelpers.getThemePaintedDrawable(
+                        context, ICON_RES, R.attr.colorPrimaryDark
                     )
                 }
                 Destination.Companion.DestinationStatus.ACTIVE -> {
-                    icon = DrawableHelpers.getThemePaintedDrawable(
-                        context, ICON_RES, R.attr.colorSecondary
+                    icon = DrawableHelpers.getResPaintedDrawable(
+                        context, ICON_RES, android.R.color.holo_blue_bright
                     )
                 }
                 Destination.Companion.DestinationStatus.VISITED -> {
@@ -94,12 +96,14 @@ class DestinationMarkerOverlay(
         }
 
         if (drawRangeEnabled) {
-//            val radius = destination.radius / TileSystem.GroundResolution(
-//                destination.latitude,
-//                projection.zoomLevel
-//            ).toFloat()
+            val radius = destination.radius + 10 / TileSystem.GroundResolution(
+                destination.latitude,
+                projection.zoomLevel
+            ).toFloat()
 
-            val radius = destination.radius
+            Log.d(TAG, "draw: init radius = ${destination.radius} , final = $radius")
+
+//            val radius = destination.radius
 
             canvas.drawCircle(
                 mPositionPixels.x.toFloat(),
@@ -136,6 +140,8 @@ class DestinationMarkerOverlay(
 
 
     companion object {
+        private const val TAG = "DestinationMarker"
+
         @DrawableRes
         private const val ICON_RES: Int = R.drawable.ic_location
     }
