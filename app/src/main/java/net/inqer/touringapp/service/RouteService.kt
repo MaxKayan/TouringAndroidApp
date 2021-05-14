@@ -512,7 +512,6 @@ class RouteService : LifecycleService() {
             }
         }
 
-        val context: Context = this
         activeRoute?.destinations?.let { destinations ->
             // Processing destinations
             lifecycleScope.launchWhenCreated {
