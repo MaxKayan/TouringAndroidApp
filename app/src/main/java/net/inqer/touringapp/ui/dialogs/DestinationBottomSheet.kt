@@ -1,5 +1,6 @@
 package net.inqer.touringapp.ui.dialogs
 
+import android.content.DialogInterface
 import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,7 +12,9 @@ import net.inqer.touringapp.R
 import net.inqer.touringapp.data.models.Destination
 import net.inqer.touringapp.databinding.DialogDestinationDetailsBinding
 
-class DestinationBottomSheet : BottomSheetDialogFragment() {
+class DestinationBottomSheet(
+    private val onDismiss: () -> Unit
+) : BottomSheetDialogFragment() {
 
     private lateinit var binding: DialogDestinationDetailsBinding
 
@@ -41,14 +44,18 @@ class DestinationBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        onDismiss()
+    }
 
     companion object {
         private const val TAG = "DestinationBottomSheet"
         private const val TITLE = "TITLE"
         private const val DESCRIPTION = "DESCRIPTION"
 
-        fun newInstance(destination: Destination): DestinationBottomSheet =
-            DestinationBottomSheet().apply {
+        fun newInstance(destination: Destination, onClose: () -> Unit): DestinationBottomSheet =
+            DestinationBottomSheet(onClose).apply {
                 val bundle = Bundle().apply {
                     putString(TITLE, destination.title)
                     putString(DESCRIPTION, destination.description)

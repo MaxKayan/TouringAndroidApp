@@ -2,7 +2,6 @@ package net.inqer.touringapp.ui.map.overlays
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.util.Log
 import androidx.annotation.DrawableRes
@@ -43,10 +42,15 @@ class DestinationMarkerOverlay(
 
     var drawRangeEnabled = true
 
+    var detailsViewed = false
+
     var status: Destination.Companion.DestinationStatus =
         Destination.Companion.DestinationStatus.EMPTY
         set(value) {
-            if (value == status) return
+            if (value == field) {
+                Log.w(TAG, "status: new status is the same, skipping... ; $value ; $field")
+                return
+            }
 
             when (value) {
                 Destination.Companion.DestinationStatus.UNVISITED,

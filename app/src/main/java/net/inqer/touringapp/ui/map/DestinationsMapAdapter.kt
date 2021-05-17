@@ -56,8 +56,7 @@ class DestinationsMapAdapter(
                     map,
                     destination
                 ) {
-                    val dialog = DestinationBottomSheet.newInstance(destination)
-                    dialog.show(fragmentManager, TAG)
+                    showBottomSheetIfRequired(this, true)
                 }
             }
 
@@ -70,22 +69,53 @@ class DestinationsMapAdapter(
     }
 
 
+    private fun showBottomSheetIfRequired(
+        marker: DestinationMarkerOverlay,
+        forced: Boolean = false
+    ) {
+        if (!forced) {
+            val existingSheet = fragmentManager.findFragmentByTag(TAG)
+            if (existingSheet !== null) {
+                Log.w(
+                    TAG,
+                    "showBottomSheetIfRequired: This sheet is already opened, skipping. $existingSheet"
+                )
+                return
+            }
+
+            if (marker.detailsViewed) {
+                Log.i(
+                    TAG, "showBottomSheetIfRequired: this destination sheet is already viewed," +
+                            " skipping. $marker"
+                )
+                return
+            }
+        }
+
+        DestinationBottomSheet.newInstance(marker.destination) {
+            marker.detailsViewed = true
+        }.show(fragmentManager, TAG)
+    }
+
+
     fun setActiveDestination(destination: Destination?) {
         Log.d(TAG, "setActiveDestination: $destination")
-        if (activeDestination != null && activeDestination?.id == destination?.id) {
-            return
-        }
+        // TODO this optimization cannot be applied currently, because we loose state when we recreate the fragment
+//        if (activeDestination != null && activeDestination?.id == destination?.id) {
+//            return
+//        }
 
         destination?.let {
             getDestinationMarker(it)?.let { marker ->
                 if (marker.status == Destination.Companion.DestinationStatus.VISITED) {
                     Log.w(
-                        TAG, "setActiveDestination: Setting destination marker that was " +
+                        TAG, "setActiveDestination: Activating destination marker that was " +
                                 "already visited before! ; $marker"
                     )
                 }
 
-                updateMarkerAppearance(marker, Destination.Companion.DestinationStatus.ACTIVE)
+                marker.status = Destination.Companion.DestinationStatus.ACTIVE
+                showBottomSheetIfRequired(marker)
             }
         }
 
@@ -96,6 +126,7 @@ class DestinationsMapAdapter(
                 Destination.Companion.DestinationStatus.VISITED
             )
         }
+
         // Update current destination variable field
         activeDestination = destination
     }
@@ -109,14 +140,7 @@ class DestinationsMapAdapter(
         destination: Destination,
         newStatus: Destination.Companion.DestinationStatus
     ) {
-        getDestinationMarker(destination)?.let { updateMarkerAppearance(it, newStatus) }
-    }
-
-    private fun updateMarkerAppearance(
-        destinationMarker: DestinationMarkerOverlay,
-        newStatus: Destination.Companion.DestinationStatus
-    ) {
-        destinationMarker.status = newStatus
+        getDestinationMarker(destination)?.let { it.status = newStatus }
     }
 
 
