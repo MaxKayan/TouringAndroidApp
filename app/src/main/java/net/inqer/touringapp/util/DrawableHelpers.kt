@@ -20,9 +20,11 @@ object DrawableHelpers {
     private const val TAG = "DrawableHelper"
 
     @JvmOverloads
-    fun modifyFab(context: Context, fab: FloatingActionButton,
-                  @DrawableRes iconRes: Int? = null,
-                  @ColorRes fabColor: Int? = null, @ColorRes iconColor: Int? = null) {
+    fun modifyFab(
+        context: Context, fab: FloatingActionButton,
+        @DrawableRes iconRes: Int? = null,
+        @ColorRes fabColor: Int? = null, @ColorRes iconColor: Int? = null
+    ) {
 
         if (iconRes != null) {
             val fabIcon = ContextCompat.getDrawable(context, iconRes)
@@ -33,39 +35,43 @@ object DrawableHelpers {
             val icon = fabIcon.constantState?.newDrawable()
 
             icon?.mutate()?.colorFilter = PorterDuffColorFilter(
-                    if (iconColor != null) ContextCompat.getColor(context, iconColor) else Color.WHITE,
-                    PorterDuff.Mode.MULTIPLY
+                if (iconColor != null) ContextCompat.getColor(context, iconColor) else Color.WHITE,
+                PorterDuff.Mode.MULTIPLY
             )
 
             fab.setImageDrawable(icon)
         }
 
         if (fabColor != null)
-            fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, fabColor))
+            fab.backgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(context, fabColor))
     }
 
 
     fun modifyButtonIcon(
-            context: Context, button: MaterialButton, @DrawableRes iconRes: Int? = null,
-            @ColorRes iconColorRes: Int? = null,
+        context: Context, button: MaterialButton, @DrawableRes iconRes: Int? = null,
+        @ColorRes iconColorRes: Int? = null,
     ) {
-        modifyButtonIcon(button,
-                if (iconRes != null) ContextCompat.getDrawable(context, iconRes) else null,
-                if (iconColorRes != null) ContextCompat.getColor(context, iconColorRes) else null
+        modifyButtonIcon(
+            button,
+            if (iconRes != null) ContextCompat.getDrawable(context, iconRes) else null,
+            if (iconColorRes != null) ContextCompat.getColor(context, iconColorRes) else null
         )
     }
 
 
-    fun modifyButtonIcon(button: MaterialButton, icon: Drawable? = null,
-                         @ColorInt iconColor: Int? = null) {
+    fun modifyButtonIcon(
+        button: MaterialButton, icon: Drawable? = null,
+        @ColorInt iconColor: Int? = null
+    ) {
         if (icon == button.icon) {
             Log.i(TAG, "modifyButtonIcon: icon is the same, skipping")
         }
         if (icon != null) {
             val newIcon = icon.constantState?.newDrawable()
             newIcon?.mutate()?.colorFilter = PorterDuffColorFilter(
-                    iconColor ?: Color.WHITE,
-                    PorterDuff.Mode.MULTIPLY
+                iconColor ?: Color.WHITE,
+                PorterDuff.Mode.MULTIPLY
             )
 
             button.icon = newIcon
@@ -118,4 +124,5 @@ object DrawableHelpers {
 }
 
 @ColorInt
-fun Context.getThemeColor(@AttrRes attribute: Int) = TypedValue().let { theme.resolveAttribute(attribute, it, true); it.data }
+fun Context.getThemeColor(@AttrRes attribute: Int) =
+    TypedValue().let { theme.resolveAttribute(attribute, it, true); it.data }
