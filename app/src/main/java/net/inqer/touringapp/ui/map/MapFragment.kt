@@ -25,11 +25,11 @@ import net.inqer.touringapp.data.models.Waypoint
 import net.inqer.touringapp.databinding.FragmentMapBinding
 import net.inqer.touringapp.ui.map.overlays.LocationOverlay
 import net.inqer.touringapp.util.DrawableHelpers
-import net.inqer.touringapp.util.GeoHelpers.calculateArea
 import net.inqer.touringapp.util.GeoHelpers.calculatePointBetween
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.MapEventsOverlay
@@ -290,7 +290,11 @@ class MapFragment : Fragment() {
             else geoPoints[0]
         )
 
-        binding.map.zoomToBoundingBox(calculateArea(geoPoints), true, 100)
+        if (binding.map.width > 0) {
+            binding.map.zoomToBoundingBox(BoundingBox.fromGeoPointsSafe(geoPoints), true, 100)
+        } else {
+            Log.w(TAG, "setTourWaypointsLine: mapView is not initialized, failed to zoom.")
+        }
     }
 
 
