@@ -307,6 +307,7 @@ class MapFragment : Fragment() {
     private fun updateTargetLine(target: GeoPoint) {
         viewModel.currentLocation.value?.let { location ->
             targetPolyline.setPoints(listOf(location, target))
+            binding.map.postInvalidate() // Force map to redraw
         }
     }
 
