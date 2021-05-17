@@ -4,7 +4,6 @@ import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.Toast
 import net.inqer.touringapp.data.models.Destination
 import net.inqer.touringapp.databinding.DestinationInfoWindowBinding
 import net.inqer.touringapp.ui.map.overlays.CirclePlottingOverlay
@@ -12,9 +11,10 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.infowindow.InfoWindow
 
 class DestinationInfoWindow(
-        private val binding: DestinationInfoWindowBinding,
-        mapView: MapView,
-        private val destination: Destination
+    private val binding: DestinationInfoWindowBinding,
+    mapView: MapView,
+    private val destination: Destination,
+    private val onOpenClick: View.OnClickListener
 ) : InfoWindow(binding.root, mapView) {
 //    constructor(layoutResId: Int, mapView: MapView?) : super(layoutResId, mapView)
 //    constructor(v: View?, mapView: MapView?) : super(v, mapView)
@@ -37,12 +37,9 @@ class DestinationInfoWindow(
         binding.root.visibility = View.VISIBLE
 
         binding.root.setOnClickListener {
-            Log.d(TAG, "onOpen: click: $it")
         }
 
-        binding.btnDetails.setOnClickListener {
-            Toast.makeText(context, "$destination ; ${destination.type}", Toast.LENGTH_SHORT).show()
-        }
+        binding.btnDetails.setOnClickListener(onOpenClick)
     }
 
     override fun close() {

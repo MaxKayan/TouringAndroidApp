@@ -76,7 +76,9 @@ class MapFragment : Fragment() {
      *  Called as soon as the view binding has been inflated.
      */
     private fun onViewBindingReady() {
-        destinationsAdapter = DestinationsMapAdapter(binding.map, layoutInflater)
+        destinationsAdapter = DestinationsMapAdapter(
+            binding.map, layoutInflater, parentFragmentManager
+        )
 
         setupMarkers()
     }

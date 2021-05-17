@@ -2,8 +2,10 @@ package net.inqer.touringapp.ui.map
 
 import android.util.Log
 import android.view.LayoutInflater
+import androidx.fragment.app.FragmentManager
 import net.inqer.touringapp.data.models.Destination
 import net.inqer.touringapp.databinding.DestinationInfoWindowBinding
+import net.inqer.touringapp.ui.dialogs.DestinationBottomSheet
 import net.inqer.touringapp.ui.map.overlays.DestinationMarkerOverlay
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -12,6 +14,7 @@ import org.osmdroid.views.overlay.Marker
 class DestinationsMapAdapter(
     private val map: MapView,
     private val layoutInflater: LayoutInflater,
+    private val fragmentManager: FragmentManager
 ) {
 
     private var currentList: List<Destination> = listOf()
@@ -52,7 +55,10 @@ class DestinationsMapAdapter(
                     DestinationInfoWindowBinding.inflate(layoutInflater),
                     map,
                     destination
-                )
+                ) {
+                    val dialog = DestinationBottomSheet.newInstance(destination)
+                    dialog.show(fragmentManager, TAG)
+                }
             }
 
             map.overlayManager.add(marker)
