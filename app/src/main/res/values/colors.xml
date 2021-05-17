@@ -9,6 +9,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <!--    -->
+    <color name="active_marker">@android:color/holo_green_light</color>
+
     <color name="bottom_panel">#303030</color>
 
     <color name="black_overlay">#66000000</color>
