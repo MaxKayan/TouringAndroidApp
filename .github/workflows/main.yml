@@ -35,8 +35,8 @@ jobs:
           echo Add other actions to build,
           echo test, and deploy your project.
           
-      - name: "TODO to Issue"
-        uses: "alstr/todo-to-issue-action@v3.0.2-beta"
-        id: "todo"
-        with:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       - name: "TODO to Issue"
+#         uses: "alstr/todo-to-issue-action@v3.0.2-beta"
+#         id: "todo"
+#         with:
+#           TOKEN: ${{ secrets.GITHUB_TOKEN }}
