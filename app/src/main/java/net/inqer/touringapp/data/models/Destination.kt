@@ -31,6 +31,7 @@ data class Destination(
 
     companion object {
         enum class DestinationStatus {
+            EMPTY,
             UNVISITED,
             ACTIVE,
             VISITED
