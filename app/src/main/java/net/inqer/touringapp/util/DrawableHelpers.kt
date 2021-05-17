@@ -73,19 +73,45 @@ object DrawableHelpers {
     }
 
 
-    fun getThemePaintedDrawable(context: Context, @DrawableRes drawableRes: Int, @AttrRes colorAttribute: Int): Drawable? =
-            getPaintedDrawable(context, drawableRes, context.getThemeColor(colorAttribute))
+    fun getThemePaintedDrawable(
+        context: Context,
+        @DrawableRes drawableRes: Int,
+        @AttrRes colorAttribute: Int,
+        alpha: Int = 255,
+        mode: PorterDuff.Mode = PorterDuff.Mode.MULTIPLY,
+    ): Drawable? =
+        getPaintedDrawable(context, drawableRes, context.getThemeColor(colorAttribute), alpha, mode)
 
-    fun getResPaintedDrawable(context: Context, @DrawableRes drawableRes: Int, @ColorRes colorRes: Int): Drawable? =
-            getPaintedDrawable(context, drawableRes, ContextCompat.getColor(context, colorRes))
+    fun getResPaintedDrawable(
+        context: Context,
+        @DrawableRes drawableRes: Int,
+        @ColorRes colorRes: Int,
+        alpha: Int = 255,
+        mode: PorterDuff.Mode = PorterDuff.Mode.MULTIPLY
+    ): Drawable? =
+        getPaintedDrawable(
+            context,
+            drawableRes,
+            ContextCompat.getColor(context, colorRes),
+            alpha,
+            mode
+        )
 
-    private fun getPaintedDrawable(context: Context, @DrawableRes drawableRes: Int, @ColorInt color: Int = Color.WHITE): Drawable? {
+    private fun getPaintedDrawable(
+        context: Context,
+        @DrawableRes drawableRes: Int,
+        @ColorInt color: Int = Color.WHITE,
+        alpha: Int = 255,
+        mode: PorterDuff.Mode = PorterDuff.Mode.MULTIPLY
+    ): Drawable? {
         val drawable = ContextCompat.getDrawable(context, drawableRes) ?: return null
 
         drawable.mutate().colorFilter = PorterDuffColorFilter(
-                color,
-                PorterDuff.Mode.MULTIPLY
+            color,
+            mode
         )
+
+        drawable.alpha = alpha
 
         return drawable
     }
