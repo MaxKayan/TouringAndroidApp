@@ -13,7 +13,10 @@ data class Destination(
     val description: String,
     val latitude: Double,
     val longitude: Double,
-    val photos: List<Photo>,
+
+    @SerializedName("photos")
+    val destinationPhotos: List<DestinationPhoto>,
+
     val radius: Float,
 
     @SerializedName("route")

@@ -10,6 +10,7 @@
         android:id="@+id/sheet_pill"
         android:layout_width="64dp"
         android:layout_height="12dp"
+        android:contentDescription="@string/sheet_handle_icon"
         android:scaleType="fitXY"
         android:src="@drawable/sheet_pill"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -47,11 +48,12 @@
         tools:text="Description goes here" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_images"
-        app:layout_constraintTop_toBottomOf="@id/description"
+        android:id="@+id/photos_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        app:layout_constraintTop_toBottomOf="@id/description"
+        tools:listitem="@layout/item_info_photo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

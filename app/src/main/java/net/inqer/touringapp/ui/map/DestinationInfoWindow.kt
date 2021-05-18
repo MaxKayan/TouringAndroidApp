@@ -36,7 +36,6 @@ class DestinationInfoWindow(
         binding.root.visibility = View.INVISIBLE
         binding.title.text = destination.title
         binding.description.text = destination.description
-        Log.d(TAG, "onOpen: $this ; $item")
 
         binding.root.startAnimation(openAnimation)
         binding.root.visibility = View.VISIBLE
