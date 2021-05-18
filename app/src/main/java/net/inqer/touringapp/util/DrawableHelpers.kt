@@ -103,7 +103,7 @@ object DrawableHelpers {
             mode
         )
 
-    private fun getPaintedDrawable(
+    fun getPaintedDrawable(
         context: Context,
         @DrawableRes drawableRes: Int,
         @ColorInt color: Int = Color.WHITE,
