@@ -54,10 +54,17 @@ class DestinationsMapAdapter(
                 infoWindow = DestinationInfoWindow(
                     DestinationInfoWindowBinding.inflate(layoutInflater),
                     map,
-                    destination
-                ) {
-                    showBottomSheetIfRequired(this, true)
-                }
+                    destination,
+                    {
+                        showBottomSheetIfRequired(this, true)
+                    },
+                    {
+                        this.drawRangeEnabled = true
+                    },
+                    {
+                        this.drawRangeEnabled = false
+                    }
+                )
             }
 
             map.overlayManager.add(marker)
@@ -123,7 +130,7 @@ class DestinationsMapAdapter(
         activeDestination?.let {
             updateMarkerAppearance(
                 it,
-                Destination.Companion.DestinationStatus.VISITED
+                Destination.Companion.DestinationStatus.EMPTY
             )
         }
 
