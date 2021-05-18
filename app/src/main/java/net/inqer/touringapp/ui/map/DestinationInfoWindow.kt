@@ -13,7 +13,9 @@ class DestinationInfoWindow(
     private val binding: DestinationInfoWindowBinding,
     mapView: MapView,
     private val destination: Destination,
-    private val onOpenClick: View.OnClickListener
+    private val onDetailsClick: View.OnClickListener,
+    private val onOpenCallback: () -> Unit,
+    private val onCloseCallback: () -> Unit
 ) : InfoWindow(binding.root, mapView) {
 //    constructor(layoutResId: Int, mapView: MapView?) : super(layoutResId, mapView)
 //    constructor(v: View?, mapView: MapView?) : super(v, mapView)
@@ -42,7 +44,9 @@ class DestinationInfoWindow(
         binding.root.setOnClickListener {
         }
 
-        binding.btnDetails.setOnClickListener(onOpenClick)
+        binding.btnDetails.setOnClickListener(onDetailsClick)
+
+        onOpenCallback()
     }
 
     override fun close() {
@@ -67,6 +71,7 @@ class DestinationInfoWindow(
     }
 
     override fun onClose() {
+        onCloseCallback()
 //        binding.root.visibility = View.VISIBLE
 //        binding.root.startAnimation(closeAnimation)
     }
