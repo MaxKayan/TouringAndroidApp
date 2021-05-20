@@ -64,7 +64,12 @@ class DestinationBottomSheet(
         val context = binding.root.context
 
         val adapter = DestinationPhotoAdapter { photo, _ ->
-            DrawableHelpers.showPhotoDialog(context, photo.url)
+            DrawableHelpers.showPhotoDialog(context, photo.url).also {
+                it.window?.setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            }
         }
 
         binding.photosRecycler.layoutManager =

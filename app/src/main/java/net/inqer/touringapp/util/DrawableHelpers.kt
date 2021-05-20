@@ -129,7 +129,7 @@ object DrawableHelpers {
         return drawable
     }
 
-    fun showPhotoDialog(context: Context, imageUrl: String) {
+    fun showPhotoDialog(context: Context, imageUrl: String): AlertDialog {
 
         val inflater = context.getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
@@ -148,7 +148,8 @@ object DrawableHelpers {
             dialog.dismiss()
         }
         imageDialog.create()
-        imageDialog.show()
+
+        return imageDialog.show()
     }
 }
 
