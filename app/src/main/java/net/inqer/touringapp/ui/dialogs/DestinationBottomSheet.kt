@@ -16,11 +16,11 @@ import net.inqer.touringapp.databinding.DialogDestinationDetailsBinding
 import net.inqer.touringapp.util.DrawableHelpers
 import net.inqer.touringapp.util.MarginItemDecoration
 
-class DestinationBottomSheet(
-    private val onDismiss: () -> Unit
-) : BottomSheetDialogFragment() {
+class DestinationBottomSheet : BottomSheetDialogFragment() {
 
     private lateinit var binding: DialogDestinationDetailsBinding
+
+    lateinit var onClose: () -> Unit
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,7 +57,7 @@ class DestinationBottomSheet(
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        onDismiss()
+        if (::onClose.isInitialized) onClose()
     }
 
     private fun initRecyclerView(list: List<DestinationPhoto>) {
@@ -93,15 +93,15 @@ class DestinationBottomSheet(
         private const val DESCRIPTION = "DESCRIPTION"
         private const val PHOTOS = "PHOTOS"
 
-        fun newInstance(destination: Destination, onClose: () -> Unit): DestinationBottomSheet =
-            DestinationBottomSheet(onClose).apply {
+        fun newInstance(destination: Destination, onDismiss: () -> Unit): DestinationBottomSheet =
+            DestinationBottomSheet().apply {
                 val bundle = Bundle().apply {
                     putString(TITLE, destination.title)
                     putString(DESCRIPTION, destination.description)
                     putParcelableArrayList(PHOTOS, ArrayList(destination.destinationPhotos))
                 }
                 this.arguments = bundle
-                this.onSaveInstanceState(bundle)
+                this.onClose = onDismiss
             }
     }
 }
