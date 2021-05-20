@@ -31,24 +31,19 @@ class MapViewModel @Inject constructor(
         @ActiveTourRouteFlow private val activeTourRouteFlow: Flow<TourRoute?>,
         val routeDataBus: ActiveRouteDataBus
 ) : ViewModel() {
-    private val _mutableCurrentLocation: MutableLiveData<GeoPoint?> = MutableLiveData()
+    private val _mutableCurrentLocation: MutableLiveData<Location?> = MutableLiveData()
 
     private var lastLocation: Location? = null
 
-    private var lastLocationPoint: GeoPoint? = null
-
     fun updateLocation(location: Location?) {
         lastLocation = location
-        lastLocationPoint = GeoPoint(location)
 
-        _mutableCurrentLocation.value = lastLocationPoint
-
-        Log.d(TAG, "updateLocation: $lastLocation ; $lastLocationPoint")
+        _mutableCurrentLocation.value = lastLocation
     }
 
     val activeTourRoute: LiveData<TourRoute?> = activeTourRouteFlow.asLiveData(dispatchers.io)
 
-    val currentLocation: LiveData<GeoPoint?> = _mutableCurrentLocation
+    val currentLocation: LiveData<Location?> = _mutableCurrentLocation
 
 
     fun nextWaypoint(context: Context) = RouteService.nextWaypoint(context)

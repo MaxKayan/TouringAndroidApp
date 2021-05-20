@@ -188,7 +188,7 @@ class MapFragment : Fragment() {
         binding.fabMyLocation.setOnClickListener {
             viewModel.currentLocation.value.let {
                 binding.map.controller.animateTo(
-                    it,
+                    GeoPoint(it),
                     LOCATION_ZOOM,
                     LOCATION_ZOOM_SPEED
                 )
@@ -232,6 +232,7 @@ class MapFragment : Fragment() {
 
         viewModel.currentLocation.observe(owner) {
             updateTargetLine()
+            binding.speedValue.text = it?.speed.toString()
         }
 
         viewModel.routeDataBus.targetWaypoint.observe(owner) { waypoint ->
@@ -312,7 +313,7 @@ class MapFragment : Fragment() {
 
     private fun updateTargetLine(target: GeoPoint) {
         viewModel.currentLocation.value?.let { location ->
-            targetPolyline.setPoints(listOf(location, target))
+            targetPolyline.setPoints(listOf(GeoPoint(location), target))
             binding.map.postInvalidate() // Force map to redraw
         }
     }

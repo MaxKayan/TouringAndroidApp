@@ -28,17 +28,29 @@
             android:layout_height="wrap_content">
 
             <TextView
-                style="@style/TextAppearance.MaterialComponents.Body1"
                 android:id="@+id/active_route_title"
+                style="@style/TextAppearance.MaterialComponents.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginStart="12dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="Подольские курсанты"/>
+                tools:text="Подольские курсанты" />
+
+            <TextView
+                style="@style/TextAppearance.MaterialComponents.Body2"
+                android:id="@+id/speed_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="12dp"
+                app:layout_constraintRight_toLeftOf="@id/toolbar_divider"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="67" />
 
             <View
+                android:id="@+id/toolbar_divider"
                 android:layout_width="1dp"
                 android:layout_height="0dp"
                 android:background="@android:color/darker_gray"
@@ -48,10 +60,10 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_extras_menu"
-                android:background="?android:selectableItemBackground"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="end"
+                android:background="?android:selectableItemBackground"
                 app:icon="@drawable/ic_baseline_menu_24"
                 app:iconGravity="textTop"
                 app:iconPadding="0dp"

@@ -37,4 +37,6 @@
     <string name="destination_photo">Destination photo</string>
     <string name="full_image">Full image</string>
     <string name="sheet_handle_icon">Sheet handle icon</string>
+    <string name="active_route_icon">Active route icon</string>
+    <string name="gradient">Gradient</string>
 </resources>
