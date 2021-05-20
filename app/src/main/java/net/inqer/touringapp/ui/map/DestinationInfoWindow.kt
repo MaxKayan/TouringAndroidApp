@@ -4,17 +4,18 @@ import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.Toast
 import net.inqer.touringapp.data.models.Destination
 import net.inqer.touringapp.databinding.DestinationInfoWindowBinding
-import net.inqer.touringapp.ui.map.overlays.CirclePlottingOverlay
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.infowindow.InfoWindow
 
 class DestinationInfoWindow(
-        private val binding: DestinationInfoWindowBinding,
-        mapView: MapView,
-        private val destination: Destination
+    private val binding: DestinationInfoWindowBinding,
+    mapView: MapView,
+    private val destination: Destination,
+    private val onDetailsClick: View.OnClickListener,
+    private val onOpenCallback: () -> Unit,
+    private val onCloseCallback: () -> Unit
 ) : InfoWindow(binding.root, mapView) {
 //    constructor(layoutResId: Int, mapView: MapView?) : super(layoutResId, mapView)
 //    constructor(v: View?, mapView: MapView?) : super(v, mapView)
@@ -22,27 +23,29 @@ class DestinationInfoWindow(
 
     private val context = binding.root.context
 
-    private val openAnimation = AnimationUtils.loadAnimation(context, android.R.anim.fade_in)
-    private val closeAnimation = AnimationUtils.loadAnimation(context, android.R.anim.fade_out)
-
-    private var rangeCircle: CirclePlottingOverlay? = null
+    private val openAnimation =
+        AnimationUtils.loadAnimation(context, android.R.anim.fade_in).apply {
+            this.duration = 200L
+        }
+    private val closeAnimation =
+        AnimationUtils.loadAnimation(context, android.R.anim.fade_out).apply {
+            this.duration = 200L
+        }
 
     override fun onOpen(item: Any?) {
         binding.root.visibility = View.INVISIBLE
         binding.title.text = destination.title
         binding.description.text = destination.description
-        Log.d(TAG, "onOpen: $this ; $item")
 
         binding.root.startAnimation(openAnimation)
         binding.root.visibility = View.VISIBLE
 
         binding.root.setOnClickListener {
-            Log.d(TAG, "onOpen: click: $it")
         }
 
-        binding.btnDetails.setOnClickListener {
-            Toast.makeText(context, "$destination ; ${destination.type}", Toast.LENGTH_SHORT).show()
-        }
+        binding.btnDetails.setOnClickListener(onDetailsClick)
+
+        onOpenCallback()
     }
 
     override fun close() {
@@ -67,6 +70,7 @@ class DestinationInfoWindow(
     }
 
     override fun onClose() {
+        onCloseCallback()
 //        binding.root.visibility = View.VISIBLE
 //        binding.root.startAnimation(closeAnimation)
     }

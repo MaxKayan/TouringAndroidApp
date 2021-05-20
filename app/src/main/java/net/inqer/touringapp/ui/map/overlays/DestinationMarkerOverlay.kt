@@ -2,14 +2,15 @@ package net.inqer.touringapp.ui.map.overlays
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.util.Log
+import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import net.inqer.touringapp.R
 import net.inqer.touringapp.data.models.Destination
 import net.inqer.touringapp.util.DrawableHelpers
+import net.inqer.touringapp.util.getThemeColor
 import org.osmdroid.util.TileSystem
 import org.osmdroid.views.MapView
 import org.osmdroid.views.Projection
@@ -28,42 +29,48 @@ class DestinationMarkerOverlay(
 //        isFilterBitmap = true
 //    }
 
+    private val defaultColor = context.getThemeColor(R.attr.colorPrimary)
+    private val activeColor = ContextCompat.getColor(context, R.color.active_marker)
+    private val disabledColor = ContextCompat.getColor(context, android.R.color.darker_gray)
+
     private val circlePaint = Paint().apply {
-        this.color = ContextCompat.getColor(context, R.color.active_marker)
+        this.color = defaultColor
         this.isAntiAlias = true
         this.alpha = 50
         this.style = Paint.Style.FILL
     }
     private val circleOutlinePaint = Paint().apply {
-        this.color = ContextCompat.getColor(context, R.color.active_marker)
+        this.color = defaultColor
         this.isAntiAlias = true
         this.alpha = 150
         this.style = Paint.Style.STROKE
     }
 
-    var drawRangeEnabled = true
+    var drawRangeEnabled = false
+
+    var detailsViewed = false
 
     var status: Destination.Companion.DestinationStatus =
         Destination.Companion.DestinationStatus.EMPTY
         set(value) {
-            if (value == status) return
+            if (value == field) {
+                Log.w(TAG, "status: new status is the same, skipping... ; $value ; $field")
+                return
+            }
 
             when (value) {
                 Destination.Companion.DestinationStatus.UNVISITED,
                 Destination.Companion.DestinationStatus.EMPTY -> {
-                    icon = DrawableHelpers.getThemePaintedDrawable(
-                        context, ICON_RES, R.attr.colorPrimary
-                    )
+                    icon = DrawableHelpers.getPaintedDrawable(context, ICON_RES, defaultColor)
+                    setRangeCircleColor(defaultColor)
                 }
                 Destination.Companion.DestinationStatus.ACTIVE -> {
-                    icon = DrawableHelpers.getResPaintedDrawable(
-                        context, ICON_RES, R.color.active_marker
-                    )
+                    icon = DrawableHelpers.getPaintedDrawable(context, ICON_RES, activeColor)
+                    setRangeCircleColor(activeColor)
                 }
                 Destination.Companion.DestinationStatus.VISITED -> {
-                    icon = DrawableHelpers.getResPaintedDrawable(
-                        context, ICON_RES, android.R.color.darker_gray
-                    )
+                    icon = DrawableHelpers.getPaintedDrawable(context, ICON_RES, disabledColor)
+                    setRangeCircleColor(disabledColor)
                 }
             }
 
@@ -77,6 +84,18 @@ class DestinationMarkerOverlay(
         // Sets initial status and marker's icon
         status = Destination.Companion.DestinationStatus.UNVISITED
         alpha = ALPHA
+    }
+
+
+    private fun setRangeCircleColor(@ColorInt color: Int) {
+        circlePaint.apply {
+            this.color = color
+            this.alpha = 50
+        }
+        circleOutlinePaint.apply {
+            this.color = color
+            this.alpha = 150
+        }
     }
 
 

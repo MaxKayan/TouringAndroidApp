@@ -3,9 +3,10 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        maven { url "https://www.jitpack.io" }
     }
 
-    ext.kotlinVersion = '1.4.32'
+    ext.kotlinVersion = '1.5.0'
     ext.hilt_version = '2.33-beta'
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.1'
@@ -22,6 +23,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven { url "https://www.jitpack.io" }
     }
 }
 

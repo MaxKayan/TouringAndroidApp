@@ -1,6 +1,7 @@
 package net.inqer.touringapp.util
 
 import android.content.Context
+import android.content.Context.LAYOUT_INFLATER_SERVICE
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.PorterDuff
@@ -8,13 +9,19 @@ import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.Drawable
 import android.util.Log
 import android.util.TypedValue
+import android.view.LayoutInflater
+import android.view.View
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import net.inqer.touringapp.databinding.DialogFullImageViewBinding
+
 
 object DrawableHelpers {
     private const val TAG = "DrawableHelper"
@@ -103,7 +110,7 @@ object DrawableHelpers {
             mode
         )
 
-    private fun getPaintedDrawable(
+    fun getPaintedDrawable(
         context: Context,
         @DrawableRes drawableRes: Int,
         @ColorInt color: Int = Color.WHITE,
@@ -120,6 +127,29 @@ object DrawableHelpers {
         drawable.alpha = alpha
 
         return drawable
+    }
+
+    fun showPhotoDialog(context: Context, imageUrl: String): AlertDialog {
+
+        val inflater = context.getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+        val binding = DialogFullImageViewBinding.inflate(inflater)
+
+        val layout: View = binding.root
+
+        Glide.with(context)
+            .load(imageUrl)
+            .placeholder(android.R.drawable.progress_indeterminate_horizontal)
+            .into(binding.fullImageView)
+
+        val imageDialog: AlertDialog.Builder = AlertDialog.Builder(context)
+        imageDialog.setView(layout)
+        imageDialog.setPositiveButton(android.R.string.ok) { dialog, _ ->
+            dialog.dismiss()
+        }
+        imageDialog.create()
+
+        return imageDialog.show()
     }
 }
 

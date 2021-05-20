@@ -34,4 +34,7 @@
     <string name="key_location_poll_interval">LOCATION_POLL_INTERVAL</string>
     <string name="key_location_waypoint_radius">LOCATION_WAYPOINT_RADIUS</string>
     <string name="key_always_shorten_path">Всегда сокращать путь</string>
+    <string name="destination_photo">Destination photo</string>
+    <string name="full_image">Full image</string>
+    <string name="sheet_handle_icon">Sheet handle icon</string>
 </resources>
