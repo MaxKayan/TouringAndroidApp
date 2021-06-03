@@ -186,7 +186,7 @@ class MapFragment : Fragment() {
     private fun setupButtonClickListeners() {
         val context: Context = binding.root.context
         binding.fabMyLocation.setOnClickListener {
-            viewModel.currentLocation.value.let {
+            viewModel.currentLocation.value?.let {
                 binding.map.controller.animateTo(
                     GeoPoint(it),
                     LOCATION_ZOOM,
