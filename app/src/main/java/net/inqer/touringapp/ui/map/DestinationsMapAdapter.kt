@@ -34,7 +34,7 @@ class DestinationsMapAdapter(
     fun submitList(list: List<Destination>) {
         currentList = list
 
-        clearMarkers()
+        removeAllMarkers()
 
         for (destination in list) {
             val marker = DestinationMarkerOverlay(map, destination).apply {
@@ -158,9 +158,9 @@ class DestinationsMapAdapter(
     }
 
 
-    private fun clearMarkers() {
-        for (index in overlaysMap.keys) {
-            map.overlayManager.removeAt(index)
+    fun removeAllMarkers() {
+        for (marker in overlaysMap.values) {
+            map.overlayManager.remove(marker)
         }
         overlaysMap.clear()
     }
