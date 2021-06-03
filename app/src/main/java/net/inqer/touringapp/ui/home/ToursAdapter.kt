@@ -55,7 +55,7 @@ class ToursAdapter constructor(
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onBindViewHolder(holder: TourViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), dateFormat)
     }
 
     private val revealedStates: HashMap<Long, Boolean> = HashMap()
@@ -153,9 +153,9 @@ class ToursAdapter constructor(
             }
 
             @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-            fun bind(tour: TourRoute) {
+            fun bind(tour: TourRoute, dateFormat: DateFormat) {
                 binding.title.text = tour.title
-                binding.secondaryText.text = tour.createdAt.toString()
+                binding.secondaryText.text = dateFormat.format(tour.createdAt)
                 binding.supportingText.text = tour.description
 
                 val activeIndicatorVisibility = if (tour.isActive) View.VISIBLE else View.INVISIBLE
@@ -184,7 +184,6 @@ class ToursAdapter constructor(
                 binding.btnStart.text = launchText
                 binding.btnStart.icon = launchIcon
 
-//                binding.btnStart.iconTint = iconTint
                 binding.btnStart.also {
                     modifyButtonIcon(it, launchIcon, context.getThemeColor(R.attr.colorPrimary))
                 }
@@ -192,7 +191,6 @@ class ToursAdapter constructor(
                 binding.innerBtnStart.setOnClickListener(launchClick)
                 binding.innerBtnStart.text = launchText
                 binding.innerBtnStart.icon = launchIcon
-//                binding.innerBtnStart.iconTint = ColorStateList.valueOf(Color.WHITE)
 
                 binding.innerTitle.text = tour.title
                 binding.innerSubtitle.text = tour.createdAt.toString()
