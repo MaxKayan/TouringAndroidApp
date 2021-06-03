@@ -44,7 +44,6 @@ class DestinationBottomSheet : BottomSheetDialogFragment() {
 
         arguments?.let {
             binding.title.text = it.getString(TITLE)
-//            binding.address.text = "🗺 ${it.getString(ADDRESS)}"
             binding.address.text =
                 context?.getString(R.string.destination_address, it.getString(ADDRESS))
             binding.shortDescription.text = it.getString(SHORT_DESCRIPTION)

@@ -75,7 +75,6 @@ class ToursAdapter constructor(
         revealedStates.filter { it.value && it.key != id }.forEach { entry ->
             val holder = recyclerView.findViewHolderForItemId(entry.key) as TourViewHolder?
             Log.d(TAG, "closeOthers: holder - $holder")
-//            holder?.performCardReveal(getItem(holder.adapterPosition))
 
             if (holder != null) {
                 holder.performCardReveal(getItem(holder.adapterPosition))
@@ -340,7 +339,6 @@ class ToursAdapter constructor(
                 }
 
                 override fun areContentsTheSame(oldItem: TourRoute, newItem: TourRoute): Boolean {
-//                if (oldItem.id != newItem.id) return false
                     if (oldItem.title != newItem.title) return false
                     if (oldItem.description != newItem.description) return false
                     if (oldItem.image != newItem.image) return false

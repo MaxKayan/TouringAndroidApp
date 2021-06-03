@@ -17,9 +17,6 @@ class DestinationInfoWindow(
     private val onOpenCallback: () -> Unit,
     private val onCloseCallback: () -> Unit
 ) : InfoWindow(binding.root, mapView) {
-//    constructor(layoutResId: Int, mapView: MapView?) : super(layoutResId, mapView)
-//    constructor(v: View?, mapView: MapView?) : super(v, mapView)
-//    constructor(binding: DestinationInfoWindowBinding, mapView: MapView?) : super()
 
     private val context = binding.root.context
 
@@ -71,8 +68,6 @@ class DestinationInfoWindow(
 
     override fun onClose() {
         onCloseCallback()
-//        binding.root.visibility = View.VISIBLE
-//        binding.root.startAnimation(closeAnimation)
     }
 
     companion object {
