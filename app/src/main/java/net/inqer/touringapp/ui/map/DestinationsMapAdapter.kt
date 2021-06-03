@@ -159,6 +159,7 @@ class DestinationsMapAdapter(
 
 
     fun removeAllMarkers() {
+        closeAllInfoWindows()
         for (marker in overlaysMap.values) {
             map.overlayManager.remove(marker)
         }
