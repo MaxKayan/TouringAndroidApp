@@ -27,6 +27,16 @@
         app:layout_constraintTop_toBottomOf="@id/sheet_pill"
         tools:text="My point" />
 
+    <TextView
+        android:id="@+id/address"
+        style="@style/TextAppearance.MaterialComponents.Subtitle2"
+        android:layout_width="@dimen/info_window_content_width"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        tools:text="Address" />
+
     <View
         android:id="@+id/h_line"
         android:layout_width="0dp"
@@ -35,7 +45,17 @@
         android:background="@android:color/darker_gray"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title" />
+        app:layout_constraintTop_toBottomOf="@id/address" />
+
+    <TextView
+        android:id="@+id/short_description"
+        style="@style/TextAppearance.MaterialComponents.Subtitle1"
+        android:layout_width="@dimen/info_window_content_width"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/h_line"
+        tools:text="Short description goes here" />
 
     <TextView
         android:id="@+id/description"
@@ -44,7 +64,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/h_line"
+        app:layout_constraintTop_toBottomOf="@id/short_description"
         tools:text="Description goes here" />
 
     <androidx.recyclerview.widget.RecyclerView

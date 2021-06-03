@@ -39,11 +39,15 @@ class DestinationBottomSheet : BottomSheetDialogFragment() {
             val bottomSheetInternal =
                 d.findViewById<View>(R.id.design_bottom_sheet)
             bottomSheetInternal?.minimumHeight =
-                Resources.getSystem().displayMetrics.heightPixels
+                Resources.getSystem().displayMetrics.heightPixels / 4
         }
 
         arguments?.let {
             binding.title.text = it.getString(TITLE)
+//            binding.address.text = "🗺 ${it.getString(ADDRESS)}"
+            binding.address.text =
+                context?.getString(R.string.destination_address, it.getString(ADDRESS))
+            binding.shortDescription.text = it.getString(SHORT_DESCRIPTION)
             binding.description.text = it.getString(DESCRIPTION)
 
             val photos = it.getParcelableArrayList<DestinationPhoto>(PHOTOS)
@@ -83,13 +87,14 @@ class DestinationBottomSheet : BottomSheetDialogFragment() {
         binding.photosRecycler.setHasFixedSize(true)
         binding.photosRecycler.adapter = adapter
 
-
         adapter.submitList(list)
     }
 
     companion object {
         private const val TAG = "DestinationBottomSheet"
         private const val TITLE = "TITLE"
+        private const val ADDRESS = "ADDRESS"
+        private const val SHORT_DESCRIPTION = "SHORT_DESCRIPTION"
         private const val DESCRIPTION = "DESCRIPTION"
         private const val PHOTOS = "PHOTOS"
 
@@ -97,6 +102,8 @@ class DestinationBottomSheet : BottomSheetDialogFragment() {
             DestinationBottomSheet().apply {
                 val bundle = Bundle().apply {
                     putString(TITLE, destination.title)
+                    putString(ADDRESS, destination.address)
+                    putString(SHORT_DESCRIPTION, destination.shortDescription)
                     putString(DESCRIPTION, destination.description)
                     putParcelableArrayList(PHOTOS, ArrayList(destination.destinationPhotos))
                 }

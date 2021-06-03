@@ -16,6 +16,8 @@
     <string name="lets_go">Начать!</string>
     <string name="cancel">Отмена</string>
 
+    <string name="destination_address">🗺 %1$s</string>
+
     <string name="tour_length">🗺 Протяжённость - %1$f км.</string>
     <string name="n_waypoints">📍 %1$d маршрутных точек</string>
     <string name="estimated_n_minutes">🕑 Примерно %1$f минут пешком</string>

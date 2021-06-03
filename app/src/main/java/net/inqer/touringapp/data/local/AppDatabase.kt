@@ -9,7 +9,7 @@ import net.inqer.touringapp.data.models.TourRoute
 
 @Database(
         entities = [TourRoute::class],
-        version = 6,
+        version = 7,
         exportSchema = false
 )
 @TypeConverters(MainTypeConverters::class)

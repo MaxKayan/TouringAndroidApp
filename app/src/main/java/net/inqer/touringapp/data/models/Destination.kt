@@ -10,7 +10,6 @@ data class Destination(
     @SerializedName("pk")
     val id: Long,
 
-    val description: String,
     val latitude: Double,
     val longitude: Double,
 
@@ -24,6 +23,11 @@ data class Destination(
 
     val title: String,
     val type: String,
+
+    @SerializedName("short_description")
+    val shortDescription: String?,
+    val description: String?,
+    val address: String?,
 
     @SerializedName("created_at")
     val createdAt: Date,

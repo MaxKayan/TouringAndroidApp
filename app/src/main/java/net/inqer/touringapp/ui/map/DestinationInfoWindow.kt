@@ -35,7 +35,7 @@ class DestinationInfoWindow(
     override fun onOpen(item: Any?) {
         binding.root.visibility = View.INVISIBLE
         binding.title.text = destination.title
-        binding.description.text = destination.description
+        binding.description.text = destination.shortDescription
 
         binding.root.startAnimation(openAnimation)
         binding.root.visibility = View.VISIBLE
