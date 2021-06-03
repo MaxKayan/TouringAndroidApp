@@ -47,6 +47,13 @@ class DestinationsMapAdapter(
 
                     closeAllInfoWindows()
                     this.showInfoWindow()
+                    val currentZoom = map.zoomLevelDouble
+                    Log.d(TAG, "submitList: zoomLevelDouble = $currentZoom")
+                    map.controller.animateTo(
+                        position,
+                        if (currentZoom < 16.0) 16.0 else currentZoom,
+                        1000L
+                    )
                     Log.d(TAG, "submitList: $marker")
                     true
                 }
