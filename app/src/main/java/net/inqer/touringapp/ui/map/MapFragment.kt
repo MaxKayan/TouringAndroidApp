@@ -207,9 +207,11 @@ class MapFragment : Fragment() {
     private fun subscribeObservers(owner: LifecycleOwner) {
         viewModel.activeTourRoute.observe(owner) { route ->
             if (route == null) {
+                destinationsAdapter.removeAllMarkers()
                 clearWaypointsPolyline()
                 binding.activeRouteTitle.text = null
                 popupMenu?.let { it.menu.findItem(R.id.menu_cancel_route)?.isVisible = false }
+                binding.map.postInvalidate()
                 return@observe
             }
 
